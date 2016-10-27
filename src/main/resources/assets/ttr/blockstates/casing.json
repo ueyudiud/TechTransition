@@ -1,0 +1,95 @@
+{
+	"forge_marker":1,
+	"defaults": {
+		"transform": "forge:default-block",
+		"model": "cube_bottom_top"
+	},
+	"variants": {
+		"type": {
+			"brass": {
+				"textures": { 
+					"top": "ttr:blocks/casing/brass",
+					"side": "ttr:blocks/casing/brass",
+					"bottom": "ttr:blocks/casing/brass"
+				}
+			},
+			"bronze": {
+				"textures": { 
+					"top": "ttr:blocks/casing/bronze",
+					"side": "ttr:blocks/casing/bronze",
+					"bottom": "ttr:blocks/casing/bronze"
+				}
+			},
+            "aluminium": {
+                "textures": { 
+                    "top": "ttr:blocks/casing/aluminium",
+                    "side": "ttr:blocks/casing/aluminium",
+                    "bottom": "ttr:blocks/casing/aluminium"
+                }
+            },
+            "iron": {
+                "textures": { 
+                    "top": "ttr:blocks/casing/iron",
+                    "side": "ttr:blocks/casing/iron",
+                    "bottom": "ttr:blocks/casing/iron"
+                }
+            },
+			"steel": {
+				"textures": { 
+					"top": "ttr:blocks/casing/steel",
+					"side": "ttr:blocks/casing/steel",
+					"bottom": "ttr:blocks/casing/steel"
+				}
+			},
+			"stainless_steel": {
+				"textures": { 
+					"top": "ttr:blocks/casing/stainless_steel",
+					"side": "ttr:blocks/casing/stainless_steel",
+					"bottom": "ttr:blocks/casing/stainless_steel"
+				}
+			},
+			"titanium": {
+				"textures": { 
+					"top": "ttr:blocks/casing/titanium",
+					"side": "ttr:blocks/casing/titanium",
+					"bottom": "ttr:blocks/casing/titanium"
+				}
+			},
+			"tungstensteel": {
+				"textures": { 
+					"top": "ttr:blocks/casing/tungstensteel",
+					"side": "ttr:blocks/casing/tungstensteel",
+					"bottom": "ttr:blocks/casing/tungstensteel"
+				}
+			},
+			"advanced": {
+				"textures": { 
+					"top": "ttr:blocks/casing/advanced",
+					"side": "ttr:blocks/casing/advanced",
+					"bottom": "ttr:blocks/casing/advanced"
+				}
+			},
+			"highly_advanced": {
+				"textures": { 
+					"top": "ttr:blocks/casing/highly_advanced",
+					"side": "ttr:blocks/casing/highly_advanced",
+					"bottom": "ttr:blocks/casing/highly_advanced"
+				}
+			},
+			"bronze_brick": {
+				"textures": { 
+					"top": "ttr:blocks/casing/bronze",
+					"side": "ttr:blocks/casing/bronze_brick_side",
+					"bottom": "ttr:blocks/casing/brick_bottom"
+				}
+			},
+			"steel_brick": {
+				"textures": { 
+					"top": "ttr:blocks/casing/steel",
+					"side": "ttr:blocks/casing/steel_brick_side",
+					"bottom": "ttr:blocks/casing/brick_bottom"
+				}
+			}
+		}
+	}
+}

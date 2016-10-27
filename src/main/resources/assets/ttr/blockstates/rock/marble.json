@@ -1,0 +1,20 @@
+{
+	"forge_marker":1,
+	"defaults": {
+		"transform": "forge:default-block",
+		"model": "cube_all"
+	},
+	"variants": {
+		"rock_type": {
+			"resource" : { "textures": { "all": "ttr:blocks/rock/marble/resource" } },
+			"cobble": { "textures": { "all": "ttr:blocks/rock/marble/cobble" } },
+			"smoothed": { "textures": { "all": "ttr:blocks/rock/marble/smoothed" } },
+			"mossy": { "textures": { "all": "ttr:blocks/rock/marble/mossy" } },
+			"brick": { "textures": { "all": "ttr:blocks/rock/marble/brick" } },
+			"brick_crushed": { "textures": { "all": "ttr:blocks/rock/marble/brick_crushed" } },
+			"brick_mossy": { "textures": { "all": "ttr:blocks/rock/marble/brick_mossy" } },
+			"brick_compacted": { "textures": { "all": "ttr:blocks/rock/marble/brick_compacted" } },
+			"chiseled": { "textures": { "all": "ttr:blocks/rock/marble/chiseled" } }
+		}
+	}
+}

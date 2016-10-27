@@ -1,0 +1,62 @@
+{
+   "forge_marker":1,
+   "defaults": {
+        "transform":"forge:default-block",
+        "model":"ttr:base",
+        "textures": {
+            "back": "ttr:blocks/machine/steam/bronze/side",
+            "left": "ttr:blocks/machine/steam/bronze/side",
+            "right": "ttr:blocks/machine/steam/bronze/side"
+        }
+    },
+	"variants": {
+        "facing_primary": {
+            "north": { 
+				"y":180,
+				"textures": {
+					"top": "ttr:blocks/machine/steam/bronze/top",
+					"front": "ttr:blocks/machine/steam/bronze/hatch_side",
+					"bottom": "ttr:blocks/machine/steam/bronze/bottom"
+				}
+			},
+            "east" : { 
+				"y":270,
+				"textures": {
+					"top": "ttr:blocks/machine/steam/bronze/top",
+					"front": "ttr:blocks/machine/steam/bronze/hatch_side",
+					"bottom": "ttr:blocks/machine/steam/bronze/bottom"
+				}
+			},
+            "south": { 
+				"y":0,
+				"textures": {
+					"top": "ttr:blocks/machine/steam/bronze/top",
+					"front": "ttr:blocks/machine/steam/bronze/hatch_side",
+					"bottom": "ttr:blocks/machine/steam/bronze/bottom"
+				}
+			},
+            "west" : { 
+				"y":90,
+				"textures": {
+					"top": "ttr:blocks/machine/steam/bronze/top",
+					"front": "ttr:blocks/machine/steam/bronze/hatch_side",
+					"bottom": "ttr:blocks/machine/steam/bronze/bottom"
+				}
+			},
+			"up": {
+				"textures": {
+					"top": "ttr:blocks/machine/steam/bronze/hatch_top",
+					"front": "ttr:blocks/machine/steam/bronze/side",
+					"bottom": "ttr:blocks/machine/steam/bronze/bottom"
+				}
+			},
+			"down": {
+				"textures": {
+					"top": "ttr:blocks/machine/steam/bronze/top",
+					"front": "ttr:blocks/machine/steam/bronze/side",
+					"bottom": "ttr:blocks/machine/steam/bronze/hatch_bottom"
+				}
+			}
+        }
+    }
+}

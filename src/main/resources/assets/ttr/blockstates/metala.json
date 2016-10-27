@@ -1,0 +1,21 @@
+{
+	"forge_marker":1,
+	"defaults": {
+		"transform": "forge:default-block",
+		"model": "cube_all"
+	},
+    "variants": {
+		"type": {
+			"aluminium": { "textures": { "all": "ttr:blocks/metal/aluminium" } },
+			"titanium":  { "textures": { "all": "ttr:blocks/metal/titanium"  } },
+			"chromium":  { "textures": { "all": "ttr:blocks/metal/chromium"  } },
+			"nickel":    { "textures": { "all": "ttr:blocks/metal/nickel"    } },
+			"zinc":      { "textures": { "all": "ttr:blocks/metal/zinc"      } },
+			"silver":    { "textures": { "all": "ttr:blocks/metal/silver"    } },
+			"tungsten":  { "textures": { "all": "ttr:blocks/metal/tungsten"  } },
+			"osmium":    { "textures": { "all": "ttr:blocks/metal/osmium"    } },
+			"iridium":   { "textures": { "all": "ttr:blocks/metal/iridium"   } },
+			"platinum":  { "textures": { "all": "ttr:blocks/metal/platinum"  } }
+		}
+    }
+}

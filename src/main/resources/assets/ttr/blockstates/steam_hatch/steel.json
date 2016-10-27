@@ -1,0 +1,62 @@
+{
+   "forge_marker":1,
+   "defaults": {
+        "transform":"forge:default-block",
+        "model":"ttr:base",
+        "textures": {
+            "back": "ttr:blocks/machine/steam/steel/side",
+            "left": "ttr:blocks/machine/steam/steel/side",
+            "right": "ttr:blocks/machine/steam/steel/side"
+        }
+    },
+	"variants": {
+        "facing_primary": {
+            "north": { 
+				"y":180,
+				"textures": {
+					"top": "ttr:blocks/machine/steam/steel/top",
+					"front": "ttr:blocks/machine/steam/steel/hatch_side",
+					"bottom": "ttr:blocks/machine/steam/steel/bottom"
+				}
+			},
+            "east" : { 
+				"y":270,
+				"textures": {
+					"top": "ttr:blocks/machine/steam/steel/top",
+					"front": "ttr:blocks/machine/steam/steel/hatch_side",
+					"bottom": "ttr:blocks/machine/steam/steel/bottom"
+				}
+			},
+            "south": { 
+				"y":0,
+				"textures": {
+					"top": "ttr:blocks/machine/steam/steel/top",
+					"front": "ttr:blocks/machine/steam/steel/hatch_side",
+					"bottom": "ttr:blocks/machine/steam/steel/bottom"
+				}
+			},
+            "west" : { 
+				"y":90,
+				"textures": {
+					"top": "ttr:blocks/machine/steam/steel/top",
+					"front": "ttr:blocks/machine/steam/steel/hatch_side",
+					"bottom": "ttr:blocks/machine/steam/steel/bottom"
+				}
+			},
+			"up": {
+				"textures": {
+					"top": "ttr:blocks/machine/steam/steel/hatch_top",
+					"front": "ttr:blocks/machine/steam/steel/side",
+					"bottom": "ttr:blocks/machine/steam/steel/bottom"
+				}
+			},
+			"down": {
+				"textures": {
+					"top": "ttr:blocks/machine/steam/steel/top",
+					"front": "ttr:blocks/machine/steam/steel/side",
+					"bottom": "ttr:blocks/machine/steam/steel/hatch_bottom"
+				}
+			}
+        }
+    }
+}

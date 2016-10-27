@@ -1,0 +1,16 @@
+{
+	"parent": "block/block",
+	"elements": [
+		{ 
+			"from": [ 5, 0, 5 ],
+			"to": [ 11, 5, 11 ],
+			"faces": {
+				"down":  { "uv": [  5, 5,11,11 ], "texture": "#pipe_connected", "cullface": "down" },
+				"north": { "uv": [  5, 0, 5, 0 ], "texture": "#pipe" },
+				"south": { "uv": [  5,11,11,16 ], "texture": "#pipe" },
+				"west":  { "uv": [  5, 0,11, 5 ], "texture": "#pipe" },
+				"east":  { "uv": [  5,11,11,16 ], "texture": "#pipe" }
+			}
+		}
+	]
+}

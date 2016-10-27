@@ -1,0 +1,17 @@
+{
+	"forge_marker":1,
+	"defaults": {
+		"transform": "forge:default-block",
+		"model": "cube_bottom_top",
+		"textures": {
+			"bottom": "ttr:blocks/machine/furnace_brick_bottom",
+			"side": "ttr:blocks/machine/furnace_brick_side"
+		}
+	},
+	"variants": {
+		"working": {
+			"true" : { "textures": { "top": "ttr:blocks/machine/forge_top_on" } },
+			"false": { "textures": { "top": "ttr:blocks/machine/forge_top_off" } }
+		}
+	}
+}

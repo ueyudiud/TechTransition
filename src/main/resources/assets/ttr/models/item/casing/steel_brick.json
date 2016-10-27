@@ -1,0 +1,8 @@
+{
+    "parent": "block/cube_bottom_top",
+    "textures": {
+        "top": "ttr:blocks/casing/steel",
+        "side": "ttr:blocks/casing/steel_brick_side",
+        "bottom": "ttr:blocks/casing/brick_bottom"
+    }
+}

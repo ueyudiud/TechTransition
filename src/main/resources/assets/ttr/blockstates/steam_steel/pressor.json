@@ -1,0 +1,30 @@
+{
+   "forge_marker":1,
+   "defaults": {
+		"transform":"forge:default-block",
+		"model":"ttr:base",
+		"textures": {
+			"top": "ttr:blocks/machine/steam/steel/top",
+			"back": "ttr:blocks/machine/steam/steel/side",
+			"left": "ttr:blocks/machine/steam/steel/side",
+			"right": "ttr:blocks/machine/steam/steel/side",
+			"bottom": "ttr:blocks/machine/steam/steel/bottom"
+		}
+	},
+   "variants": {
+		"facing_primary": {
+			"north": { "y":180 },
+			"east" : { "y":270 },
+			"south": { "y":0   },
+			"west" : { "y":90  }
+		},
+		"working": {
+			"false": {
+				"textures": { "front": "ttr:blocks/machine/steam/steel/pressor_front" }
+			},
+			"true": {
+				"textures": { "front": "ttr:blocks/machine/steam/steel/pressor_front_active" }
+			}
+		}
+	}
+}

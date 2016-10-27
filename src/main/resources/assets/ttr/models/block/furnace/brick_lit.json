@@ -1,0 +1,8 @@
+{
+    "parent": "block/orientable",
+    "textures": {
+        "top": "ttr:blocks/machine/furnace_brick_top",
+        "front": "ttr:blocks/machine/furnace_brick_front_on",
+        "side": "ttr:blocks/machine/furnace_brick_side"
+    }
+}

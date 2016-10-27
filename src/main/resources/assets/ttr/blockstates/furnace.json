@@ -1,0 +1,45 @@
+{
+	"forge_marker":1,
+	"defaults": {
+		"transform": "forge:default-block",
+		"model": "orientable"
+	},
+    "variants": {
+		"facing_primary": {
+			"north": {          },
+			"south": { "y": 180 },
+			"west" : { "y": 270 },
+			"east" : { "y": 90  }
+		},
+		"working": {
+			"true": { "textures": { "front": "#front_on" } },
+			"false": { "textures": { "front": "#front_off" } }
+		},
+		"material": {
+			"stone": {
+				"textures": {
+					"top": "blocks/furnace_top",
+					"front_off": "blocks/furnace_front_off",
+					"front_on": "blocks/furnace_front_on",
+					"side": "blocks/furnace_side"
+				}
+			},
+			"brick": {
+				"textures": {
+					"top": "ttr:blocks/machine/furnace_brick_top",
+					"front_off": "ttr:blocks/machine/furnace_brick_front_off",
+					"front_on": "ttr:blocks/machine/furnace_brick_front_on",
+					"side": "ttr:blocks/machine/furnace_brick_side"
+				}
+			},
+			"obsidian": {
+				"textures": {
+					"top": "ttr:blocks/machine/furnace_obsidian_top",
+					"front_off": "ttr:blocks/machine/furnace_obsidian_front_off",
+					"front_on": "ttr:blocks/machine/furnace_obsidian_front_on",
+					"side": "ttr:blocks/machine/furnace_obsidian_side"
+				}
+			}
+		}
+    }
+}

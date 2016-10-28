@@ -14,7 +14,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import ttr.api.fuel.FuelHandler;
 import ttr.api.fuel.ITTrFuelHandler.FuelInfo;
 import ttr.api.inventory.Inventory;
-import ttr.api.recipe.IRecipeMap;
 import ttr.api.recipe.TemplateRecipeMap;
 import ttr.api.recipe.TemplateRecipeMap.TemplateRecipe;
 import ttr.api.tile.IContainerableTile;
@@ -26,31 +25,31 @@ import ttr.load.TTrLangs;
 public class TEForge extends TEMultiBlockStructureRecipeMapFloatPower implements IContainerableTile
 {
 	private static final int Burning = 16;
-	
+
 	public int temperature = 298;
 	public int maxTemperature = 298;
 	public int currentBurnTime;
 	public int burnTime;
 	public int burnPower;
-	
+
 	public TEForge()
 	{
 		super(3, 3, 0, 0);
 		inventory = new Inventory(1, TTrLangs.forge, 64);
 	}
-
+	
 	@Override
 	protected long getEnergyInput()
 	{
 		return burnPower;
 	}
-
+	
 	@Override
 	protected long getPower()
 	{
 		return burnPower;
 	}
-
+	
 	@Override
 	protected void updateServer()
 	{
@@ -81,26 +80,26 @@ public class TEForge extends TEMultiBlockStructureRecipeMapFloatPower implements
 		}
 		super.updateServer();
 	}
-
+	
 	@Override
 	protected void onMissingStructure()
 	{
 		super.onMissingStructure();
 		initRecipeOutput();
 	}
-
+	
 	@Override
 	protected boolean matchRecipeSpecial(TemplateRecipe recipe)
 	{
 		return temperature >= recipe.customValue;
 	}
-	
+
 	@Override
-	protected IRecipeMap<TemplateRecipe> getRecipeMap()
+	protected TemplateRecipeMap getRecipeMap()
 	{
 		return TemplateRecipeMap.FORGE;
 	}
-
+	
 	private boolean burnFuel()
 	{
 		if(inventory.stacks[0] == null) return false;
@@ -127,13 +126,13 @@ public class TEForge extends TEMultiBlockStructureRecipeMapFloatPower implements
 		}
 		return false;
 	}
-
+	
 	@Override
 	protected boolean useEnergy()
 	{
 		return burnPower >= minPower;
 	}
-
+	
 	@Override
 	protected boolean checkStructure()
 	{
@@ -165,25 +164,25 @@ public class TEForge extends TEMultiBlockStructureRecipeMapFloatPower implements
 		}
 		return true;
 	}
-	
+
 	@SideOnly(Side.CLIENT)
 	public boolean isBurning()
 	{
 		return burnTime > 0;
 	}
-
+	
 	@SideOnly(Side.CLIENT)
 	public boolean isSmelting()
 	{
 		return duration > 0;
 	}
-
+	
 	@Override
 	public int getFieldCount()
 	{
 		return 7;
 	}
-
+	
 	@Override
 	public int getField(int id)
 	{
@@ -199,7 +198,7 @@ public class TEForge extends TEMultiBlockStructureRecipeMapFloatPower implements
 		default: return 0;
 		}
 	}
-
+	
 	@Override
 	public void setField(int id, int value)
 	{
@@ -214,19 +213,19 @@ public class TEForge extends TEMultiBlockStructureRecipeMapFloatPower implements
 		case 6 : temperature = value; break;
 		}
 	}
-	
+
 	@SideOnly(Side.CLIENT)
 	public int getBurnProgress(int scale)
 	{
 		return (int) (scale * (float) burnTime / currentBurnTime);
 	}
-
+	
 	@Override
 	public Container getContainer(EnumFacing side, EntityPlayer player)
 	{
 		return new ContainerForge(player, this);
 	}
-
+	
 	@Override
 	@SideOnly(Side.CLIENT)
 	public GuiContainer getGui(EnumFacing side, EntityPlayer player)

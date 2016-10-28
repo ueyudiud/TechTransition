@@ -1,13 +1,11 @@
 package ttr.core.tile.pipe;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.network.PacketBuffer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.capabilities.Capability;
@@ -27,7 +25,7 @@ public class TEFluidPipe extends TESynchronization
 		{
 			super(facing, tank);
 		}
-
+		
 		@Override
 		public int fill(FluidStack resource, boolean doFill)
 		{
@@ -42,7 +40,7 @@ public class TEFluidPipe extends TESynchronization
 			}
 			return amt;
 		}
-
+		
 		@Override
 		public FluidStack drain(FluidStack resource, boolean doDrain)
 		{
@@ -57,7 +55,7 @@ public class TEFluidPipe extends TESynchronization
 			}
 			return stack;
 		}
-
+		
 		@Override
 		public FluidStack drain(int maxDrain, boolean doDrain)
 		{
@@ -72,9 +70,9 @@ public class TEFluidPipe extends TESynchronization
 			return stack;
 		}
 	}
-	
-	private final IFluidHandler[] handlers;
 
+	private final IFluidHandler[] handlers;
+	
 	protected final long maxTemperature;
 	protected final boolean canCurrentGas;
 	protected final int flowSpeed;
@@ -83,7 +81,7 @@ public class TEFluidPipe extends TESynchronization
 	protected int fluidIOAmount;
 	protected int[] lastFlowAmount = new int[6];
 	protected int[] flowAmount = new int[6];
-	
+
 	public TEFluidPipe(int capacity, long maxTemperature, boolean canCurrentGas, int flowSpeed)
 	{
 		tank = new FluidTank(capacity);
@@ -96,7 +94,7 @@ public class TEFluidPipe extends TESynchronization
 			handlers[i] = new FluidPipeHanlerWrapper(EnumFacing.VALUES[i]);
 		}
 	}
-	
+
 	@Override
 	public void readFromNBT(NBTTagCompound nbt)
 	{
@@ -104,7 +102,7 @@ public class TEFluidPipe extends TESynchronization
 		tank.readFromNBT(nbt.getCompoundTag("tank"));
 		sideLink = nbt.getByte("sideLink");
 	}
-	
+
 	@Override
 	public NBTTagCompound writeToNBT(NBTTagCompound nbt)
 	{
@@ -112,17 +110,17 @@ public class TEFluidPipe extends TESynchronization
 		nbt.setByte("sideLink", sideLink);
 		return super.writeToNBT(nbt);
 	}
-	
+
 	protected boolean isFluidCanStayInPipe(Fluid fluid, FluidStack stack)
 	{
 		return (canCurrentGas || !fluid.isGaseous(stack));
 	}
-	
+
 	protected boolean isFluidCanDestoryPipe(Fluid fluid, FluidStack stack)
 	{
 		return false;
 	}
-	
+
 	public boolean isLink(EnumFacing facing)
 	{
 		if(isSideLinkable(facing))
@@ -133,18 +131,18 @@ public class TEFluidPipe extends TESynchronization
 		}
 		return false;
 	}
-
+	
 	protected boolean isSideLinkable(EnumFacing facing)
 	{
 		return (sideLink & (1 << facing.ordinal())) != 0;
 	}
-
+	
 	public void switchLink(EnumFacing facing)
 	{
 		sideLink ^= (1 << facing.ordinal());
 		syncToNearby();
 	}
-	
+
 	@Override
 	protected void updateServer()
 	{
@@ -157,7 +155,7 @@ public class TEFluidPipe extends TESynchronization
 			flowFluidToNearby();
 		}
 	}
-	
+
 	protected boolean checkPipe()
 	{
 		FluidStack stack = tank.getFluid();
@@ -188,7 +186,7 @@ public class TEFluidPipe extends TESynchronization
 		}
 		return stack != null;
 	}
-
+	
 	protected void flowFluidToNearby()
 	{
 		List<EnumFacing> allowed = new ArrayList(6);
@@ -239,7 +237,7 @@ public class TEFluidPipe extends TESynchronization
 			}
 		}
 	}
-
+	
 	protected int tryFlowFluidTo(EnumFacing facing, int amount)
 	{
 		TileEntity tile = getTile(facing);
@@ -256,28 +254,28 @@ public class TEFluidPipe extends TESynchronization
 		}
 		return amount;
 	}
-	
+
 	@Override
-	public void readFromDescription1(PacketBuffer buffer) throws IOException
+	public void readFromDescription(NBTTagCompound nbt)
 	{
-		super.readFromDescription1(buffer);
-		sideLink = buffer.readByte();
-	}
-	
-	@Override
-	public void writeToDescription(PacketBuffer buffer) throws IOException
-	{
-		super.writeToDescription(buffer);
-		buffer.writeByte(sideLink);
+		super.readFromDescription(nbt);
+		sideLink = nbt.getByte("sl");
 	}
 
+	@Override
+	public void writeToDescription(NBTTagCompound nbt)
+	{
+		super.writeToDescription(nbt);
+		nbt.setByte("sl", sideLink);
+	}
+	
 	@Override
 	public boolean hasCapability(Capability<?> capability, EnumFacing facing)
 	{
 		return (capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY && isSideLinkable(facing)) ||
 				super.hasCapability(capability, facing);
 	}
-	
+
 	@Override
 	public <T> T getCapability(Capability<T> capability, EnumFacing facing)
 	{

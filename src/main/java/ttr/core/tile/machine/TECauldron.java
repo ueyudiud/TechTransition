@@ -1,9 +1,6 @@
 package ttr.core.tile.machine;
 
-import java.io.IOException;
-
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.EnumSkyBlock;
 import net.minecraftforge.fluids.Fluid;
@@ -14,12 +11,12 @@ import ttr.core.tile.TEStatic;
 public class TECauldron extends TEStatic
 {
 	public int washingBuf;
-
+	
 	private static final float[] LIGHT_VALUE_COEFFICIENT = {0F, 0.64F, 0.8F, 1.0F};
 	protected Fluid fluid = null;
 	private int prelight;
 	public int level;
-
+	
 	@Override
 	public void readFromNBT(NBTTagCompound compound)
 	{
@@ -30,7 +27,7 @@ public class TECauldron extends TEStatic
 			level = compound.getByte("level");
 		}
 	}
-	
+
 	@Override
 	public NBTTagCompound writeToNBT(NBTTagCompound compound)
 	{
@@ -41,48 +38,27 @@ public class TECauldron extends TEStatic
 		}
 		return super.writeToNBT(compound);
 	}
-	
+
 	@Override
-	protected void readInitalizeTag(NBTTagCompound tag)
+	public void readFromDescription(NBTTagCompound nbt)
 	{
-		super.readInitalizeTag(tag);
-		if(tag.hasKey("f"))
+		super.readFromDescription(nbt);
+		if(nbt.hasKey("f"))
 		{
-			fluid = FluidRegistry.getFluid(tag.getString("f"));
-			level = tag.getByte("l");
+			fluid = FluidRegistry.getFluid(nbt.getString("f"));
+			level = nbt.getByte("l");
 		}
+		markBlockRenderUpdate();
 	}
-	
+
 	@Override
-	protected void writeInitalizeTag(NBTTagCompound nbt)
+	public void writeToDescription(NBTTagCompound nbt)
 	{
-		super.writeInitalizeTag(nbt);
+		super.writeToDescription(nbt);
 		if(fluid != null && level > 0)
 		{
 			nbt.setString("f", fluid.getName());
 			nbt.setByte("l", (byte) level);
-		}
-	}
-	
-	@Override
-	public void readFromDescription1(PacketBuffer buffer) throws IOException
-	{
-		super.readFromDescription1(buffer);
-		level = buffer.readByte();
-		if(level > 0)
-		{
-			fluid = FluidRegistry.getFluid(buffer.readStringFromBuffer(99));
-		}
-	}
-
-	@Override
-	public void writeToDescription(PacketBuffer buffer) throws IOException
-	{
-		super.writeToDescription(buffer);
-		buffer.writeByte(level);
-		if(level > 0)
-		{
-			buffer.writeString(fluid.getName());
 		}
 	}
 
@@ -91,7 +67,7 @@ public class TECauldron extends TEStatic
 		checkClientCondition();
 		return level == 0 ? null : fluid;
 	}
-
+	
 	public void setFluidType(Fluid fluid)
 	{
 		if(this.fluid != fluid)
@@ -100,7 +76,7 @@ public class TECauldron extends TEStatic
 			updateFluidState();
 		}
 	}
-	
+
 	public void setFluidType(Fluid fluid, int amt)
 	{
 		if(worldObj.isRemote) return;
@@ -117,13 +93,13 @@ public class TECauldron extends TEStatic
 			markBlockUpdate();
 		}
 	}
-
+	
 	public int getLevel()
 	{
 		checkClientCondition();
 		return level;
 	}
-
+	
 	public boolean useFluid(boolean process)
 	{
 		if(level > 0)
@@ -141,7 +117,7 @@ public class TECauldron extends TEStatic
 		}
 		return false;
 	}
-
+	
 	public void checkClientCondition()
 	{
 		if(worldObj.isRemote && !initialized)
@@ -149,7 +125,7 @@ public class TECauldron extends TEStatic
 			sendToServer(new PacketTEAsk(worldObj, pos));
 		}
 	}
-	
+
 	@Override
 	public void markBlockRenderUpdate()
 	{
@@ -161,12 +137,12 @@ public class TECauldron extends TEStatic
 		}
 		super.markBlockRenderUpdate();
 	}
-
+	
 	public void updateFluidState()
 	{
 		syncToNearby();
 	}
-
+	
 	public int getLightValue()
 	{
 		return fluid == null ? 0 :

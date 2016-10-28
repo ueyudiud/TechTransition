@@ -1,4 +1,4 @@
-package ttr.api.util;
+package ttr.api.collection;
 
 public class Stack<E>
 {

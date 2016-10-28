@@ -71,7 +71,8 @@ public class M
 	public static final Mat lazurite = new Mat(4009, "ttr", "lazurite", "Lazurite", "Lazurite", "Al6Si6Ca8Na8").setTag(SubTag.GEM);
 	public static final Mat monazite = new Mat(4010, "ttr", "monazite", "Monazite", "Monazite", "Ce2La(PO4)2").setTag(SubTag.ORE_CRYSTAL, SubTag.GEM);
 	public static final Mat coal = new Mat(4011, "ttr", "coal", "Coal", "Coal", "C[N,O,S]").setTag(SubTag.ORE_CRYSTAL, SubTag.GEM);
-	
+	public static final Mat redstone = new Mat(4012, "ttr", "redstone", "Redstone", "Redstone", "?");
+
 	public static final Mat bronze = new Mat(5001, "ttr", "bronze", "Bronze", "Bronze", "Cu4SnPb").setToolable(2, 298, 5.0F, 0F, 3.0F, 0.1F, 9).setBlockable("pickaxe", 1, 4.5F, 9.6F).setTag(SubTag.METAL, SubTag.ALLOY);
 	public static final Mat brass = new Mat(5002, "ttr", "brass", "Brass", "Brass", "Cu3Zn").setBlockable("pickaxe", 1, 4.2F, 9.2F).setTag(SubTag.METAL, SubTag.ALLOY);
 	public static final Mat steel = new Mat(5003, "ttr", "steel", "Steel", "Steel", "Fe50C").setToolable(2, 418, 7.0F, 0F, 5.0F, 0.3F, 3).setBlockable("pickaxe", 1, 7.2F, 15.0F).setTag(SubTag.METAL, SubTag.ALLOY);
@@ -85,6 +86,7 @@ public class M
 	public static final Mat magnalium = new Mat(5011, "ttr", "magnalium", "Magnalium", "Magnalium", "Al2Mg").setTag(SubTag.METAL, SubTag.ALLOY);
 	public static final Mat yellowgold = new Mat(5012, "ttr", "yellowgold", "YellowGold", "Yellow Gold", "Au2Ag3Cu4").setTag(SubTag.ALLOY);
 	public static final Mat tungstensteel = new Mat(5013, "ttr", "tungstensteel", "Tungstensteel", "Tungsten Steel", "Fe50CW").setBlockable("pickaxe", 3, 10.8F, 51.0F).setTag(SubTag.METAL, SubTag.ALLOY).setToolable(3, 4820, 9.0F, 0F, 4.0F, -0.8F, 11);
+	public static final Mat redalloy = new Mat(5014, "ttr", "redalloy", "RedAlloy", "Red Alloy", "?").setTag(SubTag.ALLOY);
 	//	addSubItem(2006, "galliumArsenide", "Gallium Arsenide", "GalliumArsenide", "GaAs", "gallium_arsenide", new Sub());
 	//	addSubItem(7001, "bronzeRough", "Rough Bronze", "RoughBronze", "Cu4SnPb", "bronze_rough", new Sub());
 	
@@ -134,7 +136,7 @@ public class M
 	//	addSubItem(11301, "platinumGroup", "Platinum Group", "PlatinumGroup", "Pt6Ir2Os", "platinum_group", new Sub());
 	//	addSubItem(11302, "ironGroup", "Iron Group", "IronGroup", "Fe5Ni3Ti", "iron_group", new Sub());
 	//	addSubItem(11303, "ironGroupOxidized", "Oxidized Iron Group", "IronGroupOxidized", "[Fe,Ni,Ti]O", "iron_group_oxide", new Sub());
-	
+
 	static
 	{
 		lapis.byproduct1 = pyrite;

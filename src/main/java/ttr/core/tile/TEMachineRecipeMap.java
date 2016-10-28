@@ -1,11 +1,8 @@
 package ttr.core.tile;
 
-import java.io.IOException;
-
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.fluids.FluidStack;
@@ -13,8 +10,9 @@ import net.minecraftforge.fluids.FluidTank;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import ttr.api.inventory.Inventory;
-import ttr.api.recipe.IRecipeMap;
+import ttr.api.recipe.TemplateRecipeMap;
 import ttr.api.recipe.TemplateRecipeMap.TemplateRecipe;
+import ttr.api.stack.AbstractStack;
 
 public abstract class TEMachineRecipeMap extends TEMachineInventory
 {
@@ -76,29 +74,6 @@ public abstract class TEMachineRecipeMap extends TEMachineInventory
 		return true;
 	}
 	
-	@Override
-	public void writeToDescription(PacketBuffer buffer) throws IOException
-	{
-		super.writeToDescription(buffer);
-		boolean bool = is(Working);
-		buffer.writeBoolean(bool);
-		if(bool)
-		{
-			buffer.writeLong(maxDuration).writeLong(duration);
-		}
-	}
-	
-	@Override
-	public void readFromDescription1(PacketBuffer buffer) throws IOException
-	{
-		super.readFromDescription1(buffer);
-		if(buffer.readBoolean())
-		{
-			maxDuration = buffer.readLong();
-			duration = buffer.readLong();
-		}
-	}
-	
 	protected void checkRecipe()
 	{
 		if(is(Working))
@@ -154,17 +129,34 @@ public abstract class TEMachineRecipeMap extends TEMachineInventory
 			{
 				fluidInputs[i] = fluidInputTanks[i].getFluid();
 			}
-			TemplateRecipe recipe = getRecipeMap().findRecipe(worldObj, pos, getPower(), fluidInputs, itemInputs);
+			TemplateRecipeMap map = getRecipeMap();
+			TemplateRecipe recipe = map.findRecipe(worldObj, pos, getPower(), fluidInputs, itemInputs);
 			if(recipe == null ||
 					(recipe.outputsItem.length > itemOutputs.length) ||
 					(recipe.outputsFluid.length > fluidOutputTanks.length) ||
 					!matchRecipeSpecial(recipe))
 				return;
-			for(int i = 0; i < recipe.inputsItem.length; ++i)
+			if(map.shapedItemInput)
 			{
-				if(recipe.inputsItem[i] != null)
+				for(int i = 0; i < recipe.inputsItem.length; ++i)
 				{
-					decrStackSize(itemInputs, i, recipe.inputsItem[i].size(itemInputs[i]), true);
+					if(recipe.inputsItem[i] != null)
+					{
+						decrStackSize(itemInputs, i, recipe.inputsItem[i].size(itemInputs[i]), true);
+					}
+				}
+			}
+			else
+			{
+				for(int i = 0; i < itemInputs.length; ++i)
+				{
+					for (AbstractStack element : recipe.inputsItem)
+					{
+						if(element != null && element.contain(itemInputs[i]))
+						{
+							decrStackSize(itemInputs, i, recipe.inputsItem[i].size(itemInputs[i]), true);
+						}
+					}
 				}
 			}
 			for(int i = 0; i < recipe.inputsFluid.length; ++i)
@@ -237,7 +229,7 @@ public abstract class TEMachineRecipeMap extends TEMachineInventory
 		return true;
 	}
 
-	protected abstract IRecipeMap<TemplateRecipe> getRecipeMap();
+	protected abstract TemplateRecipeMap getRecipeMap();
 
 	protected void onWorking()
 	{

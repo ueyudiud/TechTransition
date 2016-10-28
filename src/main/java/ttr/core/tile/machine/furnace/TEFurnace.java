@@ -1,14 +1,11 @@
 package ttr.core.tile.machine.furnace;
 
-import java.io.IOException;
-
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.entity.EntityAreaEffectCloud;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraftforge.common.capabilities.Capability;
@@ -18,7 +15,6 @@ import net.minecraftforge.items.CapabilityItemHandler;
 import ttr.api.fuel.FuelHandler;
 import ttr.api.fuel.ITTrFuelHandler.FuelInfo;
 import ttr.api.inventory.Inventory;
-import ttr.api.recipe.IRecipeMap;
 import ttr.api.recipe.TemplateRecipeMap;
 import ttr.api.recipe.TemplateRecipeMap.TemplateRecipe;
 import ttr.api.tile.IContainerableTile;
@@ -30,14 +26,14 @@ public class TEFurnace extends TEMachineRecipeMapFloatPower implements IContaine
 {
 	private static final int Burning = 16;
 	private static final int[] FUEL = {2};
-	
+
 	public int temperature = 298;
 	public int maxTemperature = 298;
 	public int currentBurnTime;
 	public int burnTime;
 	public int burnPower;
 	public int requireTemp;
-
+	
 	public TEFurnace()
 	{
 		super(1, 1, 0, 0);
@@ -45,7 +41,7 @@ public class TEFurnace extends TEMachineRecipeMapFloatPower implements IContaine
 		inventory.setTile(this);
 		addFacing("burn", EnumFacing.NORTH);
 	}
-	
+
 	@Override
 	public void readFromNBT(NBTTagCompound nbt)
 	{
@@ -60,7 +56,7 @@ public class TEFurnace extends TEMachineRecipeMapFloatPower implements IContaine
 			burnPower = nbt.getInteger("power");
 		}
 	}
-	
+
 	@Override
 	public NBTTagCompound writeToNBT(NBTTagCompound nbt)
 	{
@@ -78,45 +74,17 @@ public class TEFurnace extends TEMachineRecipeMapFloatPower implements IContaine
 	}
 	
 	@Override
-	protected void writeInitalizeTag(NBTTagCompound nbt)
-	{
-		super.writeInitalizeTag(nbt);
-		nbt.setInteger("b", burnTime);
-	}
-
-	@Override
-	protected void readInitalizeTag(NBTTagCompound nbt)
-	{
-		super.readInitalizeTag(nbt);
-		burnPower = nbt.getInteger("b");
-	}
-
-	@Override
-	public void writeToDescription(PacketBuffer buffer) throws IOException
-	{
-		super.writeToDescription(buffer);
-		buffer.writeInt(burnTime);
-	}
-	
-	@Override
-	public void readFromDescription1(PacketBuffer buffer) throws IOException
-	{
-		super.readFromDescription1(buffer);
-		burnTime = buffer.readInt();
-	}
-
-	@Override
 	public boolean isActived()
 	{
 		return is(Burning);
 	}
-
+	
 	@Override
 	protected void updateClient()
 	{
 		super.updateClient();
 	}
-
+	
 	@Override
 	protected void updateServer()
 	{
@@ -155,21 +123,21 @@ public class TEFurnace extends TEMachineRecipeMapFloatPower implements IContaine
 			return;
 		}
 	}
-	
+
 	@Override
 	protected void initRecipeInput(TemplateRecipe recipe)
 	{
 		super.initRecipeInput(recipe);
 		requireTemp = (int) recipe.customValue;
 	}
-
+	
 	@Override
 	protected void initRecipeOutput()
 	{
 		super.initRecipeOutput();
 		requireTemp = 0;
 	}
-
+	
 	@Override
 	protected void onWorking()
 	{
@@ -181,12 +149,12 @@ public class TEFurnace extends TEMachineRecipeMapFloatPower implements IContaine
 			}
 		}
 	}
-	
+
 	protected int getMaxTemperature()
 	{
 		return 1000;
 	}
-	
+
 	private boolean burnFuel()
 	{
 		if(inventory.stacks[0] == null) return false;
@@ -213,7 +181,7 @@ public class TEFurnace extends TEMachineRecipeMapFloatPower implements IContaine
 		}
 		return false;
 	}
-	
+
 	@Override
 	public boolean hasCapability(Capability<?> capability, EnumFacing facing)
 	{
@@ -221,7 +189,7 @@ public class TEFurnace extends TEMachineRecipeMapFloatPower implements IContaine
 			return true;
 		return super.hasCapability(capability, facing);
 	}
-	
+
 	@Override
 	public <T> T getCapability(Capability<T> capability, EnumFacing facing)
 	{
@@ -229,56 +197,56 @@ public class TEFurnace extends TEMachineRecipeMapFloatPower implements IContaine
 			return CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.cast(inventory);
 		return super.getCapability(capability, facing);
 	}
-
+	
 	@Override
 	public int[] getSlotsForFace(EnumFacing side)
 	{
 		return side == getFacing("burn") ? FUEL : super.getSlotsForFace(side);
 	}
-	
+
 	@Override
 	public boolean canInsertItem(int index, ItemStack stack, EnumFacing direction)
 	{
 		return super.canInsertItem(index, stack, direction) ? true : index == 2 && FuelHandler.isItemFuel(stack);
 	}
-
+	
 	@Override
 	public boolean canExtractItem(int index, ItemStack stack, EnumFacing direction)
 	{
 		return index == 2 ? !FuelHandler.isItemFuel(stack) : super.canExtractItem(index, stack, direction);
 	}
-
+	
 	@Override
 	public Container getContainer(EnumFacing side, EntityPlayer player)
 	{
 		return new ContainerFurnace(player, this);
 	}
-
+	
 	@Override
 	@SideOnly(Side.CLIENT)
 	public GuiContainer getGui(EnumFacing side, EntityPlayer player)
 	{
 		return new GuiFurnace(player, this);
 	}
-
+	
 	@SideOnly(Side.CLIENT)
 	public boolean isBurning()
 	{
 		return isActived();
 	}
-	
+
 	@SideOnly(Side.CLIENT)
 	public boolean isSmelting()
 	{
-		return duration > 0;
+		return is(Working);
 	}
-	
+
 	@Override
 	public int getFieldCount()
 	{
 		return 7;
 	}
-	
+
 	@Override
 	public int getField(int id)
 	{
@@ -294,7 +262,7 @@ public class TEFurnace extends TEMachineRecipeMapFloatPower implements IContaine
 		default: return 0;
 		}
 	}
-	
+
 	@Override
 	public void setField(int id, int value)
 	{
@@ -309,37 +277,37 @@ public class TEFurnace extends TEMachineRecipeMapFloatPower implements IContaine
 		case 6 : temperature = value; break;
 		}
 	}
-
+	
 	@SideOnly(Side.CLIENT)
 	public int getBurnProgress(int scale)
 	{
 		return (int) (scale * (float) burnTime / currentBurnTime);
 	}
-	
+
 	@Override
-	protected IRecipeMap<TemplateRecipe> getRecipeMap()
+	protected TemplateRecipeMap getRecipeMap()
 	{
 		return TemplateRecipeMap.SMELTING;
 	}
-	
+
 	@Override
 	protected boolean useEnergy()
 	{
 		return burnPower >= minPower;
 	}
-	
+
 	@Override
 	protected long getEnergyInput()
 	{
 		return burnPower;
 	}
-	
+
 	@Override
 	protected long getPower()
 	{
 		return burnPower;
 	}
-	
+
 	@Override
 	protected boolean matchRecipeSpecial(TemplateRecipe recipe)
 	{

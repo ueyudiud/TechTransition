@@ -2,6 +2,9 @@ package ttr.load.recipe;
 
 import static ttr.api.recipe.TTrRecipeAdder.FULL_CHANCES;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import ic2.api.item.IC2Items;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fluids.FluidRegistry;
@@ -10,13 +13,18 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.oredict.ShapedOreRecipe;
 import net.minecraftforge.oredict.ShapelessOreRecipe;
+import ttr.api.collection.Stack;
 import ttr.api.data.EnumToolType;
+import ttr.api.data.M;
 import ttr.api.data.MC;
 import ttr.api.material.Mat;
+import ttr.api.material.MatCondition;
 import ttr.api.recipe.TTrRecipeAdder;
 import ttr.api.recipe.TemplateRecipeMap;
 import ttr.api.stack.AbstractStack;
+import ttr.api.stack.MatterStack;
 import ttr.api.stack.OreStack;
+import ttr.api.util.IDataChecker;
 import ttr.api.util.SubTag;
 import ttr.load.TTrFluids;
 import ttr.load.TTrItems;
@@ -161,5 +169,108 @@ public class TTrMaterialsRecipes
 		TemplateRecipeMap.FORGE.addRecipe(new AbstractStack[]{new OreStack("dustMagnetite", 7), new OreStack("dustCoal", 2), new OreStack("dustCalcite")}, new AbstractStack[]{new OreStack("dustIron", 4)}, 4000, 20, 1000);
 		TemplateRecipeMap.FORGE.addRecipe(new AbstractStack[]{new OreStack("dustLimonite", 8), new OreStack("dustCoal"), new OreStack("dustMarble")}, new AbstractStack[]{new OreStack("dustIron", 2)}, 2000, 20, 1000);
 		TemplateRecipeMap.FORGE.addRecipe(new AbstractStack[]{new OreStack("dustLimonite", 8), new OreStack("dustCoal"), new OreStack("dustCalcite")}, new AbstractStack[]{new OreStack("dustIron", 2)}, 2000, 20, 1000);
+
+		addAlloySmeltingRecipe(M.bronze, 24, 300, new Stack(M.copper, 4), M.tin, M.lead);
+		addAlloySmeltingRecipe(M.brass, 18, 200, new Stack(M.copper, 3), M.zinc);
+		addAlloySmeltingRecipe(M.electrum, 30, 100, M.gold, M.silver);
+		addAlloySmeltingRecipe(M.invar, 48, 150, new Stack(M.iron, 2), M.nickel);
+		addAlloySmeltingRecipe(M.cupronickel, 56, 100, M.copper, M.nickel);
+		addAlloySmeltingRecipe(M.redalloy, 60, 200, 750, 1, new Object[]{M.copper, new Stack(M.redstone, 4)});
 	}
+
+	private static void addAlloySmeltingRecipe(Mat material, long power, long time, Object...inputs)
+	{
+		addAlloySmeltingRecipe(material, power, time, material.meltingPoint, inputs);
+	}
+	private static void addAlloySmeltingRecipe(Mat material, long power, long time, int temperature, Object...inputs)
+	{
+		addAlloySmeltingRecipe(material, power, time, temperature, -1, inputs);
+	}
+	private static void addAlloySmeltingRecipe(Mat material, long power, long time, int temperature, int outCount, Object...inputs)
+	{
+		List<Stack<Mat>> list = new ArrayList();
+		int outCount1 = outCount;
+		outCount = 0;
+		for(Object input : inputs)
+		{
+			if(input instanceof String)
+			{
+				Mat m = Mat.register().get((String) input);
+				if(m == null) throw new RuntimeException("Fail to get material '" + input + "'.");
+				list.add(new Stack<Mat>(m));
+				++outCount;
+			}
+			else if(input instanceof Mat)
+			{
+				list.add(new Stack<Mat>((Mat) input));
+				++outCount;
+			}
+			else if(input instanceof Stack)
+			{
+				Stack stack = (Stack) input;
+				outCount += (int) stack.size;
+				if(stack.element instanceof String)
+				{
+					Mat m = Mat.register().get((String) stack.element);
+					if(m == null) throw new RuntimeException("Fail to get material '" + input + "'.");
+					list.add(new Stack<Mat>(m, stack.size));
+				}
+				else if(stack.element instanceof Mat)
+				{
+					list.add(stack.clone());
+				}
+				else throw new RuntimeException("Invalid material type.");
+			}
+			else throw new RuntimeException("Invalid material type.");
+		}
+		if(outCount1 != -1)
+		{
+			outCount = outCount1;
+		}
+		if(outCount <= 9)
+		{
+			List<Object> list1 = new ArrayList();
+			for(Stack<Mat> stack : list)
+			{
+				for(int i = 0; i < stack.size; ++i)
+				{
+					list1.add("dust" + stack.element.oreDictName);
+				}
+			}
+			AbstractStack output;
+			if(outCount % 4 == 0)
+			{
+				output = new OreStack("dust" + material.oreDictName, outCount * 3 / 4);
+			}
+			else
+			{
+				output = new OreStack("dustSmall" + material.oreDictName, outCount * 3);
+			}
+			if(output.instance() != null)
+			{
+				GameRegistry.addRecipe(new ShapelessOreRecipe(output.instance(), list1.toArray()));
+			}
+		}
+		if(list.size() <= 4)
+		{
+			List<AbstractStack> list1 = new ArrayList();
+			for(Stack<Mat> stack : list)
+			{
+				list1.add(new MatterStack(stack.element, stack.size, ALLOY_SMELTING_MATTER_STACK_CHECKER));
+			}
+			AbstractStack output;
+			if(MC.ingot.isBelongTo(material))
+			{
+				output = new OreStack("ingot" + material.oreDictName, outCount);
+			}
+			else
+			{
+				output = new OreStack("dust" + material.oreDictName, outCount);
+			}
+			TemplateRecipeMap.ALLOY_SMELTING.addRecipe(list1.toArray(new AbstractStack[list1.size()]), new AbstractStack[]{output}, time, power);
+		}
+	}
+	
+	private static final IDataChecker<MatCondition> ALLOY_SMELTING_MATTER_STACK_CHECKER =
+			(MatCondition condition) -> condition == MC.dust || condition == MC.ingot;
 }

@@ -14,9 +14,7 @@ import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import ttr.api.inventory.Inventory;
-import ttr.api.recipe.IRecipeMap;
 import ttr.api.recipe.TemplateRecipeMap;
-import ttr.api.recipe.TemplateRecipeMap.TemplateRecipe;
 import ttr.api.tile.IContainerableTile;
 import ttr.api.tile.ISteamInputHatch;
 import ttr.core.block.BlockBrick;
@@ -29,36 +27,36 @@ public class TEBronzeCompressor extends TEMultiBlockStructureRecipeMapFloatPower
 implements IContainerableTile
 {
 	private static final long MAX_PRESSURE = 102400;
-
+	
 	private long pressure;
 	private Set<ISteamInputHatch> hatchs = new HashSet(5);
-
+	
 	public TEBronzeCompressor()
 	{
 		super(1, 1, 0, 0);
 		inventory = new Inventory(1, TTrLangs.steamCompressor, 64);
 	}
-
+	
 	@Override
 	public NBTTagCompound writeToNBT(NBTTagCompound nbt)
 	{
 		nbt.setLong("pressure", pressure);
 		return super.writeToNBT(nbt);
 	}
-
+	
 	@Override
 	public void readFromNBT(NBTTagCompound nbt)
 	{
 		super.readFromNBT(nbt);
 		pressure = nbt.getLong("pressure");
 	}
-
+	
 	@Override
 	protected void updateServer()
 	{
 		super.updateServer();
 	}
-
+	
 	@Override
 	protected boolean checkStructure()
 	{
@@ -104,7 +102,7 @@ implements IContainerableTile
 		}
 		return !hatchs.isEmpty();
 	}
-	
+
 	@Override
 	protected void checkRecipe()
 	{
@@ -127,7 +125,7 @@ implements IContainerableTile
 		}
 		super.checkRecipe();
 	}
-	
+
 	@Override
 	protected void onMissingStructure()
 	{
@@ -135,37 +133,37 @@ implements IContainerableTile
 		initRecipeOutput();
 		pressure = 0;
 	}
-
+	
 	@Override
-	protected IRecipeMap<TemplateRecipe> getRecipeMap()
+	protected TemplateRecipeMap getRecipeMap()
 	{
 		return TemplateRecipeMap.BRONZE_COMPRESS;
 	}
-	
+
 	@Override
 	protected boolean useEnergy()
 	{
 		return pressure >= minPower;
 	}
-
+	
 	@Override
 	protected long getEnergyInput()
 	{
 		return Long.MAX_VALUE;
 	}
-
+	
 	@Override
 	protected long getPower()
 	{
 		return pressure;
 	}
-
+	
 	@Override
 	public int getFieldCount()
 	{
 		return 6;
 	}
-
+	
 	@Override
 	public int getField(int id)
 	{
@@ -180,7 +178,7 @@ implements IContainerableTile
 		default: return 0;
 		}
 	}
-
+	
 	@Override
 	public void setField(int id, int value)
 	{
@@ -194,19 +192,19 @@ implements IContainerableTile
 		case 5 : pressure &= 0xFFFFFFFFL; pressure |= value << 32; break;
 		}
 	}
-	
+
 	@SideOnly(Side.CLIENT)
 	public int getPressureProgress(int scale)
 	{
 		return (int) ((double) (pressure * scale) / (double) MAX_PRESSURE);
 	}
-
+	
 	@Override
 	public Container getContainer(EnumFacing side, EntityPlayer player)
 	{
 		return new ContainerSteamCompressor(player, this);
 	}
-
+	
 	@Override
 	@SideOnly(Side.CLIENT)
 	public GuiContainer getGui(EnumFacing side, EntityPlayer player)

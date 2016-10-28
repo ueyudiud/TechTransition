@@ -1,9 +1,11 @@
 package ttr.api.recipe;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -37,23 +39,24 @@ public class TemplateRecipeMap implements IRecipeMap<TemplateRecipe>
 		public long customValue;
 	}
 	
-	public static final TemplateRecipeMap SMELTING = new TemplateRecipeMap("smelting", 1, 1, 0, 0);
-	public static final TemplateRecipeMap CAULDRON_WASHING = new TemplateRecipeMap("cauldron_washing", 1, 3, 1, 0);
-	public static final TemplateRecipeMap CAULDRON_SOLUTE = new TemplateRecipeMap("cauldron_soulte", 1, 1, 1, 1);
+	public static final TemplateRecipeMap SMELTING = new TemplateRecipeMap("smelting", true, 1, 1);
+	public static final TemplateRecipeMap CAULDRON_WASHING = new TemplateRecipeMap("cauldron_washing", true, 1, 3, 1, 0);
+	public static final TemplateRecipeMap CAULDRON_SOLUTE = new TemplateRecipeMap("cauldron_soulte", true, 1, 1, 1, 1);
 	
-	public static final TemplateRecipeMap FORGE = new TemplateRecipeMap("forge", 3, 3, 0, 0);
-
-	public static final TemplateRecipeMap BRONZE_COMPRESS = new TemplateRecipeMap("compress.bronze", 1, 1, 0, 0);
-	public static final TemplateRecipeMap GRINDING_STEAM = new TemplateRecipeMap("grinding.steam", 1, 2, 0, 0);
-	public static final TemplateRecipeMap GRINDING = new TemplateRecipeMap("grinding", 1, 4, 0, 0);
-	public static final TemplateRecipeMap COMPRESS = new TemplateRecipeMap("compressor", 1, 1, 0, 0);
-	public static final TemplateRecipeMap EXTRACT_STEAM = new TemplateRecipeMap("extract.steam", 1, 1, 0, 0);
-	public static final TemplateRecipeMap EXTRACT = new TemplateRecipeMap("extract", 1, 1, 0, 0);
-	public static final TemplateRecipeMap FORGE_HAMMER = new TemplateRecipeMap("forging", 1, 1, 0, 0);
-	public static final TemplateRecipeMap PRESS = new TemplateRecipeMap("press", 2, 1, 0, 0);
-	public static final TemplateRecipeMap CUTTING = new TemplateRecipeMap("cutting", 1, 1, 0, 0);
-	public static final TemplateRecipeMap CUTTING_STEAM = new TemplateRecipeMap("cutting.steam", 1, 1, 0, 0);
-	public static final TemplateRecipeMap ALLOY_SMELTING = new TemplateRecipeMap("alloy_smelting", 4, 1, 0, 0);
+	public static final TemplateRecipeMap FORGE = new TemplateRecipeMap("forge", true, 3, 3);
+	public static final TemplateRecipeMap DISTILLER = new TemplateRecipeMap("distiller", true, 1, 0, 1, 1);
+	
+	public static final TemplateRecipeMap BRONZE_COMPRESS = new TemplateRecipeMap("compress.bronze", true, 1, 1);
+	public static final TemplateRecipeMap GRINDING_STEAM = new TemplateRecipeMap("grinding.steam", true, 1, 2);
+	public static final TemplateRecipeMap GRINDING = new TemplateRecipeMap("grinding", true, 1, 4);
+	public static final TemplateRecipeMap COMPRESS = new TemplateRecipeMap("compressor", true, 1, 1);
+	public static final TemplateRecipeMap EXTRACT_STEAM = new TemplateRecipeMap("extract.steam", true, 1, 1);
+	public static final TemplateRecipeMap EXTRACT = new TemplateRecipeMap("extract", true, 1, 1);
+	public static final TemplateRecipeMap FORGE_HAMMER = new TemplateRecipeMap("forging", true, 1, 1);
+	public static final TemplateRecipeMap PRESS = new TemplateRecipeMap("press", true, 2, 1);
+	public static final TemplateRecipeMap CUTTING = new TemplateRecipeMap("cutting", true, 1, 1);
+	public static final TemplateRecipeMap CUTTING_STEAM = new TemplateRecipeMap("cutting.steam", true, 1, 1);
+	public static final TemplateRecipeMap ALLOY_SMELTING = new TemplateRecipeMap("alloy_smelting", false, 4, 1);
 
 	public static void reloadRecipeMaps()
 	{
@@ -72,10 +75,16 @@ public class TemplateRecipeMap implements IRecipeMap<TemplateRecipe>
 	public final int sizeItemOutput;
 	public final int sizeFluidInput;
 	public final int sizeFluidOutput;
-	
-	public TemplateRecipeMap(String name, int sizeItemInput, int sizeItemOutput, int sizeFluidInput, int sizeFluidOutput)
+	public final boolean shapedItemInput;
+
+	public TemplateRecipeMap(String name, boolean shapedItemInput, int sizeItemInput, int sizeItemOutput)
+	{
+		this(name, shapedItemInput, sizeItemInput, sizeItemOutput, 0, 0);
+	}
+	public TemplateRecipeMap(String name, boolean shapedItemInput, int sizeItemInput, int sizeItemOutput, int sizeFluidInput, int sizeFluidOutput)
 	{
 		this.name = name;
+		this.shapedItemInput = shapedItemInput;
 		this.sizeItemInput = sizeItemInput;
 		this.sizeItemOutput = sizeItemOutput;
 		this.sizeFluidInput = sizeFluidInput;
@@ -226,19 +235,44 @@ public class TemplateRecipeMap implements IRecipeMap<TemplateRecipe>
 						!fluidInputs[i].containsFluid(recipe.inputsFluid[i])) return false;
 			}
 		}
-		for(i = 0; i < recipe.inputsItem.length; ++i)
+		if(shapedItemInput)
 		{
-			if(recipe.inputsItem[i] == null)
+			for(i = 0; i < recipe.inputsItem.length; ++i)
 			{
-				if(itemInputs[i] != null) return false;
+				if(recipe.inputsItem[i] == null)
+				{
+					if(itemInputs[i] != null) return false;
+				}
+				else
+				{
+					if(itemInputs[i] == null ||
+							!recipe.inputsItem[i].contain(itemInputs[i])) return false;
+				}
 			}
-			else
-			{
-				if(itemInputs[i] == null ||
-						!recipe.inputsItem[i].contain(itemInputs[i])) return false;
-			}
+			return true;
 		}
-		return true;
+		else
+		{
+			List<AbstractStack> inputs = new ArrayList(Arrays.asList(recipe.inputsItem));
+			for(i = 0; i < itemInputs.length; ++i)
+			{
+				if(itemInputs[i] != null)
+				{
+					Iterator<AbstractStack> itr = inputs.iterator();
+					while(itr.hasNext())
+					{
+						AbstractStack stack = itr.next();
+						if(stack.contain(itemInputs[i]))
+						{
+							itr.remove();
+							break;
+						}
+					}
+					return false;
+				}
+			}
+			return inputs.isEmpty();
+		}
 	}
 
 	@Override

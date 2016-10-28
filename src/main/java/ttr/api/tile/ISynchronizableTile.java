@@ -1,15 +1,13 @@
 package ttr.api.tile;
 
-import java.io.IOException;
-
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.nbt.NBTTagCompound;
 
 public interface ISynchronizableTile
 {
-	void writeToDescription(PacketBuffer buffer) throws IOException;
+	void writeToDescription(NBTTagCompound nbt);
 
-	void readFromDescription(PacketBuffer buffer) throws IOException;
+	void readFromDescription(NBTTagCompound nbt);
 	
 	void markBlockRenderUpdate();
 	

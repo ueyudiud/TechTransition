@@ -41,7 +41,7 @@ public class BlockMachine extends Block implements ITileEntityProvider, IWrencha
 	public static final PropertyEnum<EnumFacing> FACING_PRIMARYII = PropertyEnum.create("facing_primary", EnumFacing.class, EnumFacing.HORIZONTALS);
 	public static final PropertyEnum<EnumFacing> FACING_OUTPUT = PropertyEnum.create("facing_output", EnumFacing.class);
 	public static final PropertyBool WORKING = PropertyBool.create("working");
-
+	
 	public BlockMachine(Material blockMaterialIn, MapColor blockMapColorIn)
 	{
 		super(blockMaterialIn, blockMapColorIn);
@@ -55,25 +55,25 @@ public class BlockMachine extends Block implements ITileEntityProvider, IWrencha
 		super(V.MATERIAL_MACHINE);
 		setSoundType(SoundType.METAL);
 	}
-
+	
 	@Override
 	protected BlockStateContainer createBlockState()
 	{
 		return new BlockStateContainer(this, FACING_PRIMARYI);
 	}
-
+	
 	@Override
 	public IBlockState getStateFromMeta(int meta)
 	{
 		return getDefaultState();
 	}
-	
+
 	@Override
 	public int getMetaFromState(IBlockState state)
 	{
 		return 0;
 	}
-
+	
 	@Override
 	public void onBlockPlacedBy(World worldIn, BlockPos pos, IBlockState state, EntityLivingBase placer,
 			ItemStack stack)
@@ -89,7 +89,7 @@ public class BlockMachine extends Block implements ITileEntityProvider, IWrencha
 		}
 		super.onBlockPlacedBy(worldIn, pos, state, placer, stack);
 	}
-	
+
 	@Override
 	public IBlockState getActualState(IBlockState state, IBlockAccess worldIn, BlockPos pos)
 	{
@@ -122,12 +122,12 @@ public class BlockMachine extends Block implements ITileEntityProvider, IWrencha
 		}
 		return state;
 	}
-
+	
 	protected IBlockState getActualState(IBlockState state, TEBase tile)
 	{
 		return state;
 	}
-	
+
 	@Override
 	public void neighborChanged(IBlockState state, World worldIn, BlockPos pos, Block blockIn)
 	{
@@ -137,7 +137,7 @@ public class BlockMachine extends Block implements ITileEntityProvider, IWrencha
 			((TEBase) tile).onNeighbourBlockChange();
 		}
 	}
-	
+
 	@Override
 	public void onNeighborChange(IBlockAccess world, BlockPos pos, BlockPos neighbor)
 	{
@@ -147,12 +147,12 @@ public class BlockMachine extends Block implements ITileEntityProvider, IWrencha
 			((TEBase) tile).onNeighbourBlockChange();
 		}
 	}
-	
+
 	public static EnumFacing getFacing(EntityLivingBase player)
 	{
 		return EnumFacing.HORIZONTALS[MathHelper.floor_double(player.rotationYaw * 4.0F / 360F + 0.5D) & 3].getOpposite();
 	}
-	
+
 	@Override
 	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn,
 			EnumHand hand, ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ)
@@ -160,13 +160,13 @@ public class BlockMachine extends Block implements ITileEntityProvider, IWrencha
 		TileEntity tile = worldIn.getTileEntity(pos);
 		return Util.onTileActivatedGeneral(playerIn, hand, heldItem, side, hitX, hitY, hitZ, tile);
 	}
-
+	
 	@Override
 	public TileEntity createNewTileEntity(World worldIn, int meta)
 	{
 		return createTileEntity(worldIn, getStateFromMeta(meta));
 	}
-
+	
 	@Override
 	public void breakBlock(World worldIn, BlockPos pos, IBlockState state)
 	{
@@ -194,21 +194,21 @@ public class BlockMachine extends Block implements ITileEntityProvider, IWrencha
 		}
 		super.breakBlock(worldIn, pos, state);
 	}
-	
+
 	@Override
 	public String getHarvestTool(IBlockState state)
 	{
 		return EnumToolType.wrench.name();
 	}
-
+	
 	@Override
 	public int getHarvestLevel(IBlockState state)
 	{
 		return 0;
 	}
-
+	
 	private static ThreadLocal<TileEntity> threadTile = new ThreadLocal();
-
+	
 	@Override
 	public void harvestBlock(World worldIn, EntityPlayer player, BlockPos pos, IBlockState state, TileEntity tile,
 			ItemStack stack)
@@ -217,13 +217,13 @@ public class BlockMachine extends Block implements ITileEntityProvider, IWrencha
 		super.harvestBlock(worldIn, player, pos, state, tile, stack);
 		threadTile.set(null);
 	}
-
+	
 	@Override
 	protected ItemStack createStackedBlock(IBlockState state)
 	{
 		return new ItemStack(this, 1, getMetaFromState(state));
 	}
-	
+
 	@Override
 	public List<ItemStack> getDrops(IBlockAccess world, BlockPos pos, IBlockState state, int fortune)
 	{
@@ -241,7 +241,7 @@ public class BlockMachine extends Block implements ITileEntityProvider, IWrencha
 		list.add(createStackedBlock(state));
 		return list;
 	}
-	
+
 	@Override
 	public EnumFacing getFacing(World world, BlockPos pos)
 	{
@@ -250,7 +250,7 @@ public class BlockMachine extends Block implements ITileEntityProvider, IWrencha
 			return ((TEBase) tile).getRotation();
 		return null;
 	}
-
+	
 	@Override
 	public boolean setFacing(World world, BlockPos pos, EnumFacing newDirection, EntityPlayer player)
 	{
@@ -259,13 +259,13 @@ public class BlockMachine extends Block implements ITileEntityProvider, IWrencha
 			return ((TEBase) tile).setRotation(newDirection);
 		return false;
 	}
-	
+
 	@Override
 	public boolean wrenchCanRemove(World world, BlockPos pos, EntityPlayer player)
 	{
 		return false;
 	}
-	
+
 	@Override
 	@Deprecated
 	public List<ItemStack> getWrenchDrops(World world, BlockPos pos, IBlockState state, TileEntity tile,

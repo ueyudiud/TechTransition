@@ -4,8 +4,11 @@ import java.util.Map;
 
 import com.google.common.collect.ImmutableMap;
 
+import net.minecraftforge.client.event.TextureStitchEvent;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidRegistry;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import ttr.api.fluid.FluidTTr;
 import ttr.api.material.Mat;
 import ttr.api.util.SubTag;
@@ -16,6 +19,7 @@ public class TTrFluids
 	public static Fluid steam;
 	public static Fluid sulphuric_acid;
 	public static Fluid nitric_acid;
+	public static Fluid redalloy;
 
 	public static Map<Mat, Fluid> sulfate_impure;
 	public static Map<Mat, Fluid> chlorhydric_impure;
@@ -103,5 +107,17 @@ public class TTrFluids
 		{
 			nitric_acid = new FluidTTr("nitricacid").setDensity(1420).setViscosity(1600);
 		}
+		redalloy = FluidRegistry.getFluid("redalloy");
+		if(redalloy == null)
+		{
+			redalloy = new FluidTTr("redalloy").setDensity(3200).setViscosity(3500).setTemperature(850);
+		}
+		MinecraftForge.EVENT_BUS.register(new TTrFluids());
+	}
+	
+	@SubscribeEvent
+	public void onIconMapReload(TextureStitchEvent.Pre event)
+	{
+		FluidTTr.registerTextures(event.getMap());
 	}
 }

@@ -1,6 +1,5 @@
 package ttr.core.tile;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -14,7 +13,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTTagString;
-import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.fml.relauncher.Side;
@@ -110,10 +108,11 @@ public class TEMachineBase extends TESynchronization implements IPluginAccess
 			}
 		}
 	}
-	
+
 	@Override
-	protected void writeInitalizeTag(NBTTagCompound nbt)
+	public void writeToDescription(NBTTagCompound nbt)
 	{
+		super.writeToDescription(nbt);
 		nbt.setByte("f", (byte) facing.ordinal());
 		nbt.setLong("s", currentState);
 		NBTTagList list = new NBTTagList();
@@ -126,12 +125,19 @@ public class TEMachineBase extends TESynchronization implements IPluginAccess
 		}
 		nbt.setTag("fs", list);
 	}
-	
+
 	@Override
-	protected void readInitalizeTag(NBTTagCompound nbt)
+	public void readFromDescription(NBTTagCompound nbt)
 	{
+		boolean flag = false;
+		super.readFromDescription(nbt);
 		facing = EnumFacing.VALUES[nbt.getByte("f")];
-		currentState = nbt.getLong("s");
+		long state = nbt.getLong("s");
+		if(state != currentState)
+		{
+			currentState = state;
+			flag = true;
+		}
 		NBTTagList list = nbt.getTagList("fs", NBT.TAG_STRING);
 		for (int i = 0; i < list.tagCount(); ++i)
 		{
@@ -143,52 +149,16 @@ public class TEMachineBase extends TESynchronization implements IPluginAccess
 				facings[id] = key;
 			}
 		}
+		if(flag)
+		{
+			markBlockRenderUpdate();
+		}
 	}
 	
 	@Override
 	public boolean isActived()
 	{
 		return false;
-	}
-
-	@Override
-	public void writeToDescription(PacketBuffer buffer) throws IOException
-	{
-		super.writeToDescription(buffer);
-		buffer.writeLong(currentState);
-		byte code = 0;
-		for(int i = 0; i < 6; ++i)
-		{
-			if(facings[i] != null)
-			{
-				code |= (1 << i);
-			}
-		}
-		buffer.writeByte(code);
-		for(int i = 0; i < 6; ++i)
-		{
-			if(facings[i] != null)
-			{
-				buffer.writeString(facings[i]);
-			}
-		}
-	}
-	
-	@Override
-	public void readFromDescription1(PacketBuffer buffer) throws IOException
-	{
-		super.readFromDescription1(buffer);
-		facing = EnumFacing.values()[buffer.readByte()];
-		currentState = buffer.readLong();
-		Arrays.fill(facings, null);
-		byte code = buffer.readByte();
-		for(int i = 0; i < 6; ++i)
-		{
-			if((code & (1 << i)) != 0)
-			{
-				facings[i] = buffer.readStringFromBuffer(10);
-			}
-		}
 	}
 	
 	@Override

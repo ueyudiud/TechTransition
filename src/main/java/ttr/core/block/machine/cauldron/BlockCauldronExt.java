@@ -34,10 +34,10 @@ import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
+import ttr.api.collection.Stack;
 import ttr.api.recipe.TemplateRecipeMap;
 import ttr.api.recipe.TemplateRecipeMap.TemplateRecipe;
 import ttr.api.stack.AbstractStack;
-import ttr.api.util.Stack;
 import ttr.core.block.BlockMachine;
 import ttr.core.tile.machine.TECauldron;
 

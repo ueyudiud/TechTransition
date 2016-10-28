@@ -6,9 +6,7 @@ import net.minecraft.inventory.Container;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import ttr.api.recipe.IRecipeMap;
 import ttr.api.recipe.TemplateRecipeMap;
-import ttr.api.recipe.TemplateRecipeMap.TemplateRecipe;
 import ttr.core.gui.machine.steam.ContainerSteamCutter;
 import ttr.core.gui.machine.steam.GuiSteamCutter;
 import ttr.core.tile.TESteamMachine;
@@ -20,26 +18,26 @@ public abstract class TESteamCutter extends TESteamMachine
 	{
 		super(name, 1, 1, 0, 0, steamAmount, power, efficiency, durationMultipler);
 	}
-	
+
 	@Override
-	protected IRecipeMap<TemplateRecipe> getRecipeMap()
+	protected TemplateRecipeMap getRecipeMap()
 	{
 		return TemplateRecipeMap.CUTTING_STEAM;
 	}
-	
+
 	@Override
 	public Container getContainer(EnumFacing side, EntityPlayer player)
 	{
 		return new ContainerSteamCutter(player, this);
 	}
-
+	
 	public static class TESteamCutterBronze extends TESteamCutter
 	{
 		public TESteamCutterBronze()
 		{
 			super(TTrLangs.steamCutterBronze, 2000, 32, 0.75F, 1.0F);
 		}
-
+		
 		@Override
 		@SideOnly(Side.CLIENT)
 		public GuiContainer getGui(EnumFacing side, EntityPlayer player)
@@ -47,14 +45,14 @@ public abstract class TESteamCutter extends TESteamMachine
 			return new GuiSteamCutter.GuiSteamCutterBronze(player, this);
 		}
 	}
-
+	
 	public static class TESteamCutterSteel extends TESteamCutter
 	{
 		public TESteamCutterSteel()
 		{
 			super(TTrLangs.steamCutterSteel, 4000, 64, 0.875F, 1.0F);
 		}
-
+		
 		@Override
 		@SideOnly(Side.CLIENT)
 		public GuiContainer getGui(EnumFacing side, EntityPlayer player)

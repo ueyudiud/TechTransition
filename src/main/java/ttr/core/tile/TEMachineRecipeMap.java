@@ -44,6 +44,14 @@ public abstract class TEMachineRecipeMap extends TEMachineInventory implements I
 		itemOutputs = new ItemStack[itemOutputSize];
 		fluidInputTanks = new FluidTank[fluidInputSize];
 		fluidOutputTanks = new FluidTank[fluidOutputSize];
+		for(int i = 0; i < fluidInputSize; ++i)
+		{
+			fluidInputTanks[i] = new FluidTank(16000);
+		}
+		for(int i = 0; i < fluidOutputSize; ++i)
+		{
+			fluidOutputTanks[i] = new FluidTank(16000);
+		}
 		FACE_INPUT = new int[itemInputSize];
 		FACE_OUTPUT = new int[itemOutputSize];
 		int i = 0;

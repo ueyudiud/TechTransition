@@ -20,10 +20,10 @@ public abstract class ContainerWithTile<T extends TEMachineBase> extends Contain
 {
 	private int[] cachedFields;
 	protected T inventoryTile;
-
+	
 	public ContainerWithTile(EntityPlayer aPlayer, T aTile)
 	{
-		super(aPlayer.inventory);
+		super(aPlayer.inventory, aTile);
 		inventoryTile = aTile;
 		if(inventoryTile instanceof IInventory)
 		{
@@ -32,14 +32,14 @@ public abstract class ContainerWithTile<T extends TEMachineBase> extends Contain
 	}
 	public ContainerWithTile(InventoryPlayer aPlayer, T aTile)
 	{
-		super(aPlayer);
+		super(aPlayer, aTile);
 		inventoryTile = aTile;
 		if(inventoryTile instanceof IInventory)
 		{
 			cachedFields = new int[((IInventory) inventoryTile).getFieldCount()];
 		}
 	}
-
+	
 	@Override
 	public void addListener(IContainerListener listener)
 	{
@@ -56,7 +56,7 @@ public abstract class ContainerWithTile<T extends TEMachineBase> extends Contain
 			listener.sendAllWindowProperties(this, inventoryTile);
 		}
 	}
-
+	
 	@Override
 	public void detectAndSendChanges()
 	{
@@ -64,7 +64,7 @@ public abstract class ContainerWithTile<T extends TEMachineBase> extends Contain
 		if(inventoryTile instanceof IInventory)
 		{
 			IInventory inventory = inventoryTile;
-			
+
 			for(int i = 0; i < cachedFields.length; ++i)
 			{
 				int newValue;
@@ -88,7 +88,6 @@ public abstract class ContainerWithTile<T extends TEMachineBase> extends Contain
 				if(!((stack1 == null && stack2 == null) || (stack1 != null && stack1.isFluidStackIdentical(stack2))))
 				{
 					array.add(i);
-					break;
 				}
 			}
 			for(IContainerListener listener : listeners)
@@ -108,7 +107,7 @@ public abstract class ContainerWithTile<T extends TEMachineBase> extends Contain
 			}
 		}
 	}
-	
+
 	@Override
 	@SideOnly(Side.CLIENT)
 	public void updateProgressBar(int id, int data)
@@ -118,13 +117,13 @@ public abstract class ContainerWithTile<T extends TEMachineBase> extends Contain
 			((IInventory) inventoryTile).setField(id, data);
 		}
 	}
-
+	
 	@Override
 	public boolean canInteractWith(EntityPlayer player)
 	{
 		return super.canInteractWith(player) && inventoryTile.getWorld().getTileEntity(inventoryTile.getPos()) == inventoryTile;
 	}
-	
+
 	@Override
 	@SideOnly(Side.CLIENT)
 	public void setFluid(int idx, FluidStack stack)

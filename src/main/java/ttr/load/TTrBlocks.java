@@ -34,6 +34,7 @@ import ttr.core.tile.machine.furnace.TEFurnaceObsidian;
 import ttr.core.tile.machine.steam.TEBronzeCompressor;
 import ttr.core.tile.machine.steam.TESteamAlloyFurnace.TESteamAlloyFurnaceBronze;
 import ttr.core.tile.machine.steam.TESteamAlloyFurnace.TESteamAlloyFurnaceSteel;
+import ttr.core.tile.machine.steam.TESteamCrystalizer.TESteamCrystalizerBronze;
 import ttr.core.tile.machine.steam.TESteamCutter.TESteamCutterBronze;
 import ttr.core.tile.machine.steam.TESteamCutter.TESteamCutterSteel;
 import ttr.core.tile.machine.steam.TESteamExtractor.TESteamExtractorBronze;
@@ -73,34 +74,34 @@ import ttr.core.tile.pipe.TEFluidPipeMRC.TEFluidPipeTungstenSteelSmall;
 public class TTrBlocks
 {
 	public static Block marble;
-	
-	public static Block metalblock1;
 
+	public static Block metalblock1;
+	
 	public static Block brick;
 	public static Block casing;
-
+	
 	public static Block furnace;
 	public static Block cauldron;
 	public static Block forge;
-	
+
 	public static Block pipeFluid1a;
 	public static Block pipeFluid1b;
 	public static Block pipeFluid1c;
-
-	public static Block boiler1;
 	
+	public static Block boiler1;
+
 	public static Block steamHatch;
 	public static Block steamMachine1a;
 	public static Block steamMachine1b;
 	public static Block bronzeMulti;
-	
+
 	public static void init()
 	{
 		marble = new BlockRock(M.marble);
-		
+
 		register(metalblock1 = new BlockMetal1().setRegistryName("metal1").setUnlocalizedName("metal.1").setCreativeTab(CreativeTabs.BUILDING_BLOCKS));
 		TTrAPI.proxy.registerForgeModel(metalblock1, "metala", BlockMetal1.TYPE, false);
-		
+
 		register(brick = new BlockBrick().setRegistryName("brick").setUnlocalizedName("brick").setCreativeTab(CreativeTabs.BUILDING_BLOCKS));
 		TTrAPI.proxy.registerForgeModel(brick, "brick", BlockBrick.BRICK_TYPE, false);
 		register(casing = new BlockMachineCasing().setRegistryName("casing").setUnlocalizedName("casing").setCreativeTab(CreativeTabs.BUILDING_BLOCKS));
@@ -152,6 +153,7 @@ public class TTrBlocks
 		registerMachineTile(TESteamForgeHammerSteel.class, "steam.forgehammer.steel");
 		registerMachineTile(TESteamPressorBronze.class, "steam.pressor.bronze");
 		registerMachineTile(TESteamPressorSteel.class, "steam.pressor.steel");
+		registerMachineTile(TESteamCrystalizerBronze.class, "steam.crystalizer.bronze");
 		register(steamHatch = new BlockSteamHatch().setRegistryName("steam.hatch").setUnlocalizedName("steam.hatch").setCreativeTab(CreativeTabs.DECORATIONS));
 		TTrAPI.proxy.registerForgeModel(steamHatch, "steam_hatch", BlockSteamHatch.MACHINE_TYPE1);
 		registerMachineTile(TESteamInputHatchBronze.class, "steam.ihatch.bronze");
@@ -184,19 +186,19 @@ public class TTrBlocks
 		GameRegistry.registerTileEntity(TEFluidPipeTungstenSteelMiddle.class, "pipe.fluid.tungstensteel.middle");
 		GameRegistry.registerTileEntity(TEFluidPipeTungstenSteelBig.class, "pipe.fluid.tungstensteel.big");
 	}
-	
+
 	private static void registerMachineTile(Class<? extends TileEntity> tileEntityClass, String name)
 	{
 		GameRegistry.registerTileEntity(tileEntityClass, name);
 		TTr.proxy.registerMachineRender(tileEntityClass);
 	}
-
+	
 	private static void register(Block block)
 	{
 		GameRegistry.register(block);
 		GameRegistry.register(new ItemBlockExt(block).setRegistryName(block.getRegistryName()));
 	}
-
+	
 	private static void registerItemModel(Block block, int meta, String modid, String locate)
 	{
 		TTrAPI.proxy.registerItemModel(Item.getItemFromBlock(block), meta, modid, locate);

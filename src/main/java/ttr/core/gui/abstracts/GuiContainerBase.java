@@ -65,6 +65,8 @@ public abstract class GuiContainerBase extends GuiContainer
 		drawFrontgroundOther(par1, par2);
 		for(FluidSlot slot : container.fluidSlotList)
 		{
+			par1 -= xoffset;
+			par2 -= yoffset;
 			if(slot.shouldRender() && slot.x <= par1 && slot.x + slot.w >= par1 && slot.y <= par2 && slot.y + slot.h >= par2)
 			{
 				FluidTankInfo info = slot.getTankInfo();
@@ -148,14 +150,15 @@ public abstract class GuiContainerBase extends GuiContainer
 			{
 				mc.renderEngine.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
 				int color = info.fluid.getFluid().getColor(info.fluid);
-				if(lay)
-				{
-					drawRepeated(fluidIcon, xoffset + x, yoffset + y, (double) (info.fluid.amount * width) / (double)info.capacity, height, zLevel, color);
-				}
-				else
-				{
-					drawRepeated(fluidIcon, xoffset + x, yoffset + y + height - (double) (info.fluid.amount * height) / (double) info.capacity, width, (double) (info.fluid.amount * height) / (double) info.capacity, zLevel, color);
-				}
+				drawTexturedModalRect(xoffset + x, yoffset + y, fluidIcon, width, height);
+				//				if(lay)
+				//				{
+				//					drawRepeated(fluidIcon, xoffset + x, yoffset + y, (double) (info.fluid.amount * width) / (double)info.capacity, height, zLevel, color);
+				//				}
+				//				else
+				//				{
+				//					drawRepeated(fluidIcon, xoffset + x, yoffset + y + height - (double) (info.fluid.amount * height) / (double) info.capacity, width, (double) (info.fluid.amount * height) / (double) info.capacity, zLevel, color);
+				//				}
 				GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
 				mc.renderEngine.bindTexture(location);
 			}

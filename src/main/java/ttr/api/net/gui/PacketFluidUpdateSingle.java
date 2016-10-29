@@ -18,7 +18,7 @@ public class PacketFluidUpdateSingle extends PacketContainer
 {
 	private int[] id;
 	private FluidStack[] stacks;
-
+	
 	public PacketFluidUpdateSingle()
 	{
 	}
@@ -32,7 +32,7 @@ public class PacketFluidUpdateSingle extends PacketContainer
 			stacks[i] = tank.getStackInTank(i);
 		}
 	}
-	
+
 	@Override
 	protected void encode(PacketBuffer output) throws IOException
 	{
@@ -45,7 +45,7 @@ public class PacketFluidUpdateSingle extends PacketContainer
 			if(stack != null)
 			{
 				output.writeBoolean(true);
-				output.writeString(stack.getFluid().getName());
+				output.writeShort(FluidRegistry.getFluidID(stack.getFluid()));
 				output.writeInt(stack.amount);
 				output.writeNBTTagCompoundToBuffer(stack.tag);
 			}
@@ -55,7 +55,7 @@ public class PacketFluidUpdateSingle extends PacketContainer
 			}
 		}
 	}
-	
+
 	@Override
 	protected void decode(PacketBuffer input) throws IOException
 	{
@@ -66,17 +66,17 @@ public class PacketFluidUpdateSingle extends PacketContainer
 		{
 			if(input.readBoolean())
 			{
-				String key = input.readStringFromBuffer(999);
-				if(!FluidRegistry.isFluidRegistered(key))
-					throw new IOException();
+				int key = input.readShort();
 				Fluid fluid = FluidRegistry.getFluid(key);
+				if(fluid == null)
+					throw new IOException();
 				int amt = input.readInt();
 				NBTTagCompound nbt = input.readNBTTagCompoundFromBuffer();
 				stacks[id] = new FluidStack(fluid, amt, nbt);
 			}
 		}
 	}
-	
+
 	@Override
 	public IPacket process(Network network)
 	{

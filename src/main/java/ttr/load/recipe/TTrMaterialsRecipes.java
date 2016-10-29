@@ -33,11 +33,11 @@ public class TTrMaterialsRecipes
 {
 	private static final AbstractStack[] EMPTY_ITEM_STACK = {};
 	private static final FluidStack[] EMPTY_FLUID_STACK = {};
-
+	
 	public static void init()
 	{
 		final int crystalFluidNeed = (int) (MC.moncrystal.size * 2 - MC.dustTiny.size) / 9;
-
+		
 		OreDictionary.registerOre("plateAdvancedCarbon", IC2Items.getItem("crafting", "carbon_plate"));
 		OreDictionary.registerOre("plateAdvancedAlloy", IC2Items.getItem("crafting", "alloy"));
 		AbstractStack stone1 = new OreStack("dustStone");
@@ -154,7 +154,7 @@ public class TTrMaterialsRecipes
 			if(material.contain(SubTag.MONCRYSTAL))
 			{
 				AbstractStack moncrystal = new OreStack("moncrystal" + material.oreDictName, 1);
-				AbstractStack plate = new OreStack("plate" + material.oreDictName);
+				AbstractStack plate = new OreStack("plate" + material.oreDictName, 2);
 				TemplateRecipeMap.CRYSTALIZER.addRecipe(new AbstractStack[]{new OreStack("dustTiny" + material.oreDictName)}, new FluidStack[]{new FluidStack(TTrFluids.moncrystal_liquid.get(material), crystalFluidNeed)}, new AbstractStack[]{moncrystal}, EMPTY_FLUID_STACK, 2400L, 12L);
 				TemplateRecipeMap.CUTTING.addRecipe(moncrystal, 300L, 60L, plate);
 				GameRegistry.addRecipe(new ShapedOreRecipe(plate.instance(), " s", "c ", 's', EnumToolType.saw.ore(), 'c', "moncrystal" + material.oreDictName));
@@ -171,19 +171,19 @@ public class TTrMaterialsRecipes
 				TTrRecipeAdder.addGrindingRecipe(ingot, dust1, 400, 25);
 			}
 		}
-		
+
 		GameRegistry.addRecipe(new ShapedOreRecipe(TTrItems.sub.get("bronzeGear"), "sps", "pwp", "sps", 's', "stickBronze", 'p', "plateBronze", 'w', EnumToolType.wrench.ore()));
 		GameRegistry.addRecipe(new ShapedOreRecipe(TTrItems.sub.get("ironGear"), "sps", "pwp", "sps", 's', "stickIron", 'p', "plateIron", 'w', EnumToolType.wrench.ore()));
 		GameRegistry.addRecipe(new ShapedOreRecipe(TTrItems.sub.get("steelGear"), "sps", "pwp", "sps", 's', "stickSteel", 'p', "plateSteel", 'w', EnumToolType.wrench.ore()));
 		GameRegistry.addRecipe(new ShapedOreRecipe(TTrItems.sub.get("tungstensteelGear"), "sps", "pwp", "sps", 's', "stickTungstensteel", 'p', "plateTungstensteel", 'w', EnumToolType.wrench.ore()));
 		GameRegistry.addRecipe(new ShapedOreRecipe(TTrItems.sub.get("stainlessSteelGear"), "sps", "pwp", "sps", 's', "stickStainlessSteel", 'p', "plateStainlessSteel", 'w', EnumToolType.wrench.ore()));
 		GameRegistry.addRecipe(new ShapedOreRecipe(TTrItems.sub.get("titaniumGear"), "sps", "pwp", "sps", 's', "stickTitanium", 'p', "plateTitanium", 'w', EnumToolType.wrench.ore()));
-
+		
 		TemplateRecipeMap.FORGE.addRecipe(new AbstractStack[]{new OreStack("dustMagnetite", 7), new OreStack("dustCoal", 2), new OreStack("dustMarble")}, new AbstractStack[]{new OreStack("dustIron", 4)}, 4000, 20, 1000);
 		TemplateRecipeMap.FORGE.addRecipe(new AbstractStack[]{new OreStack("dustMagnetite", 7), new OreStack("dustCoal", 2), new OreStack("dustCalcite")}, new AbstractStack[]{new OreStack("dustIron", 4)}, 4000, 20, 1000);
 		TemplateRecipeMap.FORGE.addRecipe(new AbstractStack[]{new OreStack("dustLimonite", 8), new OreStack("dustCoal"), new OreStack("dustMarble")}, new AbstractStack[]{new OreStack("dustIron", 2)}, 2000, 20, 1000);
 		TemplateRecipeMap.FORGE.addRecipe(new AbstractStack[]{new OreStack("dustLimonite", 8), new OreStack("dustCoal"), new OreStack("dustCalcite")}, new AbstractStack[]{new OreStack("dustIron", 2)}, 2000, 20, 1000);
-
+		
 		addAlloySmeltingRecipe(M.bronze, 24, 300, new Stack(M.copper, 4), M.tin, M.lead);
 		addAlloySmeltingRecipe(M.brass, 18, 200, new Stack(M.copper, 3), M.zinc);
 		addAlloySmeltingRecipe(M.electrum, 30, 100, M.gold, M.silver);
@@ -191,7 +191,7 @@ public class TTrMaterialsRecipes
 		addAlloySmeltingRecipe(M.cupronickel, 56, 100, M.copper, M.nickel);
 		addAlloySmeltingRecipe(M.redalloy, 60, 200, 750, 1, new Object[]{M.copper, new Stack(M.redstone, 4)});
 	}
-
+	
 	private static void addAlloySmeltingRecipe(Mat material, long power, long time, Object...inputs)
 	{
 		addAlloySmeltingRecipe(material, power, time, material.meltingPoint, inputs);
@@ -284,7 +284,7 @@ public class TTrMaterialsRecipes
 			TemplateRecipeMap.ALLOY_SMELTING.addRecipe(list1.toArray(new AbstractStack[list1.size()]), new AbstractStack[]{output}, time, power);
 		}
 	}
-	
+
 	private static final IDataChecker<MatCondition> ALLOY_SMELTING_MATTER_STACK_CHECKER =
 			(MatCondition condition) -> condition == MC.dust || condition == MC.ingot;
 }

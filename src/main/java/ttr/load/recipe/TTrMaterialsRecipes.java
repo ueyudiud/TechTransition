@@ -31,8 +31,13 @@ import ttr.load.TTrItems;
 
 public class TTrMaterialsRecipes
 {
+	private static final AbstractStack[] EMPTY_ITEM_STACK = {};
+	private static final FluidStack[] EMPTY_FLUID_STACK = {};
+
 	public static void init()
 	{
+		final int crystalFluidNeed = (int) (MC.moncrystal.size * 2 - MC.dustTiny.size) / 9;
+
 		OreDictionary.registerOre("plateAdvancedCarbon", IC2Items.getItem("crafting", "carbon_plate"));
 		OreDictionary.registerOre("plateAdvancedAlloy", IC2Items.getItem("crafting", "alloy"));
 		AbstractStack stone1 = new OreStack("dustStone");
@@ -145,6 +150,15 @@ public class TTrMaterialsRecipes
 			{
 				AbstractStack gem = new OreStack("gem" + material.oreDictName);
 				TTrRecipeAdder.addGrindingRecipe(gem, dust1, new OreStack("dustTiny" + material.byproduct1.oreDictName), new int[]{8000, 3000, 1000}, 500, 40);
+			}
+			if(material.contain(SubTag.MONCRYSTAL))
+			{
+				AbstractStack moncrystal = new OreStack("moncrystal" + material.oreDictName, 1);
+				AbstractStack plate = new OreStack("plate" + material.oreDictName);
+				TemplateRecipeMap.CRYSTALIZER.addRecipe(new AbstractStack[]{new OreStack("dustTiny" + material.oreDictName)}, new FluidStack[]{new FluidStack(TTrFluids.moncrystal_liquid.get(material), crystalFluidNeed)}, new AbstractStack[]{moncrystal}, EMPTY_FLUID_STACK, 2400L, 12L);
+				TemplateRecipeMap.CUTTING.addRecipe(moncrystal, 300L, 60L, plate);
+				GameRegistry.addRecipe(new ShapedOreRecipe(plate.instance(), " s", "c ", 's', EnumToolType.saw.ore(), 'c', "moncrystal" + material.oreDictName));
+				TTrRecipeAdder.addGrindingRecipe(moncrystal, new OreStack("dust" + material.oreDictName, 2), 500L, 50L);
 			}
 			if(MC.plate.isBelongTo(material))
 			{

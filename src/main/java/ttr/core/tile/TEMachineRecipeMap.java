@@ -7,6 +7,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTank;
+import net.minecraftforge.fluids.FluidTankInfo;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import ttr.api.inventory.Inventory;
@@ -14,7 +15,7 @@ import ttr.api.recipe.TemplateRecipeMap;
 import ttr.api.recipe.TemplateRecipeMap.TemplateRecipe;
 import ttr.api.stack.AbstractStack;
 
-public abstract class TEMachineRecipeMap extends TEMachineInventory
+public abstract class TEMachineRecipeMap extends TEMachineInventory implements ITankSyncable
 {
 	public static final int MachineEnabled = 3;
 	public static final int Working = 4;
@@ -150,11 +151,14 @@ public abstract class TEMachineRecipeMap extends TEMachineInventory
 			{
 				for(int i = 0; i < itemInputs.length; ++i)
 				{
-					for (AbstractStack element : recipe.inputsItem)
+					if(itemInputs[i] != null)
 					{
-						if(element != null && element.contain(itemInputs[i]))
+						for (AbstractStack element : recipe.inputsItem)
 						{
-							decrStackSize(itemInputs, i, recipe.inputsItem[i].size(itemInputs[i]), true);
+							if(element != null && element.contain(itemInputs[i]))
+							{
+								decrStackSize(itemInputs, i, element.size(itemInputs[i]), true);
+							}
 						}
 					}
 				}
@@ -526,5 +530,33 @@ public abstract class TEMachineRecipeMap extends TEMachineInventory
 	public int getRecipeProgress(int scale)
 	{
 		return maxDuration == 0 ? 0 : (int) (scale * duration / maxDuration);
+	}
+
+	@Override
+	public FluidTankInfo getInfomation(int id)
+	{
+		if(id < fluidInputTanks.length)
+			return fluidInputTanks[id].getInfo();
+		else
+			return fluidOutputTanks[id - fluidInputTanks.length].getInfo();
+	}
+
+	@Override
+	public int getTankSize()
+	{
+		return fluidInputTanks.length + fluidOutputTanks.length;
+	}
+
+	@Override
+	public void setFluidStackToTank(int id, FluidStack stack)
+	{
+		if(id < fluidInputTanks.length)
+		{
+			fluidInputTanks[id].setFluid(stack);
+		}
+		else
+		{
+			fluidOutputTanks[id - fluidInputTanks.length].setFluid(stack);
+		}
 	}
 }

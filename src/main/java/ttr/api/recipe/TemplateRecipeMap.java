@@ -22,7 +22,7 @@ import ttr.api.util.Log;
 public class TemplateRecipeMap implements IRecipeMap<TemplateRecipe>
 {
 	private static final Set<TemplateRecipeMap> RECIPE_MAPS = new HashSet();
-
+	
 	public static class TemplateRecipe implements IRecipeMap.IRecipe
 	{
 		public AbstractStack[] inputsItem;
@@ -38,14 +38,14 @@ public class TemplateRecipeMap implements IRecipeMap<TemplateRecipe>
 		public long minPower;
 		public long customValue;
 	}
-	
+
 	public static final TemplateRecipeMap SMELTING = new TemplateRecipeMap("smelting", true, 1, 1);
 	public static final TemplateRecipeMap CAULDRON_WASHING = new TemplateRecipeMap("cauldron_washing", true, 1, 3, 1, 0);
 	public static final TemplateRecipeMap CAULDRON_SOLUTE = new TemplateRecipeMap("cauldron_soulte", true, 1, 1, 1, 1);
-	
+
 	public static final TemplateRecipeMap FORGE = new TemplateRecipeMap("forge", true, 3, 3);
-	public static final TemplateRecipeMap DISTILLER = new TemplateRecipeMap("distiller", true, 1, 0, 1, 1);
-	
+	public static final TemplateRecipeMap CRYSTALIZER = new TemplateRecipeMap("crystalizer", true, 1, 1, 1, 0);
+
 	public static final TemplateRecipeMap BRONZE_COMPRESS = new TemplateRecipeMap("compress.bronze", true, 1, 1);
 	public static final TemplateRecipeMap GRINDING_STEAM = new TemplateRecipeMap("grinding.steam", true, 1, 2);
 	public static final TemplateRecipeMap GRINDING = new TemplateRecipeMap("grinding", true, 1, 4);
@@ -57,7 +57,7 @@ public class TemplateRecipeMap implements IRecipeMap<TemplateRecipe>
 	public static final TemplateRecipeMap CUTTING = new TemplateRecipeMap("cutting", true, 1, 1);
 	public static final TemplateRecipeMap CUTTING_STEAM = new TemplateRecipeMap("cutting.steam", true, 1, 1);
 	public static final TemplateRecipeMap ALLOY_SMELTING = new TemplateRecipeMap("alloy_smelting", false, 4, 1);
-
+	
 	public static void reloadRecipeMaps()
 	{
 		for(TemplateRecipeMap map : RECIPE_MAPS)
@@ -65,18 +65,18 @@ public class TemplateRecipeMap implements IRecipeMap<TemplateRecipe>
 			map.reloadRecipes();
 		}
 	}
-
+	
 	private List<TemplateRecipe> list = new ArrayList();
 	private List<TemplateRecipe> validatedlist;
 	private List<TemplateRecipe> listUnmodified = Collections.unmodifiableList(list);
-
+	
 	public final String name;
 	public final int sizeItemInput;
 	public final int sizeItemOutput;
 	public final int sizeFluidInput;
 	public final int sizeFluidOutput;
 	public final boolean shapedItemInput;
-
+	
 	public TemplateRecipeMap(String name, boolean shapedItemInput, int sizeItemInput, int sizeItemOutput)
 	{
 		this(name, shapedItemInput, sizeItemInput, sizeItemOutput, 0, 0);
@@ -91,53 +91,53 @@ public class TemplateRecipeMap implements IRecipeMap<TemplateRecipe>
 		this.sizeFluidOutput = sizeFluidOutput;
 		RECIPE_MAPS.add(this);
 	}
-	
+
 	@Override
 	public Collection<TemplateRecipe> getRecipes()
 	{
 		return listUnmodified;
 	}
-
+	
 	public void addRecipe(AbstractStack input, long duration, long power, AbstractStack output)
 	{
 		addRecipe(new AbstractStack[]{input}, new AbstractStack[]{output}, duration, power);
 	}
-
+	
 	public void addRecipe(AbstractStack input, long duration, long power, AbstractStack output, long customValue)
 	{
 		addRecipe(new AbstractStack[]{input}, new AbstractStack[]{output}, duration, power, customValue);
 	}
-	
+
 	public void addRecipe(AbstractStack[] input1, AbstractStack[] output1, long duration, long power)
 	{
 		addRecipe(input1, null, output1, duration, power);
 	}
-	
+
 	public void addRecipe(AbstractStack[] input1, AbstractStack[] output1, long duration, long power, long customValue)
 	{
 		addRecipe(input1, null, output1, null, duration, power, customValue, null);
 	}
-
+	
 	public void addRecipe(AbstractStack[] input1, FluidStack[] input2, AbstractStack[] output1, long duration, long power)
 	{
 		addRecipe(input1, input2, output1, null, duration, power);
 	}
-
+	
 	public void addRecipe(AbstractStack[] input1, AbstractStack[] output1, FluidStack[] output2, long duration, long power)
 	{
 		addRecipe(input1, null, output1, output2, duration, power);
 	}
-
+	
 	public void addRecipe(AbstractStack[] input1, FluidStack[] input2, AbstractStack[] output1, FluidStack[] output2, long duration, long power)
 	{
 		addRecipe(input1, input2, output1, output2, duration, power, 0, null);
 	}
-	
+
 	public void addRecipe(AbstractStack[] input1, FluidStack[] input2, AbstractStack[] output1, FluidStack[] output2, long duration, long power, long customValue, Object customData)
 	{
 		addRecipe(input1, input2, output1, (int[][]) null, output2, duration, power, customValue, customData);
 	}
-	
+
 	public void addRecipe(AbstractStack[] input1, FluidStack[] input2, AbstractStack[] output1, int[] outputChances, FluidStack[] output2, long duration, long power, long customValue, Object customData)
 	{
 		if(outputChances.length != output1.length) throw new RuntimeException("The output chances length and output length are not same!");
@@ -148,7 +148,7 @@ public class TemplateRecipeMap implements IRecipeMap<TemplateRecipe>
 		}
 		addRecipe(input1, input2, output1, chances, output2, duration, power, customValue, customData);
 	}
-	
+
 	public void addRecipe(AbstractStack[] input1, FluidStack[] input2, AbstractStack[] output1, int[][] outputChances, FluidStack[] output2, long duration, long power, long customValue, Object customData)
 	{
 		if(input1 == null)
@@ -197,13 +197,13 @@ public class TemplateRecipeMap implements IRecipeMap<TemplateRecipe>
 		recipe.customData = customData;
 		addRecipe(recipe);
 	}
-	
+
 	@Override
 	public void addRecipe(TemplateRecipe recipe)
 	{
 		list.add(recipe);
 	}
-	
+
 	@Override
 	public TemplateRecipe findRecipe(World world, BlockPos pos, long power, FluidStack[] fluidInputs, ItemStack... itemInputs)
 	{
@@ -216,7 +216,7 @@ public class TemplateRecipeMap implements IRecipeMap<TemplateRecipe>
 		}
 		return null;
 	}
-
+	
 	protected boolean matchRecipe(TemplateRecipe recipe, World world, BlockPos pos, long power, FluidStack[] fluidInputs, ItemStack[] itemInputs)
 	{
 		int i;
@@ -254,27 +254,28 @@ public class TemplateRecipeMap implements IRecipeMap<TemplateRecipe>
 		else
 		{
 			List<AbstractStack> inputs = new ArrayList(Arrays.asList(recipe.inputsItem));
-			for(i = 0; i < itemInputs.length; ++i)
-			{
-				if(itemInputs[i] != null)
+			label:
+				for(i = 0; i < itemInputs.length; ++i)
 				{
-					Iterator<AbstractStack> itr = inputs.iterator();
-					while(itr.hasNext())
+					if(itemInputs[i] != null)
 					{
-						AbstractStack stack = itr.next();
-						if(stack.contain(itemInputs[i]))
+						Iterator<AbstractStack> itr = inputs.iterator();
+						while(itr.hasNext())
 						{
-							itr.remove();
-							break;
+							AbstractStack stack = itr.next();
+							if(stack.contain(itemInputs[i]))
+							{
+								itr.remove();
+								continue label;
+							}
 						}
+						return false;
 					}
-					return false;
 				}
-			}
 			return inputs.isEmpty();
 		}
 	}
-
+	
 	@Override
 	public void reloadRecipes()
 	{
@@ -288,7 +289,7 @@ public class TemplateRecipeMap implements IRecipeMap<TemplateRecipe>
 		}
 		validatedlist = recipes.build();
 	}
-
+	
 	private boolean isRecipeValid(TemplateRecipe recipe)
 	{
 		if(recipe.chancesOutputItem != null && recipe.chancesOutputItem.length != recipe.outputsItem.length) return false;
@@ -306,7 +307,7 @@ public class TemplateRecipeMap implements IRecipeMap<TemplateRecipe>
 		}
 		return true;
 	}
-	
+
 	public boolean containInput(ItemStack target)
 	{
 		for(TemplateRecipe recipe : validatedlist)
@@ -319,7 +320,7 @@ public class TemplateRecipeMap implements IRecipeMap<TemplateRecipe>
 		}
 		return false;
 	}
-	
+
 	public boolean containInput(FluidStack target)
 	{
 		for(TemplateRecipe recipe : validatedlist)
@@ -332,7 +333,7 @@ public class TemplateRecipeMap implements IRecipeMap<TemplateRecipe>
 		}
 		return false;
 	}
-	
+
 	public boolean containOutput(ItemStack target)
 	{
 		for(TemplateRecipe recipe : validatedlist)
@@ -345,7 +346,7 @@ public class TemplateRecipeMap implements IRecipeMap<TemplateRecipe>
 		}
 		return false;
 	}
-	
+
 	public boolean containOutput(FluidStack target)
 	{
 		for(TemplateRecipe recipe : validatedlist)

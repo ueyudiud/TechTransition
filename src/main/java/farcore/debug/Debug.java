@@ -11,7 +11,7 @@ public class Debug
 	{
 		MC.init();
 		M.init();
-		String sourceLocate = "D:/Program Files/minecraft/f/forge-1.10.2-12.18.1.2011-mdk/src/main/resources/assets";
+		String sourceLocate = "D:/Program Files/minecraft/f/forge-1.10.2-12.18.1.2011-mdk-other/src/main/resources/assets";
 		//		String srcDirName = "";
 		//		String destDirName = "";
 		//		String formatName = "chiseled.png";

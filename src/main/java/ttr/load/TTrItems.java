@@ -15,7 +15,7 @@ import ttr.core.item.behavior.BehaviorWrench;
 public class TTrItems
 {
 	public static ItemSubTTr sub;
-
+	
 	public static Item pickaxe;
 	public static Item axe;
 	public static Item shovel;
@@ -25,7 +25,7 @@ public class TTrItems
 	public static Item file;
 	public static Item saw;
 	public static Item wrench;
-
+	
 	public static void init()
 	{
 		ItemMulti.postInitalized();
@@ -40,12 +40,19 @@ public class TTrItems
 		file = new ItemTool(EnumToolType.file, TTrToolStats.FILE, NEEDED1);
 		saw = new ItemTool(EnumToolType.saw, TTrToolStats.SAW, NEEDED1);
 		wrench = new ItemTool(EnumToolType.wrench, TTrToolStats.WRENCH, NEEDED1, new BehaviorWrench());
-
+		
 		sub = new ItemSubTTr();
 	}
-
+	
 	public static void initSubItem(ItemSubTTr item)
 	{
+		item.addSubItem(701, "circuitPartBasic", "Basic Circuit Part", "circuitPartTier0");
+		item.addSubItem(721, "circuitBoardBasic", "Basic Circuit Board", "circuitBoardTier0");
+		item.addSubItem(731, "circuitBoardBasicHandmade", "Handmade Basic Circuit Board");
+		item.addSubItem(741, "circuitChipBasic", "Basic Logical Chip", "circuitChipTier0");
+		item.addSubItem(751, "circuitChipBasicHandmade", "Handmade Basic Logical Chip");
+		item.addSubItem(761, "circuitBasic", "Basic Circuit", "circuitTier0");
+		
 		item.addSubItem(901, "bronzeGear", "Bronze Gear", "gearBronze");
 		item.addSubItem(902, "ironGear", "Iron Gear", "gearIron");
 		item.addSubItem(903, "steelGear", "Steel Gear", "gearSteel");

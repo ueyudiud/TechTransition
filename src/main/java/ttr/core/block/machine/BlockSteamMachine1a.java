@@ -17,6 +17,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import ttr.core.block.BlockMachine;
 import ttr.core.tile.TEBase;
 import ttr.core.tile.machine.steam.TESteamAlloyFurnace;
+import ttr.core.tile.machine.steam.TESteamCrystalizer;
 import ttr.core.tile.machine.steam.TESteamCutter;
 import ttr.core.tile.machine.steam.TESteamExtractor;
 import ttr.core.tile.machine.steam.TESteamForgeHammer;
@@ -34,48 +35,49 @@ public class BlockSteamMachine1a extends BlockMachine
 		FORGE_HAMMER,
 		CUTTER,
 		PRESSOR,
-		ALLOY_FURNACE;
-
+		ALLOY_FURNACE,
+		CRYSTALIZER;
+		
 		@Override
 		public String getName()
 		{
 			return name().toLowerCase();
 		}
 	}
-
+	
 	public static final PropertyEnum<MachineType1> MACHINE_TYPE1 = PropertyEnum.create("type", MachineType1.class);
-
+	
 	public BlockSteamMachine1a()
 	{
 		setHardness(4.0F);
 		setResistance(8.0F);
 		setDefaultState(getDefaultState().withProperty(FACING_PRIMARYII, EnumFacing.NORTH).withProperty(WORKING, false));
 	}
-	
+
 	@Override
 	protected BlockStateContainer createBlockState()
 	{
 		return new BlockStateContainer(this, MACHINE_TYPE1, WORKING, FACING_PRIMARYII, FACING_OUTPUT);
 	}
-	
+
 	@Override
 	protected IBlockState getActualState(IBlockState state, TEBase tile)
 	{
 		return state.withProperty(WORKING, tile.isActived()).withProperty(FACING_OUTPUT, tile.getFacing("exhaust"));
 	}
-	
+
 	@Override
 	public int getMetaFromState(IBlockState state)
 	{
 		return state.getValue(MACHINE_TYPE1).ordinal();
 	}
-	
+
 	@Override
 	public IBlockState getStateFromMeta(int meta)
 	{
 		return getDefaultState().withProperty(MACHINE_TYPE1, MachineType1.values()[meta]);
 	}
-
+	
 	@Override
 	@SideOnly(Side.CLIENT)
 	public void getSubBlocks(Item itemIn, CreativeTabs tab, List<ItemStack> list)
@@ -87,8 +89,9 @@ public class BlockSteamMachine1a extends BlockMachine
 		list.add(new ItemStack(itemIn, 1, 4));
 		list.add(new ItemStack(itemIn, 1, 5));
 		list.add(new ItemStack(itemIn, 1, 6));
+		list.add(new ItemStack(itemIn, 1, 7));
 	}
-	
+
 	@Override
 	public TileEntity createTileEntity(World world, IBlockState state)
 	{
@@ -101,6 +104,7 @@ public class BlockSteamMachine1a extends BlockMachine
 		case FORGE_HAMMER  : return new TESteamForgeHammer.TESteamForgeHammerBronze();
 		case CUTTER        : return new TESteamCutter.TESteamCutterBronze();
 		case PRESSOR       : return new TESteamPressor.TESteamPressorBronze();
+		case CRYSTALIZER   : return new TESteamCrystalizer.TESteamCrystalizerBronze();
 		default : return null;
 		}
 	}

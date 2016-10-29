@@ -19,16 +19,16 @@ public class TTrFluids
 	public static Fluid steam;
 	public static Fluid sulphuric_acid;
 	public static Fluid nitric_acid;
-	public static Fluid redalloy;
-
+	public static Map<Mat, Fluid> moncrystal_liquid;
+	
 	public static Map<Mat, Fluid> sulfate_impure;
 	public static Map<Mat, Fluid> chlorhydric_impure;
 	public static Map<Mat, Fluid> nitric_impure;
-	
+
 	public static Map<Mat, Fluid> sulfate;
 	public static Map<Mat, Fluid> chlorhydric;
 	public static Map<Mat, Fluid> nitric;
-
+	
 	public static void init()
 	{
 		ImmutableMap.Builder<Mat, Fluid> builder1 = ImmutableMap.builder();
@@ -37,6 +37,7 @@ public class TTrFluids
 		ImmutableMap.Builder<Mat, Fluid> builder4 = ImmutableMap.builder();
 		ImmutableMap.Builder<Mat, Fluid> builder5 = ImmutableMap.builder();
 		ImmutableMap.Builder<Mat, Fluid> builder6 = ImmutableMap.builder();
+		ImmutableMap.Builder<Mat, Fluid> builder7 = ImmutableMap.builder();
 		for(Mat material : Mat.register())
 		{
 			if(material.contain(SubTag.SULFATE_SOLUTABLE))
@@ -84,6 +85,15 @@ public class TTrFluids
 				}
 				builder6.put(material, fluid);
 			}
+			if(material.contain(SubTag.MONCRYSTAL))
+			{
+				Fluid fluid = FluidRegistry.getFluid(material.name);
+				if(fluid == null)
+				{
+					fluid = new FluidTTr(material.name).setDensity(2500).setViscosity(3500).setTemperature(material.meltingPoint);
+				}
+				builder7.put(material, fluid);
+			}
 		}
 		sulfate = builder1.build();
 		chlorhydric = builder2.build();
@@ -91,6 +101,7 @@ public class TTrFluids
 		sulfate_impure = builder4.build();
 		chlorhydric_impure = builder5.build();
 		nitric_impure = builder6.build();
+		moncrystal_liquid = builder7.build();
 		distilledwater = FluidRegistry.getFluid("ic2distilledwater");
 		steam = FluidRegistry.getFluid("steam");
 		if(steam == null)
@@ -107,14 +118,9 @@ public class TTrFluids
 		{
 			nitric_acid = new FluidTTr("nitricacid").setDensity(1420).setViscosity(1600);
 		}
-		redalloy = FluidRegistry.getFluid("redalloy");
-		if(redalloy == null)
-		{
-			redalloy = new FluidTTr("redalloy").setDensity(3200).setViscosity(3500).setTemperature(850);
-		}
 		MinecraftForge.EVENT_BUS.register(new TTrFluids());
 	}
-	
+
 	@SubscribeEvent
 	public void onIconMapReload(TextureStitchEvent.Pre event)
 	{

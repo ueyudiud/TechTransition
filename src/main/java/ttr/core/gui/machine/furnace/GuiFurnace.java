@@ -1,11 +1,9 @@
 package ttr.core.gui.machine.furnace;
 
-import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import ttr.api.util.LanguageManager;
 import ttr.core.gui.abstracts.GuiContainerBase;
 import ttr.core.tile.machine.furnace.TEFurnace;
 
@@ -13,23 +11,15 @@ import ttr.core.tile.machine.furnace.TEFurnace;
 public class GuiFurnace extends GuiContainerBase
 {
 	private static final ResourceLocation location = new ResourceLocation("ttr", "textures/gui/furnace.png");
-
+	
 	private TEFurnace furnace;
-
+	
 	public GuiFurnace(EntityPlayer player, TEFurnace tile)
 	{
 		super(new ContainerFurnace(player, tile));
 		furnace = tile;
 	}
 
-	@Override
-	protected void drawGuiContainerForegroundLayer(int x, int y)
-	{
-		String s = furnace.hasCustomName() ? furnace.getDisplayName().getFormattedText() : LanguageManager.translateToLocal(furnace.getName());
-		fontRendererObj.drawString(s, xSize / 2 - fontRendererObj.getStringWidth(s) / 2, 6, 4210752);
-		fontRendererObj.drawString(I18n.format("container.inventory"), 8, ySize - 96 + 2, 4210752);
-	}
-	
 	@Override
 	protected void drawOther(int xOffset, int yOffset, int aMouseXPosition, int aMouseYPosition)
 	{
@@ -49,7 +39,7 @@ public class GuiFurnace extends GuiContainerBase
 			drawTexturedModalRect(xOffset + 28, yOffset + 16 + 54 - i2, 176, 31 + 54 - i2, 5, i2);
 		}
 	}
-	
+
 	@Override
 	public ResourceLocation getResourceLocation()
 	{

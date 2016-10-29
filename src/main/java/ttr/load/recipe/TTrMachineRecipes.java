@@ -1,5 +1,6 @@
 package ttr.load.recipe;
 
+import ic2.api.item.IC2Items;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.registry.GameRegistry;
@@ -7,6 +8,7 @@ import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.oredict.ShapedOreRecipe;
 import ttr.api.data.EnumToolType;
 import ttr.load.TTrBlocks;
+import ttr.load.TTrItems;
 
 public class TTrMachineRecipes
 {
@@ -34,6 +36,8 @@ public class TTrMachineRecipes
 		OreDictionary.registerOre("craftingMachineCauldron", TTrBlocks.cauldron);
 		OreDictionary.registerOre("craftingMachinePiston", Blocks.PISTON);
 		OreDictionary.registerOre("craftingMachinePiston", Blocks.PISTON_EXTENSION);
+		OreDictionary.registerOre("circuitTier0", IC2Items.getItem("crafting", "circuit"));
+		OreDictionary.registerOre("cableCopperInsulated", IC2Items.getItem("cable", "type:copper,insulation:1"));
 
 		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(TTrBlocks.brick, 2, 0),
 				"ppp",
@@ -164,6 +168,13 @@ public class TTrMachineRecipes
 				"bbb",
 				'p', "plateBronze", 'w', EnumToolType.wrench.ore(), 'b', Blocks.BRICK_BLOCK,
 				'f', new ItemStack(TTrBlocks.steamMachine1a, 1, 0)));
+		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(TTrBlocks.steamMachine1a, 1, 7),
+				"pwp",
+				"gcg",
+				"bfb",
+				'c', "craftingMachineCauldron", 'g', "blockGlass",
+				'p', "plateBronze", 'w', EnumToolType.wrench.ore(), 'b', Blocks.BRICK_BLOCK,
+				'f', new ItemStack(TTrBlocks.steamMachine1a, 1, 0)));
 		
 		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(TTrBlocks.steamMachine1b, 1, 0),
 				"pwp",
@@ -226,5 +237,11 @@ public class TTrMachineRecipes
 				"pip",
 				"iwi",
 				"pip", 'p', "plateBronze", 'i', "craftingMachinePiston", 'w', EnumToolType.wrench.ore()));
+
+		GameRegistry.addRecipe(new ShapedOreRecipe(IC2Items.getItem("crafting", "circuit").copy(),
+				"lll",
+				"xpx",
+				"lll",
+				'l', "cableCopperInsulated", 'x', TTrItems.sub.get("circuitChipBasicHandmade"), 'p', TTrItems.sub.get("circuitBoardBasicHandmade")));
 	}
 }

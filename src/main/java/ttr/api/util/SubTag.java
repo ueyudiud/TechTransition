@@ -8,7 +8,7 @@ import ttr.api.collection.Register;
 public class SubTag implements IDataChecker<ISubTagContainer>
 {
 	private static final Register<SubTag> subTags = new Register();
-
+	
 	public static final SubTag WOOD = getNewSubTag("WOOD");
 	public static final SubTag ORE_NONMETAL = getNewSubTag("ORE_NONMETAL");
 	public static final SubTag ORE_CRYSTAL = getNewSubTag("ORE_CRYSTAL");
@@ -21,6 +21,7 @@ public class SubTag implements IDataChecker<ISubTagContainer>
 	public static final SubTag RADIOACTIVITY = getNewSubTag("RADIOACTIVITY");
 	public static final SubTag GEN_COAL = getNewSubTag("GEN_COAL");
 	public static final SubTag GEM = getNewSubTag("GEM");
+	public static final SubTag MONCRYSTAL = getNewSubTag("MONCRYSTAL");
 	public static final SubTag ALLOY = getNewSubTag("ALLOY");
 	public static final SubTag SULFATE = getNewSubTag("SULFATE");
 	public static final SubTag SULFATE_SOLUTABLE = getNewSubTag("SULFATE_SOLUTABLE");
@@ -29,11 +30,11 @@ public class SubTag implements IDataChecker<ISubTagContainer>
 	public static final SubTag CHLORHYDRIC = getNewSubTag("CHLORHYDRIC");
 	public static final SubTag CHLORHYDRIC_SOLUTABLE = getNewSubTag("CHLORHYDRIC_SOLUTABLE");
 	public static final SubTag NO_ITEM = getNewSubTag("NO_ITEM");
-
+	
 	public static final SubTag[] SOLUTABLE_ALL = {NITRIC, NITRIC_SOLUTABLE, SULFATE, SULFATE_SOLUTABLE, CHLORHYDRIC, CHLORHYDRIC_SOLUTABLE};
 	public static final SubTag[] SOLUTABLE_EXCLUDE_SULFACE = {NITRIC, NITRIC_SOLUTABLE, SULFATE, CHLORHYDRIC, CHLORHYDRIC_SOLUTABLE};
 	public static final SubTag[] SOLUTABLE_EXCLUDE_CHLORHYDRIC = {NITRIC, NITRIC_SOLUTABLE, SULFATE, SULFATE_SOLUTABLE, CHLORHYDRIC};
-
+	
 	public static void addTagsTo(SubTag[] tags, ISubTagContainer...containers)
 	{
 		for(ISubTagContainer container : containers)
@@ -42,34 +43,34 @@ public class SubTag implements IDataChecker<ISubTagContainer>
 				container.add(tags);
 			}
 	}
-	
+
 	public static SubTag getNewSubTag(String name)
 	{
 		if(subTags.contain(name))
 			return subTags.get(name);
 		return new SubTag(name);
 	}
-	
+
 	private final String name;
 	public final Collection<ISubTagContainer> relevantTaggedItems = new HashSet(1);
-	
+
 	private SubTag(String name)
 	{
 		this.name = name;
 		subTags.register(name, this);
 	}
-	
+
 	public String name()
 	{
 		return name;
 	}
-	
+
 	@Override
 	public String toString()
 	{
 		return name;
 	}
-
+	
 	public SubTag addContainerToList(ISubTagContainer... containers)
 	{
 		if (containers != null)
@@ -82,7 +83,7 @@ public class SubTag implements IDataChecker<ISubTagContainer>
 		}
 		return this;
 	}
-	
+
 	public SubTag addTo(ISubTagContainer... containers)
 	{
 		if (containers != null)
@@ -95,7 +96,7 @@ public class SubTag implements IDataChecker<ISubTagContainer>
 		}
 		return this;
 	}
-
+	
 	@Override
 	public boolean isTrue(ISubTagContainer container)
 	{

@@ -34,7 +34,7 @@ public class TTrRecipeRemove
 	 */
 	private static List<FakeCraftingInventory> logRemoveList = new ArrayList();
 	private static List<AbstractStack> smeltingInputRemoveList = new ArrayList();
-	
+
 	public static void init()
 	{
 		addRemoveRecipe("xxx", "x x", "xxx", 'x', Blocks.COBBLESTONE);
@@ -60,7 +60,7 @@ public class TTrRecipeRemove
 		addRemoveRecipe("ttt", "ttx", 'x', "dustElectrum", 't', "dustRedstone");
 		addRemoveRecipe("xxx", "o  ", 'x', "ingotCopper", 'o', "ingotTin");
 		addRemoveRecipe("xxx", "x x", "xxx", 'x', "plankWood");//Chest
-		
+
 		for(Mat material : Mat.register())
 		{
 			if(material.contain(SubTag.METAL) && material.hasBlock)
@@ -70,7 +70,7 @@ public class TTrRecipeRemove
 				//				addRemoveRecipe("xxx", "xxx", "xxx", 'x', "nugget" + material.oreDictName);
 			}
 		}
-
+		
 		addRemoves(
 				Items.SHEARS, Blocks.PISTON,
 				Items.GOLDEN_HORSE_ARMOR, Items.BUCKET, Items.COOKIE,
@@ -97,7 +97,7 @@ public class TTrRecipeRemove
 				"ingotPlatinum",
 				"ingotSignalum", "ingotLumium", "ingotEnderium");
 	}
-
+	
 	public static void addRemoves(Object...objects)
 	{
 		for(Object object : objects)
@@ -105,7 +105,7 @@ public class TTrRecipeRemove
 			addRemove(object);
 		}
 	}
-
+	
 	public static void addRemove(Object object)
 	{
 		if(object instanceof Item)
@@ -129,7 +129,7 @@ public class TTrRecipeRemove
 			outputRemoveList.add((AbstractStack) object);
 		}
 	}
-
+	
 	public static void addRemoveRecipe(Object...objects)
 	{
 		FakeCraftingInventory inventory = FakeCraftingInventory.init(objects);
@@ -138,7 +138,7 @@ public class TTrRecipeRemove
 			removeList.add(inventory);
 		}
 	}
-
+	
 	public static void addLogRemoveRecipe(Object...objects)
 	{
 		FakeCraftingInventory inventory = FakeCraftingInventory.init(objects);
@@ -147,7 +147,7 @@ public class TTrRecipeRemove
 			logRemoveList.add(inventory);
 		}
 	}
-	
+
 	public static void addRemoveSmelting(Object...objects)
 	{
 		for(Object object : objects)
@@ -178,7 +178,7 @@ public class TTrRecipeRemove
 			smeltingInputRemoveList.add((AbstractStack) object);
 		}
 	}
-
+	
 	public static void removeAll()
 	{
 		for(Entry<ItemStack, ItemStack> entry : new ArrayList<Entry<ItemStack, ItemStack>>(FurnaceRecipes.instance().getSmeltingList().entrySet()))

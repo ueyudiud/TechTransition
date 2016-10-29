@@ -6,7 +6,7 @@ import ttr.api.util.SubTag;
 public class M
 {
 	public static final Mat VOID = new Mat(-1, false, "ttr", "void", "Void", "VOID", "?");
-
+	
 	public static final Mat carbon = new Mat(61, "ttr", "carbon", "Carbon", "Carbon", "C").setPoint(3720, 4485).setFuelInfo(1000, 200, 1.2F).setRGBa(0x030303).setTag(SubTag.NONMETAL);
 	public static final Mat carbon14 = new Mat(62, "ttr", "carbon14", "Carbon14", "Carbon 14", "C-14").setPoint(3720, 3720).setFuelInfo(1000, 200, 1.2F).setRGBa(0x030303).setTag(SubTag.NONMETAL);
 	public static final Mat magnesium = new Mat(121, "ttr", "magnesium", "Magnesium", "Magnesium", "Mg").setSaltable(0xFFFFFF22, SubTag.SOLUTABLE_ALL).setPoint(836, 836).setFuelInfo(1900, 800, 0.2F).setTag(SubTag.METAL);
@@ -39,14 +39,14 @@ public class M
 	public static final Mat plutonium = new Mat(941, "ttr", "plutonium", "Plutonium", "Plutonium", "Pu").setPoint(2372, 3723).setTag(SubTag.METAL, SubTag.RADIOACTIVITY);
 	public static final Mat plutonium239 = new Mat(942, "ttr", "plutonium239", "Plutonium239", "Plutonium 239", "Pu-239").setPoint(2371, 3722).setTag(SubTag.METAL, SubTag.RADIOACTIVITY);
 	public static final Mat plutonium244 = new Mat(943, "ttr", "plutonium244", "Plutonium244", "Plutonium 244", "Pu-244").setPoint(2378, 3725).setTag(SubTag.METAL, SubTag.RADIOACTIVITY);
-	
+
 	public static final Mat salt = new Mat(3001, "ttr", "salt", "Salt", "Salt", "NaCl").setTag(SubTag.ORE_SALT);
 	public static final Mat soda = new Mat(3002, "ttr", "soda", "Soda", "Soda", "Na2CO3");
 	public static final Mat trona = new Mat(3003, "ttr", "trona", "Trona", "Trona", "Na2CO3").setTag(SubTag.ORE_SALT);
 	public static final Mat saltpeter = new Mat(3004, "ttr", "saltpeter", "Saltpeter", "Saltpeter", "KNO3").setTag(SubTag.ORE_SALT);
-
+	
 	public static final Mat fluorapatite = new Mat(3101, "ttr", "fluorapatite", "Fluorapatite", "Fluorapatite", "Ca5(PO4)3").setTag(SubTag.ORE_SIMPLE);
-
+	
 	public static final Mat ilmenite = new Mat(3201, "ttr", "ilmenite", "Ilmenite", "Ilmenite", "FeTiO3").setTag(SubTag.ORE_SIMPLE);
 	public static final Mat magnetite = new Mat(3202, "ttr", "magnetite", "Magnetite", "Magnetite", "Fe3O4").setTag(SubTag.ORE_SIMPLE);
 	public static final Mat pyrite = new Mat(3203, "ttr", "pyrite", "Pyrite", "Pyrite", "FeS2").setTag(SubTag.ORE_SIMPLE);
@@ -55,11 +55,11 @@ public class M
 	public static final Mat cinnabar = new Mat(3206, "ttr", "cinnabar", "Cinnabar", "Cinnabar", "HgS").setTag(SubTag.ORE_SIMPLE);
 	public static final Mat galena = new Mat(3207, "ttr", "galena", "Galena", "Galena", "PbS").setTag(SubTag.ORE_SIMPLE);
 	public static final Mat limonite = new Mat(3208, "ttr", "limonite", "Limonite", "Limonite", "FeO(OH)").setTag(SubTag.ORE_SIMPLE);
-
+	
 	public static final Mat bauxite = new Mat(3301, "ttr", "bauxite", "Bauxite", "Bauxite", "Al2O3").setTag(SubTag.ORE_SIMPLE);
 	public static final Mat realgar = new Mat(3302, "ttr", "realgar", "Realgar", "Realgar", "As4S4").setTag(SubTag.ORE_SIMPLE);
 	public static final Mat orpiment = new Mat(3303, "ttr", "orpiment", "Orpiment", "Orpiment", "As4S6").setTag(SubTag.ORE_SIMPLE);
-
+	
 	public static final Mat diamond = new Mat(4001, "ttr", "diamond", "Diamond", "Diamond", "C128").setTag(SubTag.ORE_CRYSTAL, SubTag.GEM);
 	public static final Mat emerald = new Mat(4002, "ttr", "emerald", "Emerald", "Emerald", "Be3Al2Si6O18").setTag(SubTag.ORE_CRYSTAL, SubTag.GEM);
 	public static final Mat ruby = new Mat(4003, "ttr", "ruby", "Ruby", "Ruby", "(Al2O3)15Cr").setTag(SubTag.ORE_CRYSTAL, SubTag.GEM);
@@ -72,7 +72,7 @@ public class M
 	public static final Mat monazite = new Mat(4010, "ttr", "monazite", "Monazite", "Monazite", "Ce2La(PO4)2").setTag(SubTag.ORE_CRYSTAL, SubTag.GEM);
 	public static final Mat coal = new Mat(4011, "ttr", "coal", "Coal", "Coal", "C[N,O,S]").setTag(SubTag.ORE_CRYSTAL, SubTag.GEM);
 	public static final Mat redstone = new Mat(4012, "ttr", "redstone", "Redstone", "Redstone", "?");
-
+	
 	public static final Mat bronze = new Mat(5001, "ttr", "bronze", "Bronze", "Bronze", "Cu4SnPb").setToolable(2, 298, 5.0F, 0F, 3.0F, 0.1F, 9).setBlockable("pickaxe", 1, 4.5F, 9.6F).setTag(SubTag.METAL, SubTag.ALLOY);
 	public static final Mat brass = new Mat(5002, "ttr", "brass", "Brass", "Brass", "Cu3Zn").setBlockable("pickaxe", 1, 4.2F, 9.2F).setTag(SubTag.METAL, SubTag.ALLOY);
 	public static final Mat steel = new Mat(5003, "ttr", "steel", "Steel", "Steel", "Fe50C").setToolable(2, 418, 7.0F, 0F, 5.0F, 0.3F, 3).setBlockable("pickaxe", 1, 7.2F, 15.0F).setTag(SubTag.METAL, SubTag.ALLOY);
@@ -86,13 +86,13 @@ public class M
 	public static final Mat magnalium = new Mat(5011, "ttr", "magnalium", "Magnalium", "Magnalium", "Al2Mg").setTag(SubTag.METAL, SubTag.ALLOY);
 	public static final Mat yellowgold = new Mat(5012, "ttr", "yellowgold", "YellowGold", "Yellow Gold", "Au2Ag3Cu4").setTag(SubTag.ALLOY);
 	public static final Mat tungstensteel = new Mat(5013, "ttr", "tungstensteel", "Tungstensteel", "Tungsten Steel", "Fe50CW").setBlockable("pickaxe", 3, 10.8F, 51.0F).setTag(SubTag.METAL, SubTag.ALLOY).setToolable(3, 4820, 9.0F, 0F, 4.0F, -0.8F, 11);
-	public static final Mat redalloy = new Mat(5014, "ttr", "redalloy", "RedAlloy", "Red Alloy", "?").setTag(SubTag.ALLOY);
+	public static final Mat redalloy = new Mat(5014, "ttr", "redalloy", "RedAlloy", "Red Alloy", "?").setTag(SubTag.ALLOY, SubTag.MONCRYSTAL);
 	//	addSubItem(2006, "galliumArsenide", "Gallium Arsenide", "GalliumArsenide", "GaAs", "gallium_arsenide", new Sub());
 	//	addSubItem(7001, "bronzeRough", "Rough Bronze", "RoughBronze", "Cu4SnPb", "bronze_rough", new Sub());
-	
+
 	public static final Mat stone = new Mat(6001, "ttr", "stone", "Stone", "Stone", "?").setBlockable("pickaxe", 0, 1.5F, 10.0F).setToolable(1, 131, 4.0F, 0.5F, 1.0F, -0.2F, 5).setTag(SubTag.ROCK);
 	public static final Mat marble = new Mat(6007, "ttr", "marble", "Marble", "Marble", "CaCO3").setBlockable("pickaxe", 0, 0.8F, 5.0F).setTag(SubTag.ROCK);
-	
+
 	public static final Mat wood = new Mat(10001, "ttr", "wood", "Wood", "Wood", "?").setTag(SubTag.WOOD);
 	//	addSubGem(10002, "moissaniteArtificial", "Artificial Moissanite", "Moissanite", "SiC", "moissanite_artificial", new Sub());
 	//	addSubItem(10003, "rubberRaw", "Raw Rubber", "RubberRaw", "[C5H8]n", "raw_rubber", new Sub());
@@ -136,7 +136,7 @@ public class M
 	//	addSubItem(11301, "platinumGroup", "Platinum Group", "PlatinumGroup", "Pt6Ir2Os", "platinum_group", new Sub());
 	//	addSubItem(11302, "ironGroup", "Iron Group", "IronGroup", "Fe5Ni3Ti", "iron_group", new Sub());
 	//	addSubItem(11303, "ironGroupOxidized", "Oxidized Iron Group", "IronGroupOxidized", "[Fe,Ni,Ti]O", "iron_group_oxide", new Sub());
-
+	
 	static
 	{
 		lapis.byproduct1 = pyrite;
@@ -160,6 +160,6 @@ public class M
 		ruby.handleMaterial = wood;
 		sapphire.handleMaterial = wood;
 	}
-
+	
 	public static void init(){	}
 }

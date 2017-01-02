@@ -9,20 +9,21 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.oredict.OreDictionary;
+import ttr.api.util.Util;
 
 public class BaseStack implements AbstractStack
 {
 	public static final BaseStack EMPTY = new BaseStack((ItemStack) null);
-
+	
 	public static BaseStack sizeOf(BaseStack stack, int size)
 	{
 		return size <= 0 ? null : new BaseStack(stack.stack, size, stack.useContainer);
 	}
-
+	
 	private ImmutableList<ItemStack> list;
 	public ItemStack stack;
 	private boolean useContainer;
-
+	
 	public BaseStack(String modid, String name, int size, int meta)
 	{
 		this(modid, name, size, meta, false);
@@ -32,7 +33,7 @@ public class BaseStack implements AbstractStack
 		Item item = GameRegistry.findItem(modid, name);
 		if(item != null)
 		{
-			stack = new ItemStack(item, size, meta);
+			this.stack = new ItemStack(item, size, meta);
 		}
 		useContainer = false;
 	}
@@ -48,9 +49,9 @@ public class BaseStack implements AbstractStack
 	{
 		if(block != null)
 		{
-			stack = new ItemStack(block, size, meta);
+			this.stack = new ItemStack(block, size, meta);
 		}
-		useContainer = false;
+		this.useContainer = false;
 	}
 	public BaseStack(Item item)
 	{
@@ -64,9 +65,9 @@ public class BaseStack implements AbstractStack
 	{
 		if(item != null)
 		{
-			stack = new ItemStack(item, size, meta);
+			this.stack = new ItemStack(item, size, meta);
 		}
-		useContainer = false;
+		this.useContainer = false;
 	}
 	public BaseStack(ItemStack stack)
 	{
@@ -76,16 +77,14 @@ public class BaseStack implements AbstractStack
 	{
 		if(stack != null)
 		{
-			this.stack = stack.copy();
-			this.stack.stackSize = size;
+			this.stack = Util.copyAmount(stack, size);
 		}
 	}
 	public BaseStack(ItemStack stack, int size, int meta)
 	{
 		if(stack != null)
 		{
-			this.stack = stack.copy();
-			this.stack.stackSize = size;
+			this.stack = Util.copyAmount(stack, size);
 			this.stack.setItemDamage(meta);
 		}
 	}
@@ -103,40 +102,40 @@ public class BaseStack implements AbstractStack
 		}
 		this.useContainer = useContainer;
 	}
-
+	
 	@Override
 	public boolean similar(ItemStack stack)
 	{
 		return this.stack == null ? stack == null :
 			OreDictionary.itemMatches(this.stack, stack, false);
 	}
-
+	
 	@Override
 	public boolean contain(ItemStack stack)
 	{
 		return similar(stack) &&
 				(this.stack == null || this.stack.stackSize <= stack.stackSize);
 	}
-
+	
 	@Override
 	public int size(ItemStack stack)
 	{
 		return this.stack == null ? 0 :
 			this.stack.stackSize;
 	}
-
+	
 	@Override
 	public AbstractStack split(ItemStack stack)
 	{
 		return sizeOf(this, this.stack.stackSize - stack.stackSize);
 	}
-
+	
 	@Override
 	public ItemStack instance()
 	{
-		if(stack != null)
+		if(this.stack != null)
 		{
-			ItemStack ret = stack.copy();
+			ItemStack ret = this.stack.copy();
 			if(ret.getItemDamage() == OreDictionary.WILDCARD_VALUE)
 			{
 				ret.setItemDamage(0);
@@ -145,56 +144,56 @@ public class BaseStack implements AbstractStack
 		}
 		return null;
 	}
-
+	
 	@Override
 	public List<ItemStack> display()
 	{
-		if(list == null)
-			if(stack != null)
+		if(this.list == null)
+			if(this.stack != null)
 			{
-				list = ImmutableList.of(stack.copy());
+				this.list = ImmutableList.of(this.stack.copy());
 			}
 			else
 			{
-				list = ImmutableList.of();
+				this.list = ImmutableList.of();
 			}
-		return list;
+		return this.list;
 	}
-
+	
 	@Override
 	public boolean valid()
 	{
-		return stack != null;
+		return this.stack != null;
 	}
-
+	
 	@Override
 	public boolean useContainer()
 	{
-		return useContainer;
+		return this.useContainer;
 	}
-
+	
 	@Override
 	public String toString()
 	{
-		return "[" + stack.getUnlocalizedName() + "]" + "x" + stack.stackSize;
+		return "[" + this.stack.getUnlocalizedName() + "]" + "x" + this.stack.stackSize;
 	}
-
+	
 	@Override
 	public int hashCode()
 	{
-		return stack == null ? 31 :
-			stack.getItem().hashCode() * 31 + stack.getItemDamage();
+		return this.stack == null ? 31 :
+			this.stack.getItem().hashCode() * 31 + this.stack.getItemDamage();
 	}
-
+	
 	@Override
 	public boolean equals(Object obj)
 	{
-		if(stack == null) return obj == EMPTY;
+		if(this.stack == null) return obj == EMPTY;
 		if(obj == this)
 			return true;
 		else if(!(obj instanceof BaseStack))
 			return false;
 		BaseStack stack1 = (BaseStack) obj;
-		return ItemStack.areItemStacksEqual(stack, stack1.stack) && useContainer == stack1.useContainer;
+		return ItemStack.areItemStacksEqual(this.stack, stack1.stack) && this.useContainer == stack1.useContainer;
 	}
 }

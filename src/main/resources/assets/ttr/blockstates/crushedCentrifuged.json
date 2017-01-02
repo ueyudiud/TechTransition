@@ -1,0 +1,15 @@
+{
+	"forge_marker":1,
+	"defaults": {
+		"transform": "forge:default-item",
+		"model": "ttr:item",
+		"textures": { 
+			"layer0": "ttr:items/iconsets/void"
+		}
+	},
+	"variants": {
+		"type": {
+			"default"   : { "textures": { "layer1": "ttr:items/iconsets/crushed_centrifuged" } }
+		}
+	}
+}

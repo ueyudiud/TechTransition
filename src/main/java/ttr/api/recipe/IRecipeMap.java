@@ -1,6 +1,8 @@
 package ttr.api.recipe;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
@@ -14,10 +16,12 @@ public interface IRecipeMap<R extends IRecipe>
 	{
 	}
 	
+	Map<String, IRecipeMap> RECIPEMAPS = new HashMap();
+	
 	void addRecipe(R recipe);
-
+	
 	Collection<R> getRecipes();
-
+	
 	void reloadRecipes();
 	
 	R findRecipe(World world, BlockPos pos, long power, FluidStack[] fluidInputs, ItemStack...itemInputs);

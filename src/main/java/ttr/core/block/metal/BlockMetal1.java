@@ -8,41 +8,40 @@ import net.minecraft.util.IStringSerializable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.World;
-import ttr.api.data.M;
-import ttr.api.material.Mat;
+import ttr.api.enums.EnumMaterial;
 
 public class BlockMetal1 extends BlockMetalBase
 {
 	public static enum EnumType implements IStringSerializable
 	{
-		aluminium(M.aluminium),
-		titanium(M.titanium),
-		chromium(M.chromium),
-		nickel(M.nickel),
-		zinc(M.zinc),
-		silver(M.silver),
-		tungsten(M.tungsten),
-		osmium(M.osmium),
-		iridium(M.iridium),
-		platinum(M.platinum);
-
-		final Mat material;
-
-		EnumType(Mat material)
+		aluminium(EnumMaterial.Aluminium),
+		titanium(EnumMaterial.Titanium),
+		chromium(EnumMaterial.Chromium),
+		nickel(EnumMaterial.Nickel),
+		zinc(EnumMaterial.Zinc),
+		silver(EnumMaterial.Silver),
+		tungsten(EnumMaterial.Tungsten),
+		osmium(EnumMaterial.Osmium),
+		iridium(EnumMaterial.Iridium),
+		platinum(EnumMaterial.Platinum);
+		
+		final EnumMaterial material;
+		
+		EnumType(EnumMaterial material)
 		{
 			this.material = material;
 		}
 		
 		public String oreName()
 		{
-			return "block" + material.oreDictName;
+			return "block" + this.material.oreDictName;
 		}
-
+		
 		public String localName()
 		{
-			return material.localName + " Block";
+			return this.material.localName + " Block";
 		}
-
+		
 		@Override
 		public String getName()
 		{
@@ -51,7 +50,7 @@ public class BlockMetal1 extends BlockMetalBase
 	}
 	
 	public static final PropertyEnum<EnumType> TYPE = PropertyEnum.create("type", EnumType.class);
-
+	
 	@Override
 	protected IProperty getMetalProperty()
 	{
@@ -63,13 +62,13 @@ public class BlockMetal1 extends BlockMetalBase
 	{
 		return state.getValue(TYPE).material.blockHardness;
 	}
-
+	
 	@Override
 	public float getExplosionResistance(World world, BlockPos pos, Entity exploder, Explosion explosion)
 	{
 		return world.getBlockState(pos).getValue(TYPE).material.blockExplosionResistance;
 	}
-
+	
 	@Override
 	public String getHarvestTool(IBlockState state)
 	{

@@ -1,0 +1,28 @@
+{
+	"forge_marker":1,
+	"defaults": {
+		"transform": "forge:default-item",
+		"model": "ttr:item",
+		"textures": { "layer0": "ttr:items/iconsets/void" }
+	},
+	"variants": {
+		"type": {
+			"default"    : { "textures": { "layer1": "ttr:items/iconsets/gem_chipped_crystal" } },
+			"nonmetal"   : { "textures": { "layer1": "ttr:items/iconsets/gem_chipped_nonmetal" } },
+			"metallic"   : { "textures": { "layer1": "ttr:items/iconsets/gem_chipped_metallic" } },
+			"cube"       : { "textures": { "layer1": "ttr:items/iconsets/gem_chipped_cube" } },
+			"cube_shiny" : { 
+				"textures": { 
+					"layer1": "ttr:items/iconsets/gem_chipped_cube_shiny",
+					"layer2": "ttr:items/iconsets/gem_chipped_cube_shiny_overlay"
+				} 
+			},
+			"flint"      : { 
+				"textures": { 
+					"layer1": "ttr:items/iconsets/gem_chipped_flint",
+					"layer2": "ttr:items/iconsets/gem_chipped_flint_overlay"
+				}
+			}
+		}
+	}
+}

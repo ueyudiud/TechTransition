@@ -4,14 +4,14 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.oredict.OreDictionary;
 import ttr.api.item.IBehavior;
 import ttr.api.item.ItemSub;
-import ttr.load.TTrItems;
+import ttr.load.TTrIBF;
 
 public class ItemSubTTr extends ItemSub
 {
 	public ItemSubTTr()
 	{
 		super("ttr", "sub");
-		TTrItems.initSubItem(this);
+		TTrIBF.initSubItem(this);
 	}
 	
 	public ItemStack get(String name)

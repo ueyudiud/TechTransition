@@ -11,12 +11,14 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.IFluidContainerItem;
 import net.minecraftforge.fluids.IFluidTank;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import ttr.api.stack.AbstractStack;
 import ttr.api.util.LanguageManager;
+import ttr.api.util.Util;
 
 public class Inventory implements IItemHandlerModifiable, IInventory
 {
@@ -31,8 +33,8 @@ public class Inventory implements IItemHandlerModifiable, IInventory
 		
 		FDType(boolean doFill, boolean doDrain)
 		{
-			d = doDrain;
-			f = doFill;
+			this.d = doDrain;
+			this.f = doFill;
 		}
 	}
 	
@@ -50,13 +52,13 @@ public class Inventory implements IItemHandlerModifiable, IInventory
 	public Inventory(int size, String name, int stackLimit)
 	{
 		this.name = name;
-		stacks = new ItemStack[size];
-		limit = stackLimit;
+		this.stacks = new ItemStack[size];
+		this.limit = stackLimit;
 	}
 	
 	public void readFromNBT(NBTTagCompound nbt)
 	{
-		readFromNBT(stacks, nbt, "items");
+		readFromNBT(this.stacks, nbt, "items");
 	}
 	
 	public static void readFromNBT(ItemStack[] stacks, NBTTagCompound nbt, String tag)
@@ -75,7 +77,7 @@ public class Inventory implements IItemHandlerModifiable, IInventory
 	
 	public void writeToNBT(NBTTagCompound data)
 	{
-		writeToNBT(stacks, data, "items");
+		writeToNBT(this.stacks, data, "items");
 	}
 	
 	public static void writeToNBT(ItemStack[] stacks, NBTTagCompound data, String tag)
@@ -97,31 +99,31 @@ public class Inventory implements IItemHandlerModifiable, IInventory
 	@Override
 	public int getSizeInventory()
 	{
-		return stacks.length;
+		return this.stacks.length;
 	}
-
+	
 	@Override
 	public ItemStack getStackInSlot(int i)
 	{
-		return stacks[i];
+		return this.stacks[i];
 	}
-
+	
 	@Override
 	public ItemStack decrStackSize(int i, int size)
 	{
 		return decrStackSize(i, size, true);
 	}
-
+	
 	public ItemStack decrStackSize(int i, int size, boolean process)
 	{
 		if(size <= 0) return null;
-		if(stacks[i] == null) return null;
-		ItemStack stack = stacks[i];
+		if(this.stacks[i] == null) return null;
+		ItemStack stack = this.stacks[i];
 		if(stack.stackSize <= size)
 		{
 			if(process)
 			{
-				stacks[i] = null;
+				this.stacks[i] = null;
 			}
 			return stack;
 		}
@@ -141,24 +143,24 @@ public class Inventory implements IItemHandlerModifiable, IInventory
 	public int addStack(int i, ItemStack stack, boolean process)
 	{
 		if(stack == null || stack.stackSize == 0) return 0;
-		int size = Math.min(limit, stack.getMaxStackSize());
-		if(stacks[i] == null)
+		int size = Math.min(this.limit, stack.getMaxStackSize());
+		if(this.stacks[i] == null)
 		{
 			size = Math.min(stack.stackSize, size);
 			if(process)
 			{
 				ItemStack stack1 = stack.copy();
 				stack1.stackSize = size;
-				stacks[i] = stack1;
+				this.stacks[i] = stack1;
 			}
 			return size;
 		}
-		else if(stacks[i].isItemEqual(stack) && ItemStack.areItemStackTagsEqual(stacks[i], stack))
+		else if(this.stacks[i].isItemEqual(stack) && ItemStack.areItemStackTagsEqual(this.stacks[i], stack))
 		{
-			size = Math.min(stack.stackSize, size - stacks[i].stackSize);
+			size = Math.min(stack.stackSize, size - this.stacks[i].stackSize);
 			if(process)
 			{
-				stacks[i].stackSize += size;
+				this.stacks[i].stackSize += size;
 			}
 			return size;
 		}
@@ -168,7 +170,7 @@ public class Inventory implements IItemHandlerModifiable, IInventory
 	public boolean addStack(int i, AbstractStack stack, boolean process)
 	{
 		if(stack == null || stack.instance() == null) return true;
-		if(stacks[i] == null)
+		if(this.stacks[i] == null)
 		{
 			ItemStack stack2 = stack.instance().copy();
 			if(addStack(i, stack2, false) == stack2.stackSize)
@@ -181,15 +183,15 @@ public class Inventory implements IItemHandlerModifiable, IInventory
 			}
 			return false;
 		}
-		else if(stack.similar(stacks[i]))
+		else if(stack.similar(this.stacks[i]))
 		{
-			int size = Math.min(limit, stacks[i].getMaxStackSize());
-			int size1 = stack.size(stacks[i]);
-			if(size1 > size - stacks[i].stackSize)
+			int size = Math.min(this.limit, this.stacks[i].getMaxStackSize());
+			int size1 = stack.size(this.stacks[i]);
+			if(size1 > size - this.stacks[i].stackSize)
 				return false;
 			if(process)
 			{
-				stacks[i].stackSize += size1;
+				this.stacks[i].stackSize += size1;
 			}
 			return true;
 		}
@@ -199,48 +201,48 @@ public class Inventory implements IItemHandlerModifiable, IInventory
 	@Override
 	public ItemStack removeStackFromSlot(int index)
 	{
-		ItemStack stack = stacks[index];
-		stacks[index] = null;
+		ItemStack stack = this.stacks[index];
+		this.stacks[index] = null;
 		return stack;
 	}
-
+	
 	@Override
 	public void setInventorySlotContents(int i, ItemStack stack)
 	{
-		stacks[i] = ItemStack.copyItemStack(stack);
+		this.stacks[i] = ItemStack.copyItemStack(stack);
 	}
-
+	
 	@Override
 	public ITextComponent getDisplayName()
 	{
 		return new TextComponentString(LanguageManager.translateToLocal(getName()));
 	}
-
+	
 	@Override
 	public String getName()
 	{
-		return name;
+		return this.name;
 	}
-
+	
 	@Override
 	public int getInventoryStackLimit()
 	{
-		return limit;
+		return this.limit;
 	}
-
+	
 	@Override
 	public void markDirty()
 	{
-		tile.markDirty();
+		this.tile.markDirty();
 	}
-
+	
 	@Override
 	public boolean isUseableByPlayer(EntityPlayer player)
 	{
-		return tile == INSTANCE ? true :
-			player.getDistanceSq(tile.getPos()) <= 64;
+		return this.tile == INSTANCE ? true :
+			player.getDistanceSq(this.tile.getPos()) <= 64;
 	}
-
+	
 	@Override
 	public boolean isItemValidForSlot(int i, ItemStack stack)
 	{
@@ -265,7 +267,7 @@ public class Inventory implements IItemHandlerModifiable, IInventory
 	}
 	public boolean fillOrDrainInventoryTank(IFluidTank tank, int inputSlot, int outputSlot, FDType type)
 	{
-		ItemStack input = stacks[inputSlot];
+		ItemStack input = this.stacks[inputSlot];
 		if(input == null) return true;
 		input = input.copy();
 		input.stackSize = 1;
@@ -286,10 +288,10 @@ public class Inventory implements IItemHandlerModifiable, IInventory
 							stack2 = handler.drain(tank.fill(stack, true), true);
 							if(addStack(outputSlot, input, true) != 0)
 							{
-								stacks[inputSlot].stackSize--;
-								if(stacks[inputSlot].stackSize == 0)
+								this.stacks[inputSlot].stackSize--;
+								if(this.stacks[inputSlot].stackSize == 0)
 								{
-									stacks[inputSlot] = null;
+									this.stacks[inputSlot] = null;
 								}
 								return true;
 							}
@@ -307,19 +309,63 @@ public class Inventory implements IItemHandlerModifiable, IInventory
 					if(amt > 0 && addStack(outputSlot, input, true) != 0)
 					{
 						tank.drain(amt, true);
-						stacks[inputSlot].stackSize--;
-						if(stacks[inputSlot].stackSize == 0)
+						this.stacks[inputSlot].stackSize--;
+						if(this.stacks[inputSlot].stackSize == 0)
 						{
-							stacks[inputSlot] = null;
+							this.stacks[inputSlot] = null;
 						}
 						return true;
 					}
 				}
 			}
 		}
+		else if(input.getItem() instanceof IFluidContainerItem)
+		{
+			IFluidContainerItem item = (IFluidContainerItem) input.getItem();
+			input = Util.copyAmount(input, 1);
+			if(type.d && item.getFluid(input) != null)
+			{
+				FluidStack stack = item.drain(input, Integer.MAX_VALUE, false);
+				if(stack != null)
+				{
+					int amt = tank.fill(stack, false);
+					if(amt > 0)
+					{
+						FluidStack stack2 = item.drain(input, amt, true);
+						if(addStack(outputSlot, input, true) == 1)
+						{
+							this.stacks[inputSlot].stackSize--;
+							tank.fill(stack2, true);
+							if(this.stacks[inputSlot].stackSize == 0)
+							{
+								this.stacks[inputSlot] = null;
+							}
+							return true;
+						}
+					}
+				}
+			}
+			if(type.f)
+			{
+				FluidStack stack = tank.drain(Integer.MAX_VALUE, false);
+				input = Util.copyAmount(input, 1);
+				int amt = item.fill(input, stack, true);
+				if(amt != 0 && addStack(outputSlot, input, false) == 1)
+				{
+					addStack(outputSlot, input, true);
+					tank.drain(amt, true);
+					this.stacks[inputSlot].stackSize --;
+					if(this.stacks[inputSlot].stackSize == 0)
+					{
+						this.stacks[inputSlot] = null;
+					}
+					return true;
+				}
+			}
+		}
 		return false;
 	}
-
+	
 	//	public void chargeOrReleaseEnergy(ITileEleCharger charger, int slot)
 	//	{
 	//		chargeOrReleaseEnergy(charger, slot, FDType.D);
@@ -393,13 +439,13 @@ public class Inventory implements IItemHandlerModifiable, IInventory
 	@Override
 	public void openInventory(EntityPlayer player)
 	{
-
+		
 	}
 	
 	@Override
 	public void closeInventory(EntityPlayer player)
 	{
-
+		
 	}
 	
 	@Override
@@ -411,7 +457,7 @@ public class Inventory implements IItemHandlerModifiable, IInventory
 	@Override
 	public void setField(int id, int value)
 	{
-
+		
 	}
 	
 	@Override
@@ -423,15 +469,15 @@ public class Inventory implements IItemHandlerModifiable, IInventory
 	@Override
 	public void clear()
 	{
-		Arrays.fill(stacks, null);
+		Arrays.fill(this.stacks, null);
 	}
 	
 	@Override
 	public void setStackInSlot(int slot, ItemStack stack)
 	{
-		stacks[slot] = ItemStack.copyItemStack(stack);
+		this.stacks[slot] = ItemStack.copyItemStack(stack);
 	}
-
+	
 	@Override
 	public boolean hasCustomName()
 	{

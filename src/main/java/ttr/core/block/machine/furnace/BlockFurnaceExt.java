@@ -22,7 +22,7 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import ttr.api.data.EnumToolType;
+import ttr.api.enums.EnumTools;
 import ttr.core.block.BlockMachine;
 import ttr.core.tile.TEBase;
 import ttr.core.tile.machine.furnace.TEFurnace;
@@ -115,7 +115,7 @@ public class BlockFurnaceExt extends BlockMachine
 	@Override
 	public String getHarvestTool(IBlockState state)
 	{
-		return EnumToolType.pickaxe.name();
+		return EnumTools.pickaxe.name();
 	}
 
 	@Override

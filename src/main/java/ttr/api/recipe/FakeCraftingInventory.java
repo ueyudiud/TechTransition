@@ -2,169 +2,194 @@ package ttr.api.recipe;
 
 import java.util.HashMap;
 
+import javax.annotation.Nullable;
+
 import net.minecraft.block.Block;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.oredict.OreDictionary;
-import ttr.api.util.Log;
+import ttr.api.stack.AbstractStack;
+import ttr.api.util.Util;
 
 public class FakeCraftingInventory extends InventoryCrafting
 {
-	private static final FakeCraftingInventory INVALID =
-			new FakeCraftingInventory(0, 0, new ItemStack[0]);
-
-	static
+	public static FakeCraftingInventory createWithSingle(Object object)
 	{
-		INVALID.valid = false;
+		return new FakeCraftingInventory(1, 1, object);
 	}
-
-	private boolean valid = true;
-
-	public boolean isValid()
+	public static FakeCraftingInventory createShapeless(Object...recipe)
 	{
-		return valid;
-	}
-
-	private final ItemStack[] itemstacks;
-	private int xSize;
-	private int ySize;
-
-	public static FakeCraftingInventory init(Object...recipe)
-	{
-		String shape = "";
-		int idx = 0;
-		int xSize = 0;
-		int ySize = 0;
-		ItemStack[] itemstacks;
-		
-		if (recipe[idx] instanceof String[])
+		try
 		{
-			String[] parts = ((String[])recipe[idx++]);
-			
-			for (String s : parts)
+			int xSize, ySize;
+			switch (recipe.length)
 			{
-				xSize = s.length();
-				shape += s;
+			case 1 : return createWithSingle(recipe[0]);
+			case 2 :
+				xSize = 2; ySize = 1;
+			case 3 :
+			case 4 :
+				xSize = 2; ySize = 2;
+				break;
+			default :
+				xSize = 3; ySize = 3;
+				break;
 			}
-			
-			ySize = parts.length;
+			Object[] array = new Object[xSize * ySize];
+			System.arraycopy(recipe, 0, array, 0, recipe.length);
+			return new FakeCraftingInventory(xSize, ySize, array);
 		}
-		else
+		catch(Exception exception)
 		{
-			while (recipe[idx] instanceof String)
-			{
-				String s = (String)recipe[idx++];
-				shape += s;
-				xSize = s.length();
-				ySize++;
-			}
-		}
-		
-		if (xSize * ySize != shape.length())
-		{
-			String ret = "Invalid shaped fake inventory: ";
-			for (Object tmp :  recipe)
+			String ret = "Invalid fake crafting inventory: ";
+			for (Object tmp : recipe)
 			{
 				ret += tmp + ", ";
 			}
-			throw new RuntimeException(ret);
+			throw new RuntimeException(ret.substring(0, ret.length() - 2), exception);
 		}
-		
-		HashMap<Character, ItemStack> itemMap = new HashMap();
-		
-		for (; idx < recipe.length; idx += 2)
+	}
+	public static FakeCraftingInventory createShaped(Object...recipe)
+	{
+		try
 		{
-			Character chr = (Character)recipe[idx];
-			Object in = recipe[idx + 1];
+			String shape = "";
+			int idx = 0;
+			int xSize = 0;
+			int ySize = 0;
 			
-			if (in instanceof ItemStack)
+			if (recipe[idx] instanceof String[])
 			{
-				itemMap.put(chr, ((ItemStack)in).copy());
-			}
-			else if (in instanceof Item)
-			{
-				itemMap.put(chr, new ItemStack((Item)in));
-			}
-			else if (in instanceof Block)
-			{
-				itemMap.put(chr, new ItemStack((Block)in));
-			}
-			else if (in instanceof String)
-			{
-				if(!OreDictionary.getOres((String)in).isEmpty())
+				String[] parts = ((String[])recipe[idx++]);
+				
+				for (String s : parts)
 				{
-					ItemStack stack = OreDictionary.getOres((String)in).get(0);
-					if(stack.getItemDamage() == OreDictionary.WILDCARD_VALUE)
-					{
-						stack.setItemDamage(0);
-					}
-					itemMap.put(chr, stack);
+					xSize = s.length();
+					shape += s;
 				}
-				else
-					return INVALID;
+				
+				ySize = parts.length;
 			}
 			else
 			{
-				String ret = "Invalid fake crafting inventory: ";
-				for (Object tmp :  recipe)
+				while (recipe[idx] instanceof String)
 				{
-					ret += tmp + ", ";
+					String s = (String)recipe[idx++];
+					shape += s;
+					xSize = s.length();
+					ySize++;
 				}
-				Log.warn("Fail to make inventory.", new RuntimeException(ret));
-				return INVALID;
 			}
+			
+			if (xSize * ySize != shape.length()) throw new RuntimeException();
+			
+			HashMap<Character, Object> itemMap = new HashMap();
+			
+			for (; idx < recipe.length; idx += 2)
+			{
+				itemMap.put((Character) recipe[idx], recipe[idx + 1]);
+			}
+			
+			Object[] map = new Object[xSize * ySize];
+			idx = 0;
+			for (char chr : shape.toCharArray())
+			{
+				map[idx++] = itemMap.get(chr);
+			}
+			
+			return new FakeCraftingInventory(xSize, ySize, map);
 		}
-		
-		itemstacks = new ItemStack[xSize * ySize];
-		int x = 0;
-		for (char chr : shape.toCharArray())
+		catch(Exception exception)
 		{
-			itemstacks[x++] = itemMap.get(chr);
+			String ret = "Invalid fake crafting inventory: ";
+			for (Object tmp : recipe)
+			{
+				ret += tmp + ", ";
+			}
+			throw new RuntimeException(ret.substring(0, ret.length() - 2), exception);
 		}
-		
-		return new FakeCraftingInventory(xSize, ySize, itemstacks);
 	}
-	private FakeCraftingInventory(int xSize, int ySize, ItemStack...stacks)
+	private static ItemStack decode(Object in)
 	{
-		super(null, xSize, ySize);
-		itemstacks = stacks;
-		this.xSize = xSize;
-		this.ySize = ySize;
-	}
-	
-	@Override
-	public ItemStack getStackInRowAndColumn(int x, int y)
-	{
-		if (x >= 0 && x < xSize && y >= 0 && y < ySize)
+		if (in instanceof ItemStack)
 		{
-			int k = x + y * xSize;
-			return getStackInSlot(k);
+			return ((ItemStack)in).copy();
 		}
-		else
+		else if (in instanceof Item)
+		{
+			return new ItemStack((Item)in);
+		}
+		else if (in instanceof Block)
+		{
+			return new ItemStack((Block)in);
+		}
+		else if (in instanceof String)
+		{
+			return Util.getFromOreDict((String) in);
+		}
+		else if(in instanceof AbstractStack)
+		{
+			if(((AbstractStack) in).valid())
+			{
+				return ((AbstractStack) in).instance();
+			}
 			return null;
-	}
-	
-	@Override
-	public int getSizeInventory() {return itemstacks.length;}
-	
-	@Override
-	public ItemStack getStackInSlot(int i) {return i >= itemstacks.length || i < 0 ? null : itemstacks[i];}
-	
-	@Override
-	public ItemStack decrStackSize(int i, int size)
-	{
-		if(itemstacks[i] == null) return null;
-		ItemStack ret = itemstacks[i].copy();
-		itemstacks[i].stackSize -= size;
-		if(itemstacks[i].stackSize < 1)
-		{
-			itemstacks[i] = null;
 		}
-		ret.stackSize = Math.min(size, ret.stackSize);
-		return ret;
+		else throw new RuntimeException();
+	}
+	
+	private final int x;
+	private final int y;
+	private final Object[] stacks;
+	
+	FakeCraftingInventory(int x, int y, Object...stacks)
+	{
+		super(null, 0, 0);
+		this.x = x;
+		this.y = y;
+		this.stacks = stacks;
+	}
+	
+	public boolean isValid()
+	{
+		try
+		{
+			for(Object object : this.stacks)
+			{
+				if(object != null && decode(object) == null)
+					return false;
+			}
+			return true;
+		}
+		catch (Exception exception)
+		{
+			return false;
+		}
 	}
 	
 	@Override
-	public void setInventorySlotContents(int i, ItemStack itemstack) { itemstacks[i] = ItemStack.copyItemStack(itemstack); }
+	public @Nullable ItemStack decrStackSize(int index, int count)
+	{
+		return null;
+	}
+	
+	@Override
+	public @Nullable ItemStack getStackInSlot(int index)
+	{
+		if(this.stacks[index] == null) return null;
+		return decode(this.stacks[index]);
+	}
+	
+	@Override
+	public @Nullable ItemStack getStackInRowAndColumn(int row, int column)
+	{
+		return row >= 0 && row < this.x && column >= 0 && column <= this.y ?
+				getStackInSlot(row + column * this.x) : null;
+	}
+	
+	@Override
+	public void setInventorySlotContents(int index, ItemStack stack)
+	{
+		;
+	}
 }

@@ -19,8 +19,7 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import ttr.api.TTrAPI;
-import ttr.api.data.M;
-import ttr.api.data.MC;
+import ttr.api.enums.EnumMaterial;
 import ttr.api.fuel.FuelHandler;
 import ttr.api.item.ItemBase;
 import ttr.api.net.gui.PacketFluidUpdateAll;
@@ -34,11 +33,10 @@ import ttr.api.recipe.TempleteRecipeHandler;
 import ttr.api.util.LanguageManager;
 import ttr.api.util.Log;
 import ttr.load.Config;
-import ttr.load.TTrBlocks;
-import ttr.load.TTrFluids;
-import ttr.load.TTrItems;
+import ttr.load.TTrIBF;
 import ttr.load.TTrLangs;
 import ttr.load.TTrRecipes;
+import ttr.load.recipe.TTrRecipeModify;
 import ttr.load.recipe.TTrRecipeRemove;
 
 @Mod(modid = TTr.MODID, name = TTr.NAME, version = TTr.VERSION,
@@ -53,9 +51,9 @@ public class TTr
 {
 	public static final String MODID = "TTr";
 	public static final String NAME = "Tech Transition";
-	public static final String VERSION = "2.00c";
+	public static final String VERSION = "2.00h";
 	public static final int minForge = 2011;
-
+	
 	@Instance(MODID)
 	public static TTr mod;
 	
@@ -109,42 +107,39 @@ public class TTr
 		Log.info("Tech Transition start load config.");
 		try
 		{
-			lang = new LanguageManager(new File(TTrAPI.proxy.fileDir(), "lang"));
+			this.lang = new LanguageManager(new File(TTrAPI.proxy.fileDir(), "lang"));
 			File configFile = new File(event.getModConfigurationDirectory(), "TTr.cfg");
-			file = new File(event.getModConfigurationDirectory(), "ttr_recipes");
-			if(!file.exists())
+			this.file = new File(event.getModConfigurationDirectory(), "ttr_recipes");
+			if(!this.file.exists())
 			{
-				file.mkdirs();
-				file.createNewFile();
+				this.file.mkdirs();
+				this.file.createNewFile();
 			}
-			config = new Configuration(configFile);
-			config.load();
+			this.config = new Configuration(configFile);
+			this.config.load();
 			Log.info("Config loaded from " + configFile.getAbsolutePath());
 		}
 		catch (Exception e)
 		{
 			Log.warn("Error while trying to access configuration! " + e);
-			config = null;
+			this.config = null;
 		}
-		if(config != null)
+		if(this.config != null)
 		{
-			Config.init(config);
-			config.save();
+			Config.init(this.config);
+			this.config.save();
 		}
-		lang.read();
+		this.lang.read();
 		//		MinecraftForge.EVENT_BUS.register(new OreHandler());
 		Log.info("Tech Transition start pre load.");
-		M.init();
-		MC.init();
-		TTrFluids.init();
-		TTrItems.init();
-		TTrBlocks.init();
+		EnumMaterial.postinit();
+		TTrIBF.init();
 		//		TTrCovers.init();
 		//		MinecraftForge.EVENT_BUS.register(new FluidHandler());
 		proxy.registerRender();
 		ItemBase.post();
 	}
-
+	
 	@EventHandler
 	public void load(FMLInitializationEvent event)
 	{
@@ -154,19 +149,20 @@ public class TTr
 		network.registerPacket(PacketFluidUpdateAll.class, Side.CLIENT);
 		network.registerPacket(PacketFluidUpdateSingle.class, Side.CLIENT);
 		TTrLangs.init();
+		TTrIBF.postinit();
 		NetworkRegistry.INSTANCE.registerGuiHandler(MODID, proxy);
 		//		proxy.registedRender();
 	}
-
+	
 	@EventHandler
 	public void postLoad(FMLPostInitializationEvent event)
 	{
 		//		OreHandler.preReloadOreRecipes();
 		TTrRecipes.preinit();
 		//		GameRegistry.registerWorldGenerator(new TTrWorldGen(), 4);
-		TempleteRecipeHandler.load(file);
+		TempleteRecipeHandler.load(this.file);
 	}
-
+	
 	@EventHandler
 	public void complete(FMLLoadCompleteEvent event)
 	{
@@ -175,9 +171,10 @@ public class TTr
 		TTrRecipeRemove.removeAll();
 		TTrRecipes.init();
 		TempleteRecipeHandler.reload();
+		TTrRecipeModify.completeload();
 		TemplateRecipeMap.reloadRecipeMaps();
 		//		TTrCompact.init();
 		//		OreHandler.postReloadOreRecipes();
-		lang.write();
+		this.lang.write();
 	}
 }

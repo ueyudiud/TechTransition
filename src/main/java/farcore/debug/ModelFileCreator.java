@@ -9,27 +9,24 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.stream.JsonWriter;
 
-import ttr.api.material.Mat;
-import ttr.api.material.MatCondition;
-
 public class ModelFileCreator
 {
 	static final Gson gson = new Gson();
 	
-	static void provideGroupItemInfo(String sourceLocate, MatCondition condition)
-	{
-		for(Mat material : Mat.register())
-		{
-			if(condition.isBelongTo(material))
-			{
-				String locate = condition.orePrefix.toLowerCase() + "/" + material.name;
-				JsonObject object = new JsonObject();
-				object.addProperty("parent", "item/generated");
-				addTextures(object, "layer0", material.modid + ":items/" + locate);
-				makeJson(sourceLocate, material.modid + "/models/item/"+ locate, object);
-			}
-		}
-	}
+	//	static void provideGroupItemInfo(String sourceLocate, MatCondition condition)
+	//	{
+	//		for(Mat material : Mat.register())
+	//		{
+	//			if(condition.isBelongTo(material))
+	//			{
+	//				String locate = condition.orePrefix.toLowerCase() + "/" + material.name;
+	//				JsonObject object = new JsonObject();
+	//				object.addProperty("parent", "item/generated");
+	//				addTextures(object, "layer0", material.modid + ":items/" + locate);
+	//				makeJson(sourceLocate, material.modid + "/models/item/"+ locate, object);
+	//			}
+	//		}
+	//	}
 	
 	static void addCondition(JsonObject object, String prop, String value)
 	{
@@ -37,14 +34,14 @@ public class ModelFileCreator
 		object1.addProperty(prop, value);
 		object.add("when", object1);
 	}
-
+	
 	static void addModel(JsonObject object, String locate)
 	{
 		JsonObject object1 = new JsonObject();
 		object1.addProperty("model", locate);
 		object.add("apply", object1);
 	}
-
+	
 	static void addModel(JsonObject object, String locate, int x, int y)
 	{
 		JsonObject object1 = new JsonObject();
@@ -53,7 +50,7 @@ public class ModelFileCreator
 		object1.addProperty("y", y * 90);
 		object.add("apply", object1);
 	}
-
+	
 	static void addTextures(JsonObject object, String locate)
 	{
 		addTextures(object, "all", locate);
@@ -75,7 +72,7 @@ public class ModelFileCreator
 		}
 		object.add("textures", object1);
 	}
-
+	
 	static void makeJson(String sourceLocate, String pathName, JsonObject object)
 	{
 		pathName = pathName.replace(':', '/');

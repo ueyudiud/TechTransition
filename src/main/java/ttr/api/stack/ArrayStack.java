@@ -22,7 +22,7 @@ public class ArrayStack implements AbstractStack
 	
 	public ArrayStack(int size, Collection<ItemStack> collection)
 	{
-		array = ImmutableList.copyOf(collection);
+		this.array = ImmutableList.copyOf(collection);
 		this.size = size;
 	}
 	public ArrayStack(Collection<ItemStack> collection)
@@ -31,69 +31,69 @@ public class ArrayStack implements AbstractStack
 	}
 	public ArrayStack(int size, ItemStack...stacks)
 	{
-		array = ImmutableList.copyOf(stacks);
+		this.array = ImmutableList.copyOf(stacks);
 		this.size = size;
 	}
 	public ArrayStack(ItemStack...stacks)
 	{
 		this(1, stacks);
 	}
-
+	
 	@Override
 	public boolean similar(ItemStack stack)
 	{
 		if(stack == null) return false;
-		for(ItemStack target : array)
+		for(ItemStack target : this.array)
 		{
 			if(OreDictionary.itemMatches(target, stack, false))
 				return true;
 		}
 		return false;
 	}
-
+	
 	@Override
 	public boolean contain(ItemStack stack)
 	{
-		return similar(stack) && stack.stackSize >= size;
+		return similar(stack) && stack.stackSize >= this.size;
 	}
-
+	
 	@Override
 	public int size(ItemStack stack)
 	{
-		return size;
+		return this.size;
 	}
-
+	
 	@Override
 	public AbstractStack split(ItemStack stack)
 	{
-		return size >= stack.stackSize ?
-				new ArrayStack(size - stack.stackSize, array) :
+		return this.size >= stack.stackSize ?
+				new ArrayStack(this.size - stack.stackSize, this.array) :
 					null;
 	}
-
+	
 	@Override
 	public ItemStack instance()
 	{
-		if(array.isEmpty()) return new ItemStack(Blocks.FIRE);
-		ItemStack stack = array.get(0);
+		if(this.array.isEmpty()) return new ItemStack(Blocks.FIRE);
+		ItemStack stack = this.array.get(0);
 		stack = stack.copy();
-		stack.stackSize = size;
+		stack.stackSize = this.size == 0 ? this.size : this.size;
 		return stack;
 	}
-
+	
 	@Override
 	public List<ItemStack> display()
 	{
 		
-		return Util.sizeOf(array, size);
+		return Util.sizeOf(this.array, this.size);
 	}
-
+	
 	@Override
 	public boolean valid()
 	{
-		return !array.isEmpty();
+		return !this.array.isEmpty();
 	}
-
+	
 	@Override
 	public boolean useContainer()
 	{

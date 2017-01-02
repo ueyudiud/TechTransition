@@ -1,21 +1,44 @@
 package ttr.core.tile;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.IInventory;
+import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
+import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTank;
 import net.minecraftforge.fluids.FluidTankInfo;
+import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
+import net.minecraftforge.fluids.capability.FluidTankProperties;
+import net.minecraftforge.fluids.capability.FluidTankPropertiesWrapper;
+import net.minecraftforge.fluids.capability.IFluidHandler;
+import net.minecraftforge.fluids.capability.IFluidTankProperties;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.items.IItemHandler;
+import ttr.api.data.Capabilities;
+import ttr.api.enums.EnumTools;
+import ttr.api.inventory.IItemHandlerIO;
 import ttr.api.inventory.Inventory;
 import ttr.api.recipe.TemplateRecipeMap;
 import ttr.api.recipe.TemplateRecipeMap.TemplateRecipe;
 import ttr.api.stack.AbstractStack;
+import ttr.api.util.Util;
+import ttr.core.CommonProxy;
+import ttr.core.TTr;
 
-public abstract class TEMachineRecipeMap extends TEMachineInventory implements ITankSyncable
+public abstract class TEMachineRecipeMap extends TEMachineInventory implements ITankSyncable, IItemHandlerIO, IFluidHandler
 {
 	public static final int MachineEnabled = 3;
 	public static final int Working = 4;
@@ -23,7 +46,7 @@ public abstract class TEMachineRecipeMap extends TEMachineInventory implements I
 	public static final int PowerNotEnough = 6;
 	
 	public long lastEnergyInput;
-
+	
 	public ItemStack[] itemInputs;
 	public ItemStack[] itemOutputs;
 	public FluidTank[] fluidInputTanks;
@@ -32,46 +55,71 @@ public abstract class TEMachineRecipeMap extends TEMachineInventory implements I
 	public FluidStack[] outputCacheFluids;
 	public int[] FACE_INPUT;
 	public int[] FACE_OUTPUT;
-	public boolean allowAutoOutput = false;
-
+	//For logistic configuration.
+	public EnumFacing autoOutputFace = null;
+	public boolean allowAutoOutputItem = false;
+	public boolean allowAutoOutputFluid = false;
+	public boolean throwItemOut = false;
+	public boolean moveFully = false;
+	
 	public long duration;
 	public long maxDuration = Long.MAX_VALUE;
 	public long minPower;
 	
 	public TEMachineRecipeMap(int itemInputSize, int itemOutputSize, int fluidInputSize, int fluidOutputSize)
 	{
-		itemInputs = new ItemStack[itemInputSize];
-		itemOutputs = new ItemStack[itemOutputSize];
-		fluidInputTanks = new FluidTank[fluidInputSize];
-		fluidOutputTanks = new FluidTank[fluidOutputSize];
+		this.itemInputs = new ItemStack[itemInputSize];
+		this.itemOutputs = new ItemStack[itemOutputSize];
+		this.fluidInputTanks = new FluidTank[fluidInputSize];
+		this.fluidOutputTanks = new FluidTank[fluidOutputSize];
 		for(int i = 0; i < fluidInputSize; ++i)
 		{
-			fluidInputTanks[i] = new FluidTank(16000);
+			this.fluidInputTanks[i] = new FluidTank(16000);
 		}
 		for(int i = 0; i < fluidOutputSize; ++i)
 		{
-			fluidOutputTanks[i] = new FluidTank(16000);
+			this.fluidOutputTanks[i] = new FluidTank(16000);
 		}
-		FACE_INPUT = new int[itemInputSize];
-		FACE_OUTPUT = new int[itemOutputSize];
+		this.FACE_INPUT = new int[itemInputSize];
+		this.FACE_OUTPUT = new int[itemOutputSize];
 		int i = 0;
 		for(; i < itemInputSize; ++i)
 		{
-			FACE_INPUT[i] = i;
+			this.FACE_INPUT[i] = i;
 		}
 		for(; i < itemInputSize + itemOutputSize; ++i)
 		{
-			FACE_OUTPUT[i - itemInputSize] = i;
+			this.FACE_OUTPUT[i - itemInputSize] = i;
 		}
 		enable(MachineEnabled);
 	}
-
+	
+	@Override
+	public boolean onActived(EntityPlayer player, EnumHand hand, ItemStack heldItem, EnumFacing facing, float hitX,
+			float hitY, float hitZ)
+	{
+		if(accessConfigGUIOpen() && hand == EnumHand.MAIN_HAND && EnumTools.wrench.match(heldItem))
+		{
+			Util.damageOrDischargeItem(heldItem, 100L, 1, player);
+			player.openGui(TTr.MODID, CommonProxy.ELE_MACHINE_CONFIG_ID, this.worldObj, this.pos.getX(), this.pos.getY(), this.pos.getZ());
+			return true;
+		}
+		return super.onActived(player, hand, heldItem, facing, hitX, hitY, hitZ);
+	}
+	
+	protected boolean accessConfigGUIOpen()
+	{
+		return false;
+	}
+	
 	@Override
 	protected void updateServer()
 	{
-		lastEnergyInput = getEnergyInput();
+		this.lastEnergyInput = getEnergyInput();
 		if (is(MachineEnabled) && canUseMachine())
 		{
+			updateLogistic();//Logistic only take effects when structure is usable.
+			
 			checkRecipe();
 			onWorking();
 		}
@@ -87,45 +135,45 @@ public abstract class TEMachineRecipeMap extends TEMachineInventory implements I
 	{
 		if(is(Working))
 		{
-			if(duration >= maxDuration)
+			if(this.duration >= this.maxDuration)
 			{
 				disable(Working);
 				enable(OutPuting);
-				duration = maxDuration;
+				this.duration = this.maxDuration;
 			}
 		}
 		if(is(OutPuting))
 		{
 			if(!matchRecipeOutput())
 				return;
-			if(outputCacheItems != null)
+			if(this.outputCacheItems != null)
 			{
-				for(int i = 0; i < outputCacheItems.length; ++i)
+				for(int i = 0; i < this.outputCacheItems.length; ++i)
 				{
-					if(addStack(itemOutputs, i, outputCacheItems[i], false, getInventoryStackLimit()) != outputCacheItems[i].stackSize)
+					if(addStack(this.itemOutputs, i, this.outputCacheItems[i], false, getInventoryStackLimit()) != this.outputCacheItems[i].stackSize)
 						return;
 				}
 			}
-			if(outputCacheFluids != null)
+			if(this.outputCacheFluids != null)
 			{
-				for(int i = 0; i < outputCacheFluids.length; ++i)
+				for(int i = 0; i < this.outputCacheFluids.length; ++i)
 				{
-					if(fluidOutputTanks[i].fill(outputCacheFluids[i], false) != outputCacheFluids[i].amount)
+					if(this.fluidOutputTanks[i].fill(this.outputCacheFluids[i], false) != this.outputCacheFluids[i].amount)
 						return;
 				}
 			}
-			if(outputCacheItems != null)
+			if(this.outputCacheItems != null)
 			{
-				for(int i = 0; i < outputCacheItems.length; ++i)
+				for(int i = 0; i < this.outputCacheItems.length; ++i)
 				{
-					addStack(itemOutputs, i, outputCacheItems[i], true, getInventoryStackLimit());
+					addStack(this.itemOutputs, i, this.outputCacheItems[i], true, getInventoryStackLimit());
 				}
 			}
-			if(outputCacheFluids != null)
+			if(this.outputCacheFluids != null)
 			{
-				for(int i = 0; i < outputCacheFluids.length; ++i)
+				for(int i = 0; i < this.outputCacheFluids.length; ++i)
 				{
-					fluidOutputTanks[i].fill(outputCacheFluids[i], true);
+					this.fluidOutputTanks[i].fill(this.outputCacheFluids[i], true);
 				}
 			}
 			initRecipeOutput();
@@ -133,16 +181,16 @@ public abstract class TEMachineRecipeMap extends TEMachineInventory implements I
 		}
 		if(!is(Working) && !is(OutPuting))
 		{
-			FluidStack[] fluidInputs = new FluidStack[fluidInputTanks.length];
+			FluidStack[] fluidInputs = new FluidStack[this.fluidInputTanks.length];
 			for(int i = 0; i < fluidInputs.length; ++i)
 			{
-				fluidInputs[i] = fluidInputTanks[i].getFluid();
+				fluidInputs[i] = this.fluidInputTanks[i].getFluid();
 			}
 			TemplateRecipeMap map = getRecipeMap();
-			TemplateRecipe recipe = map.findRecipe(worldObj, pos, getPower(), fluidInputs, itemInputs);
+			TemplateRecipe recipe = map.findRecipe(this.worldObj, this.pos, getPower(), fluidInputs, this.itemInputs);
 			if(recipe == null ||
-					(recipe.outputsItem.length > itemOutputs.length) ||
-					(recipe.outputsFluid.length > fluidOutputTanks.length) ||
+					(recipe.outputsItem.length > this.itemOutputs.length) ||
+					(recipe.outputsFluid.length > this.fluidOutputTanks.length) ||
 					!matchRecipeSpecial(recipe))
 				return;
 			if(map.shapedItemInput)
@@ -151,21 +199,21 @@ public abstract class TEMachineRecipeMap extends TEMachineInventory implements I
 				{
 					if(recipe.inputsItem[i] != null)
 					{
-						decrStackSize(itemInputs, i, recipe.inputsItem[i].size(itemInputs[i]), true);
+						decrStackSize(this.itemInputs, i, recipe.inputsItem[i].size(this.itemInputs[i]), true);
 					}
 				}
 			}
 			else
 			{
-				for(int i = 0; i < itemInputs.length; ++i)
+				for(int i = 0; i < this.itemInputs.length; ++i)
 				{
-					if(itemInputs[i] != null)
+					if(this.itemInputs[i] != null)
 					{
 						for (AbstractStack element : recipe.inputsItem)
 						{
-							if(element != null && element.contain(itemInputs[i]))
+							if(element != null && element.contain(this.itemInputs[i]))
 							{
-								decrStackSize(itemInputs, i, element.size(itemInputs[i]), true);
+								decrStackSize(this.itemInputs, i, element.size(this.itemInputs[i]), true);
 							}
 						}
 					}
@@ -175,29 +223,29 @@ public abstract class TEMachineRecipeMap extends TEMachineInventory implements I
 			{
 				if(recipe.inputsFluid[i] != null)
 				{
-					fluidInputTanks[i].drain(recipe.inputsFluid[i], true);
+					this.fluidInputTanks[i].drain(recipe.inputsFluid[i], true);
 				}
 			}
 			initRecipeInput(recipe);
 			enable(Working);
 		}
 	}
-
+	
 	protected void initRecipeInput(TemplateRecipe recipe)
 	{
-		maxDuration = recipe.duration;
-		minPower = recipe.minPower;
-		outputCacheFluids = new FluidStack[Math.min(fluidOutputTanks.length, recipe.outputsFluid.length)];
-		for(int i = 0; i < outputCacheFluids.length; ++i)
+		this.maxDuration = recipe.duration;
+		this.minPower = recipe.minPower;
+		this.outputCacheFluids = new FluidStack[Math.min(this.fluidOutputTanks.length, recipe.outputsFluid.length)];
+		for(int i = 0; i < this.outputCacheFluids.length; ++i)
 		{
-			outputCacheFluids[i] = recipe.outputsFluid[i];
-			if(outputCacheFluids[i] != null)
+			this.outputCacheFluids[i] = recipe.outputsFluid[i];
+			if(this.outputCacheFluids[i] != null)
 			{
-				outputCacheFluids[i] = outputCacheFluids[i].copy();
+				this.outputCacheFluids[i] = this.outputCacheFluids[i].copy();
 			}
 		}
-		outputCacheItems = new ItemStack[Math.min(itemOutputs.length, recipe.outputsItem.length)];
-		for(int i = 0; i < outputCacheItems.length; ++i)
+		this.outputCacheItems = new ItemStack[Math.min(this.itemOutputs.length, recipe.outputsItem.length)];
+		for(int i = 0; i < this.outputCacheItems.length; ++i)
 		{
 			if(recipe.outputsItem[i] != null)
 			{
@@ -206,7 +254,7 @@ public abstract class TEMachineRecipeMap extends TEMachineInventory implements I
 				{
 					for(int chance : recipe.chancesOutputItem[i])
 					{
-						if(chance == 10000 || random.nextInt(10000) < chance)
+						if(chance == 10000 || this.random.nextInt(10000) < chance)
 						{
 							multiply++;
 						}
@@ -216,19 +264,19 @@ public abstract class TEMachineRecipeMap extends TEMachineInventory implements I
 				{
 					multiply = 1;
 				}
-				outputCacheItems[i] = recipe.outputsItem[i].instance();
-				outputCacheItems[i].stackSize *= multiply;
+				this.outputCacheItems[i] = recipe.outputsItem[i].instance().copy();
+				this.outputCacheItems[i].stackSize *= multiply;
 			}
 		}
 	}
 	
 	protected void initRecipeOutput()
 	{
-		outputCacheFluids = null;
-		outputCacheItems = null;
-		duration = 0;
-		maxDuration = Long.MAX_VALUE;
-		minPower = 0;
+		this.outputCacheFluids = null;
+		this.outputCacheItems = null;
+		this.duration = 0;
+		this.maxDuration = Long.MAX_VALUE;
+		this.minPower = 0;
 	}
 	
 	protected boolean matchRecipeOutput()
@@ -240,16 +288,16 @@ public abstract class TEMachineRecipeMap extends TEMachineInventory implements I
 	{
 		return true;
 	}
-
+	
 	protected abstract TemplateRecipeMap getRecipeMap();
-
+	
 	protected void onWorking()
 	{
 		if(useEnergy())
 		{
 			if(is(Working))
 			{
-				++duration;
+				++this.duration;
 			}
 		}
 	}
@@ -264,69 +312,83 @@ public abstract class TEMachineRecipeMap extends TEMachineInventory implements I
 	public NBTTagCompound writeToNBT(NBTTagCompound nbt)
 	{
 		super.writeToNBT(nbt);
-		Inventory.writeToNBT(itemInputs, nbt, "inputItem");
-		Inventory.writeToNBT(itemOutputs, nbt, "outputItem");
-		nbt.setBoolean("allowAutoOutput", allowAutoOutput);
-		nbt.setLong("minPower", minPower);
-		nbt.setLong("duration", duration);
-		nbt.setLong("maxDuration", maxDuration);
-		NBTTagList list = new NBTTagList();
-		for(int i = 0; i < fluidInputTanks.length; ++i)
+		Inventory.writeToNBT(this.itemInputs, nbt, "inputItem");
+		Inventory.writeToNBT(this.itemOutputs, nbt, "outputItem");
+		nbt.setBoolean("allowAutoOutputItem", this.allowAutoOutputItem);
+		nbt.setBoolean("allowAutoOutputFluid", this.allowAutoOutputFluid);
+		nbt.setBoolean("throwItemOut", this.throwItemOut);
+		nbt.setBoolean("moveFully", this.moveFully);
+		if(this.autoOutputFace != null)
 		{
-			NBTTagCompound nbt1 = fluidInputTanks[i].writeToNBT(new NBTTagCompound());
+			nbt.setByte("autoOutputFace", (byte) this.autoOutputFace.ordinal());
+		}
+		nbt.setLong("minPower", this.minPower);
+		nbt.setLong("duration", this.duration);
+		nbt.setLong("maxDuration", this.maxDuration);
+		NBTTagList list = new NBTTagList();
+		for(int i = 0; i < this.fluidInputTanks.length; ++i)
+		{
+			NBTTagCompound nbt1 = this.fluidInputTanks[i].writeToNBT(new NBTTagCompound());
 			nbt1.setByte("id", (byte) i);
 			list.appendTag(nbt1);
 		}
 		nbt.setTag("inputFluid", list);
 		list = new NBTTagList();
-		for(int i = 0; i < fluidOutputTanks.length; ++i)
+		for(int i = 0; i < this.fluidOutputTanks.length; ++i)
 		{
-			NBTTagCompound nbt1 = fluidOutputTanks[i].writeToNBT(new NBTTagCompound());
+			NBTTagCompound nbt1 = this.fluidOutputTanks[i].writeToNBT(new NBTTagCompound());
 			nbt1.setByte("id", (byte) i);
 			list.appendTag(nbt1);
 		}
 		nbt.setTag("outputFluid", list);
-		if(outputCacheItems != null)
+		if(this.outputCacheItems != null)
 		{
-			Inventory.writeToNBT(outputCacheItems, nbt, "outputCacheItems");
-			nbt.setByte("outputCacheItemsLength", (byte) outputCacheItems.length);
+			Inventory.writeToNBT(this.outputCacheItems, nbt, "outputCacheItems");
+			nbt.setByte("outputCacheItemsLength", (byte) this.outputCacheItems.length);
 		}
-		if(outputCacheFluids != null)
+		if(this.outputCacheFluids != null)
 		{
 			list = new NBTTagList();
-			for(int i = 0; i < outputCacheFluids.length; ++i)
+			for(int i = 0; i < this.outputCacheFluids.length; ++i)
 			{
-				if(outputCacheFluids[i] != null)
+				if(this.outputCacheFluids[i] != null)
 				{
-					NBTTagCompound nbt1 = outputCacheFluids[i].writeToNBT(new NBTTagCompound());
+					NBTTagCompound nbt1 = this.outputCacheFluids[i].writeToNBT(new NBTTagCompound());
 					nbt1.setByte("id", (byte) i);
 					list.appendTag(nbt1);
 				}
 			}
 			nbt.setTag("outputCacheFluids", list);
-			nbt.setByte("outputCacheFluidsLength", (byte) outputCacheFluids.length);
+			nbt.setByte("outputCacheFluidsLength", (byte) this.outputCacheFluids.length);
 		}
 		return nbt;
 	}
-
+	
 	@Override
 	public void readFromNBT(NBTTagCompound nbt)
 	{
 		super.readFromNBT(nbt);
-		Inventory.readFromNBT(itemInputs, nbt, "inputItem");
-		Inventory.readFromNBT(itemOutputs, nbt, "outputItem");
-		allowAutoOutput = nbt.getBoolean("allowAutoOutput");
-		minPower = nbt.getLong("minPower");
-		maxDuration = nbt.getLong("maxDuration");
-		duration = nbt.getLong("duration");
+		Inventory.readFromNBT(this.itemInputs, nbt, "inputItem");
+		Inventory.readFromNBT(this.itemOutputs, nbt, "outputItem");
+		this.allowAutoOutputFluid = nbt.getBoolean("allowAutoOutputFluid");
+		this.allowAutoOutputItem = nbt.getBoolean("allowAutoOutputItem");
+		this.throwItemOut = nbt.getBoolean("throwItemOut");
+		this.moveFully = nbt.getBoolean("moveFully");
+		if(nbt.hasKey("autoOutputFace"))
+		{
+			this.autoOutputFace = EnumFacing.VALUES[nbt.getByte("autoOutputFace")];
+		}
+		this.minPower = nbt.getLong("minPower");
+		this.maxDuration = nbt.getLong("maxDuration");
+		this.duration = nbt.getLong("duration");
 		NBTTagList list = nbt.getTagList("inputFluid", NBT.TAG_COMPOUND);
 		for(int i = 0; i < list.tagCount(); ++i)
 		{
 			NBTTagCompound nbt1 = list.getCompoundTagAt(i);
 			byte id = nbt1.getByte("id");
-			if(id >= 0 && id < fluidInputTanks.length)
+			if(id >= 0 && id < this.fluidInputTanks.length)
 			{
-				fluidInputTanks[id].readFromNBT(nbt1);
+				this.fluidInputTanks[id].readFromNBT(nbt1);
 			}
 		}
 		list = nbt.getTagList("outputFluid", NBT.TAG_COMPOUND);
@@ -334,60 +396,327 @@ public abstract class TEMachineRecipeMap extends TEMachineInventory implements I
 		{
 			NBTTagCompound nbt1 = list.getCompoundTagAt(i);
 			byte id = nbt1.getByte("id");
-			if(id >= 0 && id < fluidOutputTanks.length)
+			if(id >= 0 && id < this.fluidOutputTanks.length)
 			{
-				fluidOutputTanks[id].readFromNBT(nbt1);
+				this.fluidOutputTanks[id].readFromNBT(nbt1);
 			}
 		}
 		if(nbt.hasKey("outputCacheItems", NBT.TAG_COMPOUND))
 		{
-			outputCacheItems = new ItemStack[nbt.getByte("outputCacheItemsLength")];
-			Inventory.readFromNBT(outputCacheItems, nbt, "outputCacheItems");
+			this.outputCacheItems = new ItemStack[nbt.getByte("outputCacheItemsLength")];
+			Inventory.readFromNBT(this.outputCacheItems, nbt, "outputCacheItems");
 		}
 		if(nbt.hasKey("outputCacheFluids", NBT.TAG_COMPOUND))
 		{
-			outputCacheFluids = new FluidStack[nbt.getByte("outputCacheFluidsLength")];
+			this.outputCacheFluids = new FluidStack[nbt.getByte("outputCacheFluidsLength")];
 			list = nbt.getTagList("outputCacheFluids", NBT.TAG_COMPOUND);
 			for(int i = 0; i < list.tagCount(); ++i)
 			{
 				NBTTagCompound nbt1 = list.getCompoundTagAt(i);
 				byte id = nbt1.getByte("id");
-				if(id >= 0 && id < outputCacheFluids.length)
+				if(id >= 0 && id < this.outputCacheFluids.length)
 				{
-					outputCacheFluids[id] = FluidStack.loadFluidStackFromNBT(nbt1);
+					this.outputCacheFluids[id] = FluidStack.loadFluidStackFromNBT(nbt1);
 				}
 			}
 		}
 	}
 	
+	@Override
+	public void writeToDescription(NBTTagCompound nbt)
+	{
+		super.writeToDescription(nbt);
+		byte state = 0;
+		if(this.autoOutputFace != null)
+		{
+			state |= this.autoOutputFace.ordinal() + 1;
+		}
+		if(this.allowAutoOutputFluid)
+		{
+			state |= 0x8;
+		}
+		if(this.allowAutoOutputItem)
+		{
+			state |= 0x10;
+		}
+		if(this.moveFully)
+		{
+			state |= 0x20;
+		}
+		if(this.throwItemOut)
+		{
+			state |= 0x40;
+		}
+		nbt.setByte("lo", state);
+	}
+	
+	@Override
+	public void readFromDescription(NBTTagCompound nbt)
+	{
+		super.readFromDescription(nbt);
+		short state = nbt.getShort("lo");
+		if((state & 0x7) != 0)
+		{
+			this.autoOutputFace = EnumFacing.VALUES[(state & 0x7) - 1];
+		}
+		else
+		{
+			this.autoOutputFace = null;
+		}
+		this.allowAutoOutputFluid = (state & 0x8) != 0;
+		this.allowAutoOutputItem = (state & 0x10) != 0;
+		this.moveFully = (state & 0x20) != 0;
+		this.throwItemOut = (state & 0x40) != 0;
+	}
+	
 	protected abstract boolean useEnergy();
-
+	
 	protected abstract long getEnergyInput();
-
+	
 	protected abstract long getPower();
-
+	
+	protected void updateLogistic()
+	{
+		if(this.autoOutputFace != null && this.lastActived % 20 == 0)
+		{
+			TileEntity tile = this.worldObj.getTileEntity(this.pos.offset(this.autoOutputFace));
+			if(tile == null)
+			{
+				if(this.throwItemOut && this.allowAutoOutputItem && this.worldObj.isAirBlock(this.pos.offset(this.autoOutputFace)))
+				{
+					for(int i : this.FACE_OUTPUT)
+					{
+						if(getStackInSlot(i) != null)
+						{
+							if(this.moveFully)
+							{
+								ItemStack stack = removeStackFromSlot(i);
+								EntityItem entity = new EntityItem(this.worldObj, this.pos.getX() + (1 + this.autoOutputFace.getFrontOffsetX()) * .5, this.pos.getY() + (1 + this.autoOutputFace.getFrontOffsetY()) * .5, this.pos.getZ() + (1 + this.autoOutputFace.getFrontOffsetZ()) * .5, stack);
+								entity.motionX = (this.random.nextDouble() - this.random.nextDouble()) * 0.01 + this.autoOutputFace.getFrontOffsetX() * .3;
+								entity.motionY = (this.random.nextDouble() - this.random.nextDouble()) * 0.01 + this.autoOutputFace.getFrontOffsetY() * .3;
+								entity.motionZ = (this.random.nextDouble() - this.random.nextDouble()) * 0.01 + this.autoOutputFace.getFrontOffsetZ() * .3;
+								this.worldObj.spawnEntityInWorld(entity);
+							}
+							else
+							{
+								ItemStack stack = decrStackSize(i, 1);
+								EntityItem entity = new EntityItem(this.worldObj, this.pos.getX() + (1 + this.autoOutputFace.getFrontOffsetX()) * .5, this.pos.getY() + (1 + this.autoOutputFace.getFrontOffsetY()) * .5, this.pos.getZ() + (1 + this.autoOutputFace.getFrontOffsetZ()) * .5, stack);
+								entity.motionX = (this.random.nextDouble() - this.random.nextDouble()) * 0.01 + this.autoOutputFace.getFrontOffsetX() * .3;
+								entity.motionY = (this.random.nextDouble() - this.random.nextDouble()) * 0.01 + this.autoOutputFace.getFrontOffsetY() * .3;
+								entity.motionZ = (this.random.nextDouble() - this.random.nextDouble()) * 0.01 + this.autoOutputFace.getFrontOffsetZ() * .3;
+								this.worldObj.spawnEntityInWorld(entity);
+							}
+							return;
+						}
+					}
+				}
+			}
+			else
+			{
+				EnumFacing oppisite = this.autoOutputFace.getOpposite();
+				if(this.allowAutoOutputItem)
+				{
+					if(tile.hasCapability(Capabilities.ITEM_HANDLER_IO, oppisite))
+					{
+						IItemHandlerIO io = tile.getCapability(Capabilities.ITEM_HANDLER_IO, oppisite);
+						if(io.canInsertItem())
+						{
+							for(int i : this.FACE_OUTPUT)
+							{
+								ItemStack stack = getStackInSlot(i);
+								if(stack != null)
+								{
+									stack = stack.copy();
+									if(!this.moveFully)
+									{
+										stack.stackSize = 1;
+									}
+									if(io.tryInsertItem(stack, oppisite, true) > 0)
+									{
+										decrStackSize(i, io.tryInsertItem(stack, oppisite, false));
+										break;
+									}
+								}
+							}
+						}
+					}
+					else if(tile.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, oppisite))
+					{
+						IItemHandler handler = tile.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, oppisite);
+						label:
+							for(int j : this.FACE_OUTPUT)
+							{
+								ItemStack stack = getStackInSlot(j);
+								if(stack != null)
+								{
+									ItemStack stack1 = stack.copy();
+									if(!this.moveFully)
+									{
+										stack1.stackSize = 1;
+									}
+									for(int i = 0; i < handler.getSlots() && stack1 != null;
+											stack1 = handler.insertItem(i++, stack1, true));
+									if(!ItemStack.areItemsEqual(stack, stack1))
+									{
+										stack1 = stack.copy();
+										for(int i = 0; i < handler.getSlots() && stack1 != null;
+												stack1 = handler.insertItem(i++, stack1, false));
+										if(stack1 == null)
+										{
+											removeStackFromSlot(j);
+										}
+										else
+										{
+											decrStackSize(j, stack.stackSize - stack1.stackSize);
+										}
+										break label;
+									}
+								}
+							}
+					}
+					else if(tile instanceof ISidedInventory)
+					{
+						ISidedInventory inventory = (ISidedInventory) tile;
+						label:
+							for(int j : this.FACE_OUTPUT)
+							{
+								ItemStack stack = getStackInSlot(j);
+								if(stack != null)
+								{
+									ItemStack stack1 = stack.copy();
+									if(!this.moveFully)
+									{
+										stack1.stackSize = 1;
+									}
+									for(int i : inventory.getSlotsForFace(oppisite))
+									{
+										if(inventory.canInsertItem(i, stack1, oppisite))
+										{
+											ItemStack target = inventory.getStackInSlot(i);
+											if(target == null || (ItemStack.areItemsEqual(stack1, target) && ItemStack.areItemStackTagsEqual(stack1, target)))
+											{
+												int size;
+												if(target == null)
+												{
+													size = Math.min(stack1.stackSize, inventory.getInventoryStackLimit());
+													decrStackSize(j, size);
+													stack1.stackSize = size;
+													inventory.setInventorySlotContents(i, stack1);
+												}
+												else
+												{
+													size = Math.min(stack1.stackSize, Math.min(inventory.getInventoryStackLimit(), stack1.getMaxStackSize()) - target.stackSize);
+													decrStackSize(j, size);
+													target.stackSize += size;
+												}
+												break label;
+											}
+										}
+									}
+								}
+							}
+					}
+					else if(tile instanceof IInventory)
+					{
+						IInventory inventory = (IInventory) tile;
+						label:
+							for(int j : this.FACE_OUTPUT)
+							{
+								ItemStack stack = getStackInSlot(j);
+								if(stack != null)
+								{
+									ItemStack stack1 = stack.copy();
+									if(!this.moveFully)
+									{
+										stack1.stackSize = 1;
+									}
+									for(int i = 0; i < inventory.getSizeInventory(); ++i)
+									{
+										ItemStack target = inventory.getStackInSlot(i);
+										if(target == null || (ItemStack.areItemsEqual(stack1, target) && ItemStack.areItemStackTagsEqual(stack1, target)))
+										{
+											int size;
+											if(target == null)
+											{
+												size = Math.min(stack1.stackSize, inventory.getInventoryStackLimit());
+												decrStackSize(j, size);
+												stack1.stackSize = size;
+												inventory.setInventorySlotContents(i, stack1);
+											}
+											else
+											{
+												size = Math.min(stack1.stackSize, Math.min(inventory.getInventoryStackLimit(), stack1.getMaxStackSize()) - target.stackSize);
+												decrStackSize(j, size);
+												target.stackSize += size;
+											}
+											break label;
+										}
+									}
+								}
+							}
+					}
+				}
+				if(this.allowAutoOutputFluid)
+				{
+					if(tile.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, oppisite))
+					{
+						IFluidHandler handler = tile.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, oppisite);
+						for(FluidTank tank : this.fluidOutputTanks)
+						{
+							if(tank.getFluid() != null)
+							{
+								int amount = handler.fill(tank.getFluid(), false);
+								if(amount != 0)
+								{
+									handler.fill(tank.drain(amount, true), true);
+									break;
+								}
+							}
+						}
+					}
+					else if(tile instanceof net.minecraftforge.fluids.IFluidHandler)
+					{
+						net.minecraftforge.fluids.IFluidHandler handler = (net.minecraftforge.fluids.IFluidHandler) tile;
+						for(FluidTank tank : this.fluidOutputTanks)
+						{
+							if(tank.getFluid() != null && handler.canFill(oppisite, tank.getFluid().getFluid()))
+							{
+								int amount = handler.fill(oppisite, tank.getFluid(), false);
+								if(amount != 0)
+								{
+									handler.fill(oppisite, tank.drain(amount, true), true);
+									break;
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	
 	@Override
 	public int getSizeInventory()
 	{
-		return itemInputs.length + itemOutputs.length + inventory.getSizeInventory();
+		return this.itemInputs.length + this.itemOutputs.length + this.inventory.getSizeInventory();
 	}
-
+	
 	@Override
 	public ItemStack getStackInSlot(int index)
 	{
-		return index < itemInputs.length ? itemInputs[index] :
-			index < itemInputs.length + itemOutputs.length ? itemOutputs[index - itemInputs.length] :
-				inventory.getStackInSlot(index - itemInputs.length - itemOutputs.length);
+		return index < this.itemInputs.length ? this.itemInputs[index] :
+			index < this.itemInputs.length + this.itemOutputs.length ? this.itemOutputs[index - this.itemInputs.length] :
+				this.inventory.getStackInSlot(index - this.itemInputs.length - this.itemOutputs.length);
 	}
-
+	
 	@Override
 	public ItemStack removeStackFromSlot(int index)
 	{
-		return index < itemInputs.length ? removeStackFromSlot(itemInputs, index) :
-			index < itemInputs.length + itemOutputs.length ? removeStackFromSlot(itemOutputs, index - itemInputs.length) :
-				removeStackFromSlot(itemOutputs, index - itemInputs.length - itemOutputs.length);
+		return index < this.itemInputs.length ? removeStackFromSlot(this.itemInputs, index) :
+			index < this.itemInputs.length + this.itemOutputs.length ? removeStackFromSlot(this.itemOutputs, index - this.itemInputs.length) :
+				removeStackFromSlot(this.itemOutputs, index - this.itemInputs.length - this.itemOutputs.length);
 	}
-
+	
 	protected ItemStack removeStackFromSlot(ItemStack[] stacks, int index)
 	{
 		ItemStack ret = stacks[index];
@@ -425,9 +754,9 @@ public abstract class TEMachineRecipeMap extends TEMachineInventory implements I
 	@Override
 	public ItemStack decrStackSize(int index, int count)
 	{
-		return index < itemInputs.length ? decrStackSize(itemInputs, index, count, true) :
-			index < itemInputs.length + itemOutputs.length ? decrStackSize(itemOutputs, index - itemInputs.length, count, true) :
-				inventory.decrStackSize(index - itemInputs.length - itemOutputs.length, count, true);
+		return index < this.itemInputs.length ? decrStackSize(this.itemInputs, index, count, true) :
+			index < this.itemInputs.length + this.itemOutputs.length ? decrStackSize(this.itemOutputs, index - this.itemInputs.length, count, true) :
+				this.inventory.decrStackSize(index - this.itemInputs.length - this.itemOutputs.length, count, true);
 	}
 	
 	protected ItemStack decrStackSize(ItemStack[] stacks, int index, int count, boolean process)
@@ -440,13 +769,17 @@ public abstract class TEMachineRecipeMap extends TEMachineInventory implements I
 			if(process)
 			{
 				stacks[index] = null;
+				markDirty();
 			}
 			return stack;
 		}
 		else
 		{
 			if(process)
+			{
+				markDirty();
 				return stack.splitStack(count);
+			}
 			else
 			{
 				ItemStack ret = stack.copy();
@@ -459,112 +792,283 @@ public abstract class TEMachineRecipeMap extends TEMachineInventory implements I
 	@Override
 	public void setInventorySlotContents(int index, ItemStack stack)
 	{
-		if(index < itemInputs.length)
+		if(index < this.itemInputs.length)
 		{
-			itemInputs[index] = ItemStack.copyItemStack(stack);
+			this.itemInputs[index] = ItemStack.copyItemStack(stack);
 		}
-		else if(index < itemInputs.length + itemOutputs.length)
+		else if(index < this.itemInputs.length + this.itemOutputs.length)
 		{
-			itemOutputs[index - itemInputs.length] = ItemStack.copyItemStack(stack);
+			this.itemOutputs[index - this.itemInputs.length] = ItemStack.copyItemStack(stack);
 		}
 		else
 		{
-			inventory.setInventorySlotContents(index - itemInputs.length - itemOutputs.length, stack);
+			this.inventory.setInventorySlotContents(index - this.itemInputs.length - this.itemOutputs.length, stack);
 		}
+		markDirty();
 	}
-
+	
 	@Override
 	public int[] getSlotsForFace(EnumFacing side)
 	{
-		return side == getFacing("input") ? FACE_INPUT : side == getFacing("output") ? FACE_OUTPUT : new int[0];
+		return side == getFacing("input") ? this.FACE_INPUT : side == getFacing("output") ? this.FACE_OUTPUT : new int[0];
 	}
 	
 	@Override
 	protected int[] getInputSlots()
 	{
-		return FACE_INPUT;
+		return this.FACE_INPUT;
 	}
 	
 	@Override
 	protected int[] getOutputSlots()
 	{
-		return FACE_OUTPUT;
+		return this.FACE_OUTPUT;
 	}
 	
 	@Override
 	protected boolean canInsertItemFromSlot(int index, ItemStack stack)
 	{
-		return index < itemInputs.length;
+		return index < this.itemInputs.length;
 	}
-
+	
 	@Override
 	protected boolean canExtractItemFromSlot(int index, ItemStack stack)
 	{
-		return index < itemInputs.length + itemOutputs.length && index >= itemInputs.length;
+		return index < this.itemInputs.length + this.itemOutputs.length && index >= this.itemInputs.length;
 	}
-
+	
 	@Override
 	public int getFieldCount()
 	{
 		return 4;
 	}
-
+	
 	@Override
 	public int getField(int id)
 	{
 		switch (id)
 		{
-		case 0 : return (int) (duration & 0xFFFFFFFF);
-		case 1 : return (int) ((duration >> 32) & 0xFFFFFFFF);
-		case 2 : return (int) (maxDuration & 0xFFFFFFFF);
-		case 3 : return (int) ((maxDuration >> 32) & 0xFFFFFFFF);
+		case 0 : return (int) (this.duration & 0xFFFFFFFF);
+		case 1 : return (int) ((this.duration >> 32) & 0xFFFFFFFF);
+		case 2 : return (int) (this.maxDuration & 0xFFFFFFFF);
+		case 3 : return (int) ((this.maxDuration >> 32) & 0xFFFFFFFF);
 		default: return 0;
 		}
 	}
-
+	
 	@Override
 	public void setField(int id, int value)
 	{
 		switch(id)
 		{
-		case 0 : duration &= 0xFFFFFFFF00000000L; duration |= value; break;
-		case 1 : duration &= 0xFFFFFFFFL; duration |= value << 32; break;
-		case 2 : maxDuration &= 0xFFFFFFFF00000000L; maxDuration |= value; break;
-		case 3 : maxDuration &= 0xFFFFFFFFL; maxDuration |= value << 32; break;
+		case 0 : this.duration &= 0xFFFFFFFF00000000L; this.duration |= value; break;
+		case 1 : this.duration &= 0xFFFFFFFFL; this.duration |= value << 32; break;
+		case 2 : this.maxDuration &= 0xFFFFFFFF00000000L; this.maxDuration |= value; break;
+		case 3 : this.maxDuration &= 0xFFFFFFFFL; this.maxDuration |= value << 32; break;
 		}
 	}
-
+	
 	@SideOnly(Side.CLIENT)
 	public int getRecipeProgress(int scale)
 	{
-		return maxDuration == 0 ? 0 : (int) (scale * duration / maxDuration);
+		return this.maxDuration == 0 ? 0 : (int) (scale * this.duration / this.maxDuration);
 	}
-
+	
 	@Override
 	public FluidTankInfo getInfomation(int id)
 	{
-		if(id < fluidInputTanks.length)
-			return fluidInputTanks[id].getInfo();
+		if(id < this.fluidInputTanks.length)
+			return this.fluidInputTanks[id].getInfo();
 		else
-			return fluidOutputTanks[id - fluidInputTanks.length].getInfo();
+			return this.fluidOutputTanks[id - this.fluidInputTanks.length].getInfo();
 	}
-
+	
 	@Override
 	public int getTankSize()
 	{
-		return fluidInputTanks.length + fluidOutputTanks.length;
+		return this.fluidInputTanks.length + this.fluidOutputTanks.length;
 	}
-
+	
 	@Override
 	public void setFluidStackToTank(int id, FluidStack stack)
 	{
-		if(id < fluidInputTanks.length)
+		if(id < this.fluidInputTanks.length)
 		{
-			fluidInputTanks[id].setFluid(stack);
+			this.fluidInputTanks[id].setFluid(stack);
 		}
 		else
 		{
-			fluidOutputTanks[id - fluidInputTanks.length].setFluid(stack);
+			this.fluidOutputTanks[id - this.fluidInputTanks.length].setFluid(stack);
 		}
+	}
+	
+	@Override
+	public boolean canExtractItem()
+	{
+		return this.allowOutput;
+	}
+	
+	@Override
+	public boolean canInsertItem()
+	{
+		return this.allowInput;
+	}
+	
+	@Override
+	public ItemStack extractItem(int size, EnumFacing direction, boolean simulate)
+	{
+		if(direction == this.facing) return null;
+		for(int i = 0; i < this.itemOutputs.length; ++i)
+		{
+			if(this.itemOutputs[i] != null)
+			{
+				ItemStack stack = this.itemOutputs[i].copy();
+				if(size > stack.stackSize)
+				{
+					if(!simulate)
+					{
+						this.itemOutputs[i] = null;
+						markDirty();
+					}
+				}
+				else if(!simulate)
+				{
+					this.itemOutputs[i].stackSize -= size;
+					markDirty();
+				}
+				return stack;
+			}
+		}
+		return null;
+	}
+	
+	@Override
+	public int tryInsertItem(ItemStack stack, EnumFacing direction, boolean simulate)
+	{
+		for(int i = 0; i < this.itemInputs.length; ++i)
+		{
+			if(this.itemInputs[i] != null && this.itemInputs[i].isItemEqual(stack) && ItemStack.areItemStackTagsEqual(this.itemInputs[i], stack))
+			{
+				int size = Math.min(stack.stackSize, Math.min(getInventoryStackLimit(), stack.getMaxStackSize()) - this.itemInputs[i].stackSize);
+				if(size > 0)
+				{
+					if(!simulate)
+					{
+						this.itemInputs[i].stackSize += size;
+						markDirty();
+					}
+					return size;
+				}
+			}
+		}
+		for(int i = 0; i < this.itemInputs.length; ++i)
+		{
+			if(this.itemInputs[i] == null)
+			{
+				int size = Math.min(stack.stackSize, getInventoryStackLimit());
+				if(!simulate)
+				{
+					this.itemInputs[i] = stack.copy();
+					this.itemInputs[i].stackSize = size;
+					markDirty();
+				}
+				return size;
+			}
+		}
+		return 0;
+	}
+	
+	@Override
+	public IFluidTankProperties[] getTankProperties()
+	{
+		List<IFluidTankProperties> list = new ArrayList();
+		for(FluidTank tank : this.fluidInputTanks)
+		{
+			list.add(new FluidTankPropertiesWrapper(tank));
+		}
+		for(FluidTank tank : this.fluidOutputTanks)
+		{
+			list.add(new FluidTankPropertiesWrapper(tank));
+		}
+		return list.toArray(new FluidTankProperties[list.size()]);
+	}
+	
+	@Override
+	public int fill(FluidStack resource, boolean doFill)
+	{
+		if(this.allowInput)
+		{
+			int amount;
+			for(FluidTank tank : this.fluidInputTanks)
+			{
+				if(tank.getFluid() != null && (amount = tank.fill(resource, doFill)) != 0)
+				{
+					if(doFill)
+						markDirty();
+					return amount;
+				}
+			}
+			for(FluidTank tank : this.fluidInputTanks)
+			{
+				if(tank.getFluid() == null && (amount = tank.fill(resource, doFill)) != 0)
+				{
+					if(doFill)
+						markDirty();
+					return amount;
+				}
+			}
+		}
+		return 0;
+	}
+	
+	@Override
+	public FluidStack drain(FluidStack resource, boolean doDrain)
+	{
+		if(this.allowOutput)
+		{
+			FluidStack out;
+			for(FluidTank tank : this.fluidOutputTanks)
+			{
+				if((out = tank.drain(resource, doDrain)) != null)
+				{
+					if(doDrain)
+						markDirty();
+					return out;
+				}
+			}
+		}
+		return null;
+	}
+	
+	@Override
+	public FluidStack drain(int maxDrain, boolean doDrain)
+	{
+		if(this.allowOutput)
+		{
+			FluidStack out;
+			for(FluidTank tank : this.fluidOutputTanks)
+			{
+				if((out = tank.drain(maxDrain, doDrain)) != null)
+				{
+					if(doDrain)
+						markDirty();
+					return out;
+				}
+			}
+		}
+		return null;
+	}
+	
+	@Override
+	public boolean hasCapability(Capability<?> capability, EnumFacing facing)
+	{
+		return ((capability == Capabilities.ITEM_HANDLER_IO || capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY) && this.facing != facing) || super.hasCapability(capability, facing);
+	}
+	
+	@Override
+	public <T> T getCapability(Capability<T> capability, EnumFacing facing)
+	{
+		return capability == Capabilities.ITEM_HANDLER_IO ? Capabilities.ITEM_HANDLER_IO.cast(this) :
+			capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY ? CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY.cast(this) : super.getCapability(capability, facing);
 	}
 }

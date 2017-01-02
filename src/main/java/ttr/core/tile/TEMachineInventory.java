@@ -11,38 +11,38 @@ import ttr.api.inventory.Inventory;
 public class TEMachineInventory extends TEMachineBase implements ISidedInventory
 {
 	public Inventory inventory;
-
+	
 	public boolean allowInput = true;
 	public boolean allowOutput = true;
 	
 	public TEMachineInventory()
 	{
-		addFacing("input", EnumFacing.WEST);
+		//		addFacing("input", EnumFacing.WEST);
 		addFacing("output", EnumFacing.EAST);
 	}
-
+	
 	@Override
 	public void readFromNBT(NBTTagCompound nbt)
 	{
 		super.readFromNBT(nbt);
-		inventory.readFromNBT(nbt);
-		allowInput = nbt.getBoolean("allowInput");
-		allowOutput = nbt.getBoolean("allowOutput");
+		this.inventory.readFromNBT(nbt);
+		this.allowInput = nbt.getBoolean("allowInput");
+		this.allowOutput = nbt.getBoolean("allowOutput");
 	}
-
+	
 	@Override
 	public NBTTagCompound writeToNBT(NBTTagCompound nbt)
 	{
-		inventory.writeToNBT(nbt);
-		nbt.setBoolean("allowInput", allowInput);
-		nbt.setBoolean("allowOutput", allowOutput);
+		this.inventory.writeToNBT(nbt);
+		nbt.setBoolean("allowInput", this.allowInput);
+		nbt.setBoolean("allowOutput", this.allowOutput);
 		return super.writeToNBT(nbt);
 	}
-
+	
 	@Override
 	protected void initServer()
 	{
-		inventory.setTile(this);
+		this.inventory.setTile(this);
 		super.initServer();
 	}
 	
@@ -50,66 +50,66 @@ public class TEMachineInventory extends TEMachineBase implements ISidedInventory
 	public void onLoad()
 	{
 		super.onLoad();
-		if(worldObj.isRemote)
+		if(this.worldObj.isRemote)
 		{
-			inventory.setTile(this);
+			this.inventory.setTile(this);
 		}
 	}
-
+	
 	@Override
 	public int getSizeInventory()
 	{
-		return inventory.getSizeInventory();
+		return this.inventory.getSizeInventory();
 	}
 	
 	@Override
 	public int getInventoryStackLimit()
 	{
-		return inventory.getInventoryStackLimit();
+		return this.inventory.getInventoryStackLimit();
 	}
-
+	
 	@Override
 	public ItemStack getStackInSlot(int index)
 	{
-		return inventory.getStackInSlot(index);
+		return this.inventory.getStackInSlot(index);
 	}
-
+	
 	@Override
 	public ItemStack removeStackFromSlot(int index)
 	{
-		return inventory.removeStackFromSlot(index);
+		return this.inventory.removeStackFromSlot(index);
 	}
 	
 	@Override
 	public ItemStack decrStackSize(int index, int count)
 	{
-		return inventory.decrStackSize(index, count, true);
+		return this.inventory.decrStackSize(index, count, true);
 	}
-
+	
 	@Override
 	public boolean isUseableByPlayer(EntityPlayer player)
 	{
-		return inventory.isUseableByPlayer(player);
+		return this.inventory.isUseableByPlayer(player);
 	}
-
+	
 	@Override
 	public void setInventorySlotContents(int index, ItemStack stack)
 	{
-		inventory.setInventorySlotContents(index, stack);
+		this.inventory.setInventorySlotContents(index, stack);
 	}
 	
 	@Override
 	public String getName()
 	{
-		return inventory.getName();
+		return this.inventory.getName();
 	}
 	
 	@Override
 	public ITextComponent getDisplayName()
 	{
-		return inventory.getDisplayName();
+		return this.inventory.getDisplayName();
 	}
-
+	
 	@Override
 	public int[] getSlotsForFace(EnumFacing side)
 	{
@@ -125,22 +125,22 @@ public class TEMachineInventory extends TEMachineBase implements ISidedInventory
 	{
 		return new int[0];
 	}
-
+	
 	@Override
 	public boolean canInsertItem(int index, ItemStack stack, EnumFacing direction)
 	{
-		return allowInput && canInsertItemFromSlot(index, stack);
+		return this.allowInput && canInsertItemFromSlot(index, stack);
 	}
 	
 	protected boolean canInsertItemFromSlot(int index, ItemStack stack)
 	{
 		return false;
 	}
-
+	
 	@Override
 	public boolean canExtractItem(int index, ItemStack stack, EnumFacing direction)
 	{
-		return allowOutput && canExtractItemFromSlot(index, stack);
+		return this.allowOutput && canExtractItemFromSlot(index, stack);
 	}
 	
 	protected boolean canExtractItemFromSlot(int index, ItemStack stack)

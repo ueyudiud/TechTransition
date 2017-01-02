@@ -1,0 +1,25 @@
+{
+	"forge_marker":1,
+	"defaults": {
+		"transform": "forge:default-item",
+		"model": "ttr:item",
+		"textures": { "layer0": "ttr:items/iconsets/void" }
+	},
+	"variants": {
+		"type": {
+			"default"   : { "textures": { "layer1": "ttr:items/iconsets/dust_small_dull" } },
+			"dull"      : { "textures": { "layer1": "ttr:items/iconsets/dust_small_dull" } },
+			"white"     : { "textures": { "layer1": "ttr:items/iconsets/dust_small_white" } },
+			"metallic"  : { "textures": { "layer1": "ttr:items/iconsets/dust_small_metallic" } },
+			"nonmetal1" : { "textures": { "layer1": "ttr:items/iconsets/dust_small_rough" } },
+			"nonmetal2" : { "textures": { "layer1": "ttr:items/iconsets/dust_small_shiny" } },
+			"wood"      : { "textures": { "layer1": "ttr:items/iconsets/dust_small_fine" } },
+			"shiny"     : { 
+				"textures": { 
+					"layer1": "ttr:items/iconsets/dust_small_shiny",
+					"layer2": "ttr:items/iconsets/dust_small_shiny_overlay"
+				} 
+			}
+		}
+	}
+}

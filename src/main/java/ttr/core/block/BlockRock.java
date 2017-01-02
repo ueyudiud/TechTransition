@@ -29,18 +29,23 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.oredict.OreDictionary;
 import ttr.api.TTrAPI;
 import ttr.api.block.ItemBlockExt;
-import ttr.api.material.Mat;
+import ttr.api.enums.EnumMaterial;
+import ttr.api.enums.EnumOrePrefix;
+import ttr.api.enums.EnumTools;
+import ttr.api.recipe.TTrRecipeAdder;
 import ttr.api.recipe.TemplateRecipeMap;
 import ttr.api.stack.AbstractStack;
 import ttr.api.stack.BaseStack;
 import ttr.api.stack.OreStack;
 import ttr.api.util.LanguageManager;
 import ttr.api.util.Util;
+import ttr.core.TTrMaterialHandler;
+import ttr.core.TTrRecipeHandler;
 
 public class BlockRock extends Block
 {
 	public static final PropertyEnum<RockType> ROCK_TYPE = PropertyEnum.create("rock_type", RockType.class);
-
+	
 	public static enum RockType implements IStringSerializable
 	{
 		resource("%s"),
@@ -52,7 +57,7 @@ public class BlockRock extends Block
 		brick_mossy("Mossy %s Brick"),
 		brick_compacted("Compacted %s Brick"),
 		chiseled("Chiseled %s");
-
+		
 		static
 		{
 			resource.fallBreakMeta = cobble.ordinal();
@@ -61,55 +66,55 @@ public class BlockRock extends Block
 			mossy.burnable = true;
 			brick_mossy.burnable = true;
 		}
-
+		
 		int noMossy = ordinal();
 		int noSilkTouchDropMeta = ordinal();
 		int fallBreakMeta = ordinal();
 		boolean burnable;
 		boolean displayInTab = true;
 		String local;
-
+		
 		private RockType(String local)
 		{
 			this.local = local;
 		}
-
+		
 		@Override
 		public String getName()
 		{
 			return name();
 		}
-
+		
 		public boolean isBurnable()
 		{
-			return burnable;
+			return this.burnable;
 		}
-
+		
 		public RockType burned()
 		{
-			return values()[noMossy];
+			return values()[this.noMossy];
 		}
 	}
-
-	public final Mat material;
+	
+	public final EnumMaterial material;
 	public final float hardnessMultiplier;
 	public final float resistanceMultiplier;
 	public final int harvestLevel;
-
-	public BlockRock(Mat material)
+	
+	public BlockRock(EnumMaterial material)
 	{
 		super(Material.ROCK);
 		setRegistryName("rock." + material.name);
 		GameRegistry.register(this);
 		GameRegistry.register(new ItemBlockExt(this).setRegistryName("rock." + material.name));
 		this.material = material;
-		harvestLevel = material.blockHarvestLevel;
+		this.harvestLevel = material.toolQuality;
 		setSoundType(SoundType.STONE);
-		setHardness(hardnessMultiplier = material.blockHardness);
-		setResistance(resistanceMultiplier = material.blockExplosionResistance);
+		setHardness(this.hardnessMultiplier = material.blockHardness);
+		setResistance(this.resistanceMultiplier = material.blockExplosionResistance);
 		setTickRandomly(true);
 		setCreativeTab(CreativeTabs.BUILDING_BLOCKS);
-
+		
 		for(RockType type : RockType.values())
 		{
 			LanguageManager.registerLocal(new ItemStack(this, 1, type.ordinal()).getUnlocalizedName() + ".name", String.format(type.local, material.localName));
@@ -127,27 +132,33 @@ public class BlockRock extends Block
 		TemplateRecipeMap.FORGE_HAMMER.addRecipe(new BaseStack(this, 1, RockType.brick.ordinal()), (long) (50 * material.blockHardness), 40, new BaseStack(this, 1, RockType.brick_crushed.ordinal()));
 		TemplateRecipeMap.GRINDING.addRecipe(new AbstractStack[]{new BaseStack(this)}, null, new AbstractStack[]{new OreStack("dust" + material.oreDictName), new OreStack("dustSmall" + material.byproduct1.oreDictName)}, new int[][]{{10000, 5000, 2500, 1250}, {1000}}, null, (long) (100 * material.blockHardness), 24, 0, null);
 		TemplateRecipeMap.GRINDING_STEAM.addRecipe(new AbstractStack[]{new BaseStack(this)}, null, new AbstractStack[]{new OreStack("dust" + material.oreDictName), new OreStack("dustTiny" + material.byproduct1.oreDictName)}, new int[][]{{10000, 2000}, {1000}}, null, (long) (120 * material.blockHardness), 16, 0, null);
+		TTrRecipeAdder.addCuttingRecipe(new BaseStack(this), 400, (long) (12 * material.blockHardness), 4, new BaseStack(TTrMaterialHandler.getItemStack(EnumOrePrefix.plate, material, 2)), new BaseStack(TTrMaterialHandler.getItemStack(EnumOrePrefix.plate, material, 1)));
+		TemplateRecipeMap.SMELTING.addRecipe(new BaseStack(this, 1, RockType.cobble.ordinal()), 400 * material.heatCapability / 1000L, 20, new BaseStack(this, 1, RockType.resource.ordinal()));
+		TTrRecipeHandler.addShapelessRecipe(new ItemStack(this, 1, RockType.smoothed.ordinal()), EnumTools.file.orename(), new ItemStack(this, 1, RockType.resource.ordinal()));
+		TTrRecipeHandler.addShapedRecipe(new ItemStack(this, 4, RockType.brick.ordinal()), "xx", "xx", 'x', new ItemStack(this, 1, RockType.resource.ordinal()));
+		TTrRecipeHandler.addShapedRecipe(new ItemStack(this, 4, RockType.brick_compacted.ordinal()), "xx", "xx", 'x', new ItemStack(this, 1, RockType.smoothed.ordinal()));
+		
 		TTrAPI.proxy.registerForgeModel(this, "rock/" + material.name, ROCK_TYPE, false);
 	}
-
+	
 	@Override
 	protected BlockStateContainer createBlockState()
 	{
 		return new BlockStateContainer(this, ROCK_TYPE);
 	}
-
+	
 	@Override
 	public int getMetaFromState(IBlockState state)
 	{
 		return state.getValue(ROCK_TYPE).ordinal();
 	}
-
+	
 	@Override
 	public IBlockState getStateFromMeta(int meta)
 	{
 		return getDefaultState().withProperty(ROCK_TYPE, RockType.values()[meta]);
 	}
-
+	
 	@Override
 	@SideOnly(Side.CLIENT)
 	public void getSubBlocks(Item itemIn, CreativeTabs tab, List<ItemStack> list)
@@ -158,25 +169,25 @@ public class BlockRock extends Block
 				list.add(new ItemStack(itemIn, 1, type.ordinal()));
 			}
 	}
-
+	
 	@Override
 	public boolean canSilkHarvest(World world, BlockPos pos, IBlockState state, EntityPlayer player)
 	{
 		return true;
 	}
-
+	
 	@Override
 	public String getHarvestTool(IBlockState state)
 	{
 		return "pickaxe";
 	}
-
+	
 	@Override
 	public boolean isToolEffective(String type, IBlockState state)
 	{
 		return getHarvestTool(state).equals(type);
 	}
-
+	
 	@Override
 	public int getHarvestLevel(IBlockState state)
 	{
@@ -185,18 +196,18 @@ public class BlockRock extends Block
 		{
 		case cobble :
 		case mossy :
-			return harvestLevel / 2;
+			return this.harvestLevel / 2;
 		default:
-			return harvestLevel;
+			return this.harvestLevel;
 		}
 	}
-
+	
 	@Override
 	protected ItemStack createStackedBlock(IBlockState state)
 	{
 		return new ItemStack(this, 1, state.getValue(ROCK_TYPE).ordinal());
 	}
-
+	
 	@Override
 	public List<ItemStack> getDrops(IBlockAccess world, BlockPos pos, IBlockState state, int fortune)
 	{
@@ -212,19 +223,19 @@ public class BlockRock extends Block
 	{
 		return world.getBlockState(pos).getValue(ROCK_TYPE).burnable;
 	}
-
+	
 	@Override
 	public int getFireSpreadSpeed(IBlockAccess world, BlockPos pos, EnumFacing face)
 	{
 		return isFlammable(world, pos, face) ? 40 : 0;
 	}
-
+	
 	@Override
 	public int getFlammability(IBlockAccess world, BlockPos pos, EnumFacing face)
 	{
 		return 0;
 	}
-
+	
 	@Override
 	public void updateTick(World worldIn, BlockPos pos, IBlockState state, Random rand)
 	{
@@ -233,7 +244,7 @@ public class BlockRock extends Block
 			worldIn.setBlockState(pos, state.withProperty(ROCK_TYPE, RockType.values()[state.getValue(ROCK_TYPE).noMossy]), 3);
 		}
 	}
-
+	
 	@Override
 	public boolean isReplaceableOreGen(IBlockState state, IBlockAccess world, BlockPos pos,
 			Predicate<IBlockState> target)

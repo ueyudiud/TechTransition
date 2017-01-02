@@ -27,8 +27,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import ttr.api.data.EnumToolType;
 import ttr.api.data.V;
+import ttr.api.enums.EnumTools;
 import ttr.api.util.Util;
 import ttr.core.tile.TEBase;
 import ttr.core.tile.TEMachineBase;
@@ -67,7 +67,7 @@ public class BlockMachine extends Block implements ITileEntityProvider, IWrencha
 	{
 		return getDefaultState();
 	}
-
+	
 	@Override
 	public int getMetaFromState(IBlockState state)
 	{
@@ -89,7 +89,7 @@ public class BlockMachine extends Block implements ITileEntityProvider, IWrencha
 		}
 		super.onBlockPlacedBy(worldIn, pos, state, placer, stack);
 	}
-
+	
 	@Override
 	public IBlockState getActualState(IBlockState state, IBlockAccess worldIn, BlockPos pos)
 	{
@@ -127,7 +127,7 @@ public class BlockMachine extends Block implements ITileEntityProvider, IWrencha
 	{
 		return state;
 	}
-
+	
 	@Override
 	public void neighborChanged(IBlockState state, World worldIn, BlockPos pos, Block blockIn)
 	{
@@ -137,7 +137,7 @@ public class BlockMachine extends Block implements ITileEntityProvider, IWrencha
 			((TEBase) tile).onNeighbourBlockChange();
 		}
 	}
-
+	
 	@Override
 	public void onNeighborChange(IBlockAccess world, BlockPos pos, BlockPos neighbor)
 	{
@@ -147,17 +147,22 @@ public class BlockMachine extends Block implements ITileEntityProvider, IWrencha
 			((TEBase) tile).onNeighbourBlockChange();
 		}
 	}
-
+	
 	public static EnumFacing getFacing(EntityLivingBase player)
 	{
 		return EnumFacing.HORIZONTALS[MathHelper.floor_double(player.rotationYaw * 4.0F / 360F + 0.5D) & 3].getOpposite();
 	}
-
+	
 	@Override
 	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn,
 			EnumHand hand, ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ)
 	{
 		TileEntity tile = worldIn.getTileEntity(pos);
+		if(tile instanceof TEMachineBase)
+		{
+			if(((TEMachineBase) tile).onActived(playerIn, hand, heldItem, side, hitX, hitY, hitZ))
+				return true;
+		}
 		return Util.onTileActivatedGeneral(playerIn, hand, heldItem, side, hitX, hitY, hitZ, tile);
 	}
 	
@@ -194,11 +199,11 @@ public class BlockMachine extends Block implements ITileEntityProvider, IWrencha
 		}
 		super.breakBlock(worldIn, pos, state);
 	}
-
+	
 	@Override
 	public String getHarvestTool(IBlockState state)
 	{
-		return EnumToolType.wrench.name();
+		return EnumTools.wrench.name();
 	}
 	
 	@Override
@@ -223,7 +228,7 @@ public class BlockMachine extends Block implements ITileEntityProvider, IWrencha
 	{
 		return new ItemStack(this, 1, getMetaFromState(state));
 	}
-
+	
 	@Override
 	public List<ItemStack> getDrops(IBlockAccess world, BlockPos pos, IBlockState state, int fortune)
 	{
@@ -241,7 +246,7 @@ public class BlockMachine extends Block implements ITileEntityProvider, IWrencha
 		list.add(createStackedBlock(state));
 		return list;
 	}
-
+	
 	@Override
 	public EnumFacing getFacing(World world, BlockPos pos)
 	{
@@ -259,13 +264,13 @@ public class BlockMachine extends Block implements ITileEntityProvider, IWrencha
 			return ((TEBase) tile).setRotation(newDirection);
 		return false;
 	}
-
+	
 	@Override
 	public boolean wrenchCanRemove(World world, BlockPos pos, EntityPlayer player)
 	{
 		return false;
 	}
-
+	
 	@Override
 	@Deprecated
 	public List<ItemStack> getWrenchDrops(World world, BlockPos pos, IBlockState state, TileEntity tile,

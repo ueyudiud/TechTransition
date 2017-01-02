@@ -16,9 +16,10 @@ import ttr.api.inventory.WaterTank;
 import ttr.api.tile.IPluginAccess;
 import ttr.api.util.EnergyTrans;
 import ttr.api.util.Log;
+import ttr.api.util.Util;
 import ttr.core.tile.ITankSyncable;
 import ttr.core.tile.TEMachineInventory;
-import ttr.load.TTrFluids;
+import ttr.load.TTrIBF;
 
 public abstract class TEBoiler extends TEMachineInventory implements ITankSyncable
 {
@@ -31,7 +32,7 @@ public abstract class TEBoiler extends TEMachineInventory implements ITankSyncab
 		@Override
 		public IFluidTankProperties[] getTankProperties()
 		{
-			return new IFluidTankProperties[]{tankSteamProperties};
+			return new IFluidTankProperties[]{this.tankSteamProperties};
 		}
 		
 		@Override
@@ -43,34 +44,34 @@ public abstract class TEBoiler extends TEMachineInventory implements ITankSyncab
 		@Override
 		public FluidStack drain(FluidStack resource, boolean doDrain)
 		{
-			return resource.getFluid() == TTrFluids.steam ? drain(resource.amount, doDrain) : null;
+			return resource.getFluid() == TTrIBF.steam ? drain(resource.amount, doDrain) : null;
 		}
 		
 		@Override
 		public FluidStack drain(int maxDrain, boolean doDrain)
 		{
-			int value = Math.min(maxDrain, amount);
+			int value = Math.min(maxDrain, TEBoiler.this.amount);
 			if(value == 0) return null;
 			if(doDrain)
 			{
-				amount -= value;
+				TEBoiler.this.amount -= value;
 			}
-			return new FluidStack(TTrFluids.steam, value);
+			return new FluidStack(TTrIBF.steam, value);
 		}
 	}
-
+	
 	public class BoilerTankProperties implements IFluidTankProperties
 	{
 		@Override
 		public FluidStack getContents()
 		{
-			return amount <= 0 ? new FluidStack(TTrFluids.steam, amount) : null;
+			return TEBoiler.this.amount <= 0 ? new FluidStack(TTrIBF.steam, TEBoiler.this.amount) : null;
 		}
 		
 		@Override
 		public int getCapacity()
 		{
-			return realSteamCap;
+			return TEBoiler.this.realSteamCap;
 		}
 		
 		@Override
@@ -94,10 +95,10 @@ public abstract class TEBoiler extends TEMachineInventory implements ITankSyncab
 		@Override
 		public boolean canDrainFluidType(FluidStack fluidStack)
 		{
-			return fluidStack.getFluid() == TTrFluids.steam;
+			return fluidStack.getFluid() == TTrIBF.steam;
 		}
 	}
-
+	
 	protected final float efficiency;
 	public final int maxTemperature;
 	public final float outputPressure;
@@ -111,26 +112,26 @@ public abstract class TEBoiler extends TEMachineInventory implements ITankSyncab
 	
 	public TEBoiler(int maxTemperature, float outputPressure, int waterCap, int steamCap, float efficiency)
 	{
-		tank1 = new WaterTank(waterCap)
+		this.tank1 = new WaterTank(waterCap)
 		{
 			@Override
 			public int fill(FluidStack resource, boolean doFill)
 			{
-				if ((doFill) && (resource != null) && (resource.amount > 0) && (temperature > 373) && ((fluid == null) || (fluid.amount == 0)))
+				if ((doFill) && (resource != null) && (resource.amount > 0) && (TEBoiler.this.temperature > 373) && ((this.fluid == null) || (this.fluid.amount == 0)))
 				{
 					TEBoiler.this.removeBlock();
-					TEBoiler.this.worldObj.createExplosion(null, TEBoiler.this.pos.getX() + 0.5D, TEBoiler.this.pos.getY() + 0.5D, TEBoiler.this.pos.getZ() + 0.5D, 2.0F + (temperature - 300) * 0.01F, false);
+					TEBoiler.this.worldObj.createExplosion(null, TEBoiler.this.pos.getX() + 0.5D, TEBoiler.this.pos.getY() + 0.5D, TEBoiler.this.pos.getZ() + 0.5D, 2.0F + (TEBoiler.this.temperature - 300) * 0.01F, false);
 					return 0;
 				}
 				return super.fill(resource, doFill);
 			}
 		};
-		realSteamCap = steamCap;
+		this.realSteamCap = steamCap;
 		this.maxTemperature = maxTemperature;
 		this.outputPressure = outputPressure;
 		this.efficiency = efficiency;
 	}
-
+	
 	@Override
 	protected EnumFacing[] getMainAllowedFacing()
 	{
@@ -141,22 +142,22 @@ public abstract class TEBoiler extends TEMachineInventory implements ITankSyncab
 	public void readFromNBT(NBTTagCompound nbt)
 	{
 		super.readFromNBT(nbt);
-		tank1.readFromNBT(nbt.getCompoundTag("tank1"));
-		amount = nbt.getInteger("amount");
-		temperature = nbt.getInteger("temp");
-		calcification = nbt.getFloat("calcify");
+		this.tank1.readFromNBT(nbt.getCompoundTag("tank1"));
+		this.amount = nbt.getInteger("amount");
+		this.temperature = nbt.getInteger("temp");
+		this.calcification = nbt.getFloat("calcify");
 	}
-
+	
 	@Override
 	public NBTTagCompound writeToNBT(NBTTagCompound nbt)
 	{
-		nbt.setTag("tank1", tank1.writeToNBT(new NBTTagCompound()));
-		nbt.setInteger("amount", amount);
-		nbt.setInteger("temp", temperature);
-		nbt.setFloat("calcify", calcification);
+		nbt.setTag("tank1", this.tank1.writeToNBT(new NBTTagCompound()));
+		nbt.setInteger("amount", this.amount);
+		nbt.setInteger("temp", this.temperature);
+		nbt.setFloat("calcify", this.calcification);
 		return super.writeToNBT(nbt);
 	}
-
+	
 	@Override
 	protected void updateServer()
 	{
@@ -170,35 +171,35 @@ public abstract class TEBoiler extends TEMachineInventory implements ITankSyncab
 	
 	protected int getRealSteamCap()
 	{
-		return (1 + getPluginLevel(IPluginAccess.tankCapacity)) * realSteamCap;
+		return (1 + getPluginLevel(IPluginAccess.tankCapacity)) * this.realSteamCap;
 	}
 	
 	protected boolean checkCasing()
 	{
-		if (maxTemperature < temperature)
+		if (this.maxTemperature < this.temperature)
 		{
 			removeBlock();
-			worldObj.createExplosion(null, pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D, 2.0F, true);
+			this.worldObj.createExplosion(null, this.pos.getX() + 0.5D, this.pos.getY() + 0.5D, this.pos.getZ() + 0.5D, 2.0F, true);
 			return false;
 		}
-		if (amount > getRealSteamCap())
+		if (this.amount > getRealSteamCap())
 		{
-			if(worldObj.isAirBlock(pos.up()))
+			if(this.worldObj.isAirBlock(this.pos.up()))
 			{
-				amount = getRealSteamCap() * 2 / 3;
+				this.amount = getRealSteamCap() * 2 / 3;
 				//Display sound.
-				worldObj.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, pos.getX() + 0.5 + (random.nextFloat() - random.nextFloat()) * 0.5, pos.getY() + 1, pos.getZ() + 0.5 + (random.nextFloat() - random.nextFloat()) * 0.5, 0, 0.2, 0);
+				this.worldObj.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, this.pos.getX() + 0.5 + (this.random.nextFloat() - this.random.nextFloat()) * 0.5, this.pos.getY() + 1, this.pos.getZ() + 0.5 + (this.random.nextFloat() - this.random.nextFloat()) * 0.5, 0, 0.2, 0);
 			}
 			else
 			{
 				removeBlock();
-				worldObj.createExplosion(null, pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D, 2.0F, true);
+				this.worldObj.createExplosion(null, this.pos.getX() + 0.5D, this.pos.getY() + 0.5D, this.pos.getZ() + 0.5D, 2.0F, true);
 				return false;
 			}
 		}
 		return true;
 	}
-
+	
 	protected int getWaterBoilPoint()
 	{
 		return 373;
@@ -209,59 +210,59 @@ public abstract class TEBoiler extends TEMachineInventory implements ITankSyncab
 	protected void boilWater()
 	{
 		int bp = getWaterBoilPoint();
-		if (temperature >= bp)
+		if (this.temperature >= bp)
 		{
-			int speed = (int) (getPower() * EnergyTrans.J_TO_STEAM * efficiency * (1.0F - calcification));
+			int speed = (int) (getPower() * EnergyTrans.J_TO_STEAM * this.efficiency * (1.0F - this.calcification));
 			int produce = useWater(speed);
-			amount += produce;
+			this.amount += produce;
 		}
 		else
 		{
-			int speed = (int) (Math.log1p(bp - temperature) * amount / (tank1.getFluidAmount() + 1));
-			amount -= speed;
-			if (amount < 0)
+			int speed = (int) (Math.log1p(bp - this.temperature) * this.amount / (this.tank1.getFluidAmount() + 1));
+			this.amount -= speed;
+			if (this.amount < 0)
 			{
-				amount = 0;
+				this.amount = 0;
 			}
 		}
 	}
-
-
+	
+	
 	protected int useWater(int speed)
 	{
-		boolean flag = !tank1.isDistilledWater();
+		boolean flag = !this.tank1.isDistilledWater();
 		int ret;
-		if (speed > buf)
+		if (speed > this.buf)
 		{
 			int ex = speed / 100 + 1;
-			FluidStack stack = tank1.drain(ex, true);
+			FluidStack stack = this.tank1.drain(ex, true);
 			if (stack == null)
 			{
-				ret = buf;
+				ret = this.buf;
 			}
 			else
 			{
-				buf += stack.amount * 100;
-				ret = Math.min(buf, speed);
-				buf -= ret;
+				this.buf += stack.amount * 100;
+				ret = Math.min(this.buf, speed);
+				this.buf -= ret;
 			}
 		}
 		else
 		{
-			buf -= speed;
+			this.buf -= speed;
 			ret = speed;
 		}
-		if ((flag) && (random.nextInt(6) == 0))
+		if ((flag) && (this.random.nextInt(6) == 0))
 		{
-			calcification += 1.0E-008F * ret;
+			this.calcification += 1.0E-008F * ret;
 		}
 		return ret;
 	}
-
+	
 	protected void tryFlowSteam()
 	{
 		float pressAmount = getPressure();
-		if (pressAmount > outputPressure)
+		if (pressAmount > this.outputPressure)
 		{
 			for(EnumFacing facing : EnumFacing.VALUES)
 			{
@@ -272,20 +273,31 @@ public abstract class TEBoiler extends TEMachineInventory implements ITankSyncab
 			}
 		}
 	}
-
+	
 	protected void sendSteamTo(EnumFacing face)
 	{
 		try
 		{
-			TileEntity tile = worldObj.getTileEntity(pos.offset(face));
-			if (tile != null &&
-					tile.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, face.getOpposite()))
+			TileEntity tile = this.worldObj.getTileEntity(this.pos.offset(face));
+			if (tile != null)
 			{
-				IFluidHandler handler = tile.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, face.getOpposite());
-				FluidStack stack = new FluidStack(TTrFluids.steam, Math.min(getMaxOutput(), amount));
-				if (handler.fill(stack, false) != 0)
+				if(tile.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, face.getOpposite()))
 				{
-					amount -= handler.fill(stack, true);
+					IFluidHandler handler = tile.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, face.getOpposite());
+					FluidStack stack = Util.getSteam(Math.min(getMaxOutput(), this.amount));
+					if (handler.fill(stack, false) != 0)
+					{
+						this.amount -= handler.fill(stack, true);
+					}
+				}
+				else if(tile instanceof net.minecraftforge.fluids.IFluidHandler)
+				{
+					net.minecraftforge.fluids.IFluidHandler handler = (net.minecraftforge.fluids.IFluidHandler) tile;
+					FluidStack stack = Util.getSteam(Math.min(getMaxOutput(), this.amount));
+					if (handler.fill(face.getOpposite(), stack, false) != 0)
+					{
+						this.amount -= handler.fill(face.getOpposite(), stack, true);
+					}
 				}
 				return;
 			}
@@ -297,50 +309,50 @@ public abstract class TEBoiler extends TEMachineInventory implements ITankSyncab
 	}
 	
 	protected abstract int getMaxOutput();
-
+	
 	protected float getPressure()
 	{
-		return (float) amount / (float) getRealSteamCap();
+		return (float) this.amount / (float) getRealSteamCap();
 	}
-
+	
 	@Override
 	public int getFieldCount()
 	{
 		return 2;
 	}
-
+	
 	@Override
 	public int getField(int id)
 	{
 		switch (id)
 		{
-		case 0 : return amount;
-		case 1 : return temperature;
+		case 0 : return this.amount;
+		case 1 : return this.temperature;
 		default: return 0;
 		}
 	}
-
+	
 	@Override
 	public void setField(int id, int value)
 	{
 		switch(id)
 		{
-		case 0 : amount = value; break;
-		case 1 : temperature = value; break;
+		case 0 : this.amount = value; break;
+		case 1 : this.temperature = value; break;
 		}
 	}
-
+	
 	@Override
 	public boolean hasCapability(Capability<?> capability, EnumFacing facing)
 	{
 		return capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY ? true : super.hasCapability(capability, facing);
 	}
-
+	
 	@Override
 	public <T> T getCapability(Capability<T> capability, EnumFacing facing)
 	{
 		if(capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY)
-			return (T) (facing == getFacing("steam") ? tank2 : tank1);
+			return (T) (facing == getFacing("steam") ? this.tank2 : this.tank1);
 		return super.getCapability(capability, facing);
 	}
 	
@@ -353,56 +365,56 @@ public abstract class TEBoiler extends TEMachineInventory implements ITankSyncab
 	@Override
 	public FluidTankInfo getInfomation(int id)
 	{
-		return tank1.getInfo();
+		return this.tank1.getInfo();
 	}
-
+	
 	@Override
 	public FluidStack getStackInTank(int id)
 	{
-		return tank1.getFluid();
+		return this.tank1.getFluid();
 	}
 	
 	@Override
 	public void setFluidStackToTank(int id, FluidStack stack)
 	{
-		tank1.setFluid(stack);
+		this.tank1.setFluid(stack);
 	}
 	
 	@SideOnly(Side.CLIENT)
 	public int getWaterProgress(int scale)
 	{
-		return (int) ((float) (tank1.getFluidAmount() * scale) / (float) tank1.getCapacity());
+		return (int) ((float) (this.tank1.getFluidAmount() * scale) / (float) this.tank1.getCapacity());
 	}
 	
 	@SideOnly(Side.CLIENT)
 	public int getSteamProgress(int scale)
 	{
-		return (int) ((float) (amount * scale) / (float) getRealSteamCap());
+		return (int) ((float) (this.amount * scale) / (float) getRealSteamCap());
 	}
 	
 	@SideOnly(Side.CLIENT)
 	public int getTemperatureProgress(int scale)
 	{
-		return (int) ((float) (temperature * scale) / (float) maxTemperature);
+		return (int) ((float) ((this.temperature - 298) * scale) / (float) (this.maxTemperature - 298));
 	}
-
+	
 	@Override
 	protected NBTTagCompound writeNBTToStack()
 	{
-		if(calcification != 0)
+		if(this.calcification != 0)
 		{
 			NBTTagCompound nbt = new NBTTagCompound();
-			nbt.setFloat("calcification", calcification);
+			nbt.setFloat("calcification", this.calcification);
 			return nbt;
 		}
 		return super.writeNBTToStack();
 	}
-
+	
 	@Override
 	protected void readFromNBTAtStack(NBTTagCompound nbt)
 	{
 		super.readFromNBTAtStack(nbt);
-		calcification = nbt.getFloat("calcification");
+		this.calcification = nbt.getFloat("calcification");
 	}
 	
 	@Override

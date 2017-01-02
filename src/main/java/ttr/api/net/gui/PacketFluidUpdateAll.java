@@ -24,24 +24,24 @@ public class PacketFluidUpdateAll extends PacketContainer
 	public PacketFluidUpdateAll(int windowID, ITankSyncable tanks)
 	{
 		super(windowID);
-		stacks = new FluidStack[tanks.getTankSize()];
-		for(int i = 0; i < stacks.length; ++i)
+		this.stacks = new FluidStack[tanks.getTankSize()];
+		for(int i = 0; i < this.stacks.length; ++i)
 		{
-			stacks[i] = tanks.getStackInTank(i);
+			this.stacks[i] = tanks.getStackInTank(i);
 		}
 	}
-
+	
 	@Override
 	protected void encode(PacketBuffer output) throws IOException
 	{
 		super.encode(output);
-		output.writeShort((short) stacks.length);
-		for (FluidStack stack : stacks)
+		output.writeShort((short) this.stacks.length);
+		for (FluidStack stack : this.stacks)
 		{
 			if(stack != null)
 			{
 				output.writeBoolean(true);
-				output.writeString(stack.getFluid().getName());
+				output.writeShort(FluidRegistry.getFluidID(stack.getFluid()));
 				output.writeInt(stack.amount);
 				output.writeNBTTagCompoundToBuffer(stack.tag);
 			}
@@ -51,36 +51,36 @@ public class PacketFluidUpdateAll extends PacketContainer
 			}
 		}
 	}
-
+	
 	@Override
 	protected void decode(PacketBuffer input) throws IOException
 	{
 		super.decode(input);
-		stacks = new FluidStack[input.readShort()];
-		for(int i = 0; i < stacks.length; ++i)
+		this.stacks = new FluidStack[input.readShort()];
+		for(int i = 0; i < this.stacks.length; ++i)
 		{
 			if(input.readBoolean())
 			{
-				String key = input.readStringFromBuffer(999);
-				if(!FluidRegistry.isFluidRegistered(key))
-					throw new IOException();
+				short key = input.readShort();
 				Fluid fluid = FluidRegistry.getFluid(key);
+				if(fluid == null)
+					throw new IOException();
 				int amt = input.readInt();
 				NBTTagCompound nbt = input.readNBTTagCompoundFromBuffer();
-				stacks[i] = new FluidStack(fluid, amt, nbt);
+				this.stacks[i] = new FluidStack(fluid, amt, nbt);
 			}
 		}
 	}
-
+	
 	@Override
 	public IPacket process(Network network)
 	{
 		Container container = getPlayer().openContainer;
-		if(container.windowId == windowID && container instanceof IFluidSyncableContainer)
+		if(container.windowId == this.windowID && container instanceof IFluidSyncableContainer)
 		{
-			for(int idx = 0; idx < stacks.length; ++idx)
+			for(int idx = 0; idx < this.stacks.length; ++idx)
 			{
-				((IFluidSyncableContainer) container).setFluid(idx, stacks[idx]);
+				((IFluidSyncableContainer) container).setFluid(idx, this.stacks[idx]);
 			}
 		}
 		return null;

@@ -6,6 +6,7 @@ import java.util.List;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -16,7 +17,7 @@ import ttr.api.util.UnlocalizedList;
 public class ItemBase extends Item
 {
 	private static List<ItemBase> list = new ArrayList();
-
+	
 	/**
 	 * Called when all others object(fluids, blocks, configurations, materials, etc)
 	 * are already initialized.
@@ -30,7 +31,7 @@ public class ItemBase extends Item
 		}
 		list = null;
 	}
-
+	
 	protected final String modid;
 	protected final String name;
 	
@@ -40,7 +41,7 @@ public class ItemBase extends Item
 	
 	protected ItemBase(String name)
 	{
-		this(name, null);
+		this(Loader.instance().activeModContainer().getModId(), name);
 	}
 	protected ItemBase(String modid, String name)
 	{
@@ -50,10 +51,10 @@ public class ItemBase extends Item
 	{
 		this.modid = modid;
 		this.name = name;
-		unlocalized = modid + "." + name;
+		this.unlocalized = modid + "." + name;
 		if(unlocalizedTooltip != null)
 		{
-			this.unlocalizedTooltip = "fle." + unlocalizedTooltip;
+			this.unlocalizedTooltip = modid + "." + unlocalizedTooltip;
 			LanguageManager.registerLocal(unlocalizedTooltip, localTooltip);
 		}
 		setRegistryName(modid, name);
@@ -63,10 +64,10 @@ public class ItemBase extends Item
 		 */
 		list.add(this);
 	}
-
+	
 	public void postInitalizedItems()
 	{
-
+		
 	}
 	
 	@Override
@@ -74,17 +75,17 @@ public class ItemBase extends Item
 	{
 		return this;
 	}
-
+	
 	@Override
 	public final String getUnlocalizedName()
 	{
-		return unlocalized;
+		return this.unlocalized;
 	}
-
+	
 	@Override
 	public String getUnlocalizedName(ItemStack stack)
 	{
-		return hasSubtypes ?
+		return this.hasSubtypes ?
 				getUnlocalizedName() + "@" + getDamage(stack) :
 					getUnlocalizedName();
 	}
@@ -104,7 +105,7 @@ public class ItemBase extends Item
 	{
 		return new Object[0];
 	}
-
+	
 	@Override
 	@SideOnly(Side.CLIENT)
 	public void addInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced)
@@ -112,17 +113,17 @@ public class ItemBase extends Item
 		super.addInformation(stack, playerIn, tooltip, advanced);
 		addInformation(stack, playerIn, new UnlocalizedList(tooltip), advanced);
 	}
-
+	
 	@SideOnly(Side.CLIENT)
 	protected void addInformation(ItemStack stack, EntityPlayer playerIn, UnlocalizedList unlocalizedList,
 			boolean advanced)
 	{
-		if(unlocalizedTooltip != null)
+		if(this.unlocalizedTooltip != null)
 		{
-			unlocalizedList.add(unlocalizedTooltip);
+			unlocalizedList.add(this.unlocalizedTooltip);
 		}
 	}
-
+	
 	/**
 	 * The offset meta given by item nbt. Use to divide
 	 * the sub item of each material.
@@ -138,7 +139,7 @@ public class ItemBase extends Item
 	{
 		return super.getDamage(stack);
 	}
-
+	
 	@Override
 	public int getDamage(ItemStack stack)
 	{

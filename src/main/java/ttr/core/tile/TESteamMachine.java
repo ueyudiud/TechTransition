@@ -19,7 +19,7 @@ import ttr.api.recipe.TemplateRecipeMap.TemplateRecipe;
 import ttr.api.tile.IContainerableTile;
 import ttr.api.util.DamageSources;
 import ttr.api.util.EnergyTrans;
-import ttr.load.TTrFluids;
+import ttr.load.TTrIBF;
 
 public abstract class TESteamMachine extends TEMachineRecipeMap
 implements IContainerableTile, IFluidHandler
@@ -34,13 +34,13 @@ implements IContainerableTile, IFluidHandler
 	public final int maxSteamCap;
 	protected final float efficiency;
 	protected int steamAmount;
-
+	
 	public TESteamMachine(String name, int itemInputSize, int itemOutputSize, int fluidInputSize, int fluidOutputSize, int maxSteamCap, long maxPower, float efficiency, float durationMultipler)
 	{
 		this(itemInputSize, itemOutputSize, fluidInputSize, fluidOutputSize, maxSteamCap, maxPower, efficiency, durationMultipler);
-		inventory = new Inventory(1, name, 64);
+		this.inventory = new Inventory(1, name, 64);
 	}
-
+	
 	public TESteamMachine(int itemInputSize, int itemOutputSize, int fluidInputSize, int fluidOutputSize, int maxSteamCap, long maxPower, float efficiency, float durationMultipler)
 	{
 		super(itemInputSize, itemOutputSize, fluidInputSize, fluidOutputSize);
@@ -61,30 +61,30 @@ implements IContainerableTile, IFluidHandler
 	public void readFromNBT(NBTTagCompound nbt)
 	{
 		super.readFromNBT(nbt);
-		steamAmount = nbt.getInteger("steam");
+		this.steamAmount = nbt.getInteger("steam");
 	}
-
+	
 	@Override
 	public NBTTagCompound writeToNBT(NBTTagCompound nbt)
 	{
-		nbt.setInteger("steam", steamAmount);
+		nbt.setInteger("steam", this.steamAmount);
 		return super.writeToNBT(nbt);
 	}
-
+	
 	@Override
 	protected void initRecipeInput(TemplateRecipe recipe)
 	{
 		super.initRecipeInput(recipe);
-		duration = (long) Math.ceil(duration * durationMultipler);
-		minPower = (long) Math.ceil(minPower / durationMultipler);
+		this.duration = (long) Math.ceil(this.duration * this.durationMultipler);
+		this.minPower = (long) Math.ceil(this.minPower / this.durationMultipler);
 	}
 	
 	@Override
 	protected boolean matchRecipeOutput()
 	{
-		return worldObj.isAirBlock(pos.offset(getFacing("exhaust")));
+		return this.worldObj.isAirBlock(this.pos.offset(getFacing("exhaust")));
 	}
-
+	
 	@Override
 	protected void updateClient()
 	{
@@ -94,13 +94,13 @@ implements IContainerableTile, IFluidHandler
 			EnumFacing dir = getFacing("exhaust");
 			for(int i = 0; i < 4; ++i)
 			{
-				worldObj.spawnParticle(EnumParticleTypes.EXPLOSION_NORMAL,
-						dir.getFrontOffsetX() * .5 + pos.getX() + .5,
-						dir.getFrontOffsetY() * .5 + pos.getY() + .5,
-						dir.getFrontOffsetZ() * .5 + pos.getZ() + .5,
-						dir.getFrontOffsetX() * 0.2 + (random.nextFloat() - random.nextFloat()) * 0.02,
-						dir.getFrontOffsetY() * 0.2 + (random.nextFloat() - random.nextFloat()) * 0.02,
-						dir.getFrontOffsetZ() * 0.2 + (random.nextFloat() - random.nextFloat()) * 0.02);
+				this.worldObj.spawnParticle(EnumParticleTypes.EXPLOSION_NORMAL,
+						dir.getFrontOffsetX() * .5 + this.pos.getX() + .5,
+						dir.getFrontOffsetY() * .5 + this.pos.getY() + .5,
+						dir.getFrontOffsetZ() * .5 + this.pos.getZ() + .5,
+						dir.getFrontOffsetX() * 0.2 + (this.random.nextFloat() - this.random.nextFloat()) * 0.02,
+						dir.getFrontOffsetY() * 0.2 + (this.random.nextFloat() - this.random.nextFloat()) * 0.02,
+						dir.getFrontOffsetZ() * 0.2 + (this.random.nextFloat() - this.random.nextFloat()) * 0.02);
 			}
 			disable(ReleaseSteam);
 		}
@@ -112,14 +112,14 @@ implements IContainerableTile, IFluidHandler
 		super.preUpdateEntity();
 		disable(ReleaseSteam);
 	}
-
+	
 	@Override
 	protected void initRecipeOutput()
 	{
 		super.initRecipeOutput();
 		//Display sound
 		EnumFacing dir = getFacing("exhaust");
-		for(EntityLivingBase entity : worldObj.getEntitiesWithinAABB(EntityLivingBase.class, new AxisAlignedBB(pos.offset(dir))))
+		for(EntityLivingBase entity : this.worldObj.getEntitiesWithinAABB(EntityLivingBase.class, new AxisAlignedBB(this.pos.offset(dir))))
 		{
 			if(entity.getActivePotionEffect(MobEffects.FIRE_RESISTANCE) == null)
 			{
@@ -134,7 +134,7 @@ implements IContainerableTile, IFluidHandler
 	{
 		return 6F;
 	}
-
+	
 	@Override
 	protected void updateServer()
 	{
@@ -144,16 +144,16 @@ implements IContainerableTile, IFluidHandler
 	@Override
 	protected long getPower()
 	{
-		return maxPower;
+		return this.maxPower;
 	}
 	
 	@Override
 	protected boolean useEnergy()
 	{
-		if(steamAmount >= minPower)
+		if(this.steamAmount >= this.minPower)
 		{
 			disable(SteamNotEnough);
-			steamAmount -= Math.ceil(minPower * EnergyTrans.J_TO_STEAM / efficiency);
+			this.steamAmount -= Math.ceil(this.minPower * EnergyTrans.J_TO_STEAM / this.efficiency);
 			return true;
 		}
 		else if(is(Working))
@@ -166,28 +166,32 @@ implements IContainerableTile, IFluidHandler
 	@Override
 	protected long getEnergyInput()
 	{
-		return steamInput;
+		return this.steamInput;
 	}
 	
 	public int getSteamAmount()
 	{
-		return steamAmount;
+		return this.steamAmount;
 	}
-
+	
 	@Override
 	public IFluidTankProperties[] getTankProperties()
 	{
-		return new IFluidTankProperties[]{new FluidTankProperties(new FluidStack(TTrFluids.steam, steamAmount), maxSteamCap, true, false)};
+		return new IFluidTankProperties[]{new FluidTankProperties(new FluidStack(TTrIBF.steam, this.steamAmount), this.maxSteamCap, true, false)};
 	}
 	
 	@Override
 	public int fill(FluidStack resource, boolean doFill)
 	{
-		if(resource != null && resource.getFluid() == TTrFluids.steam)
+		if(resource != null && resource.getFluid() == TTrIBF.steam)
 		{
-			steamAmount += resource.amount;
-			steamInput += resource.amount;
-			return resource.amount;
+			int in = Math.min(resource.amount, this.maxSteamCap - this.steamAmount);
+			if(doFill)
+			{
+				this.steamAmount += in;
+				this.steamInput += in;
+			}
+			return in;
 		}
 		return 0;
 	}
@@ -203,7 +207,7 @@ implements IContainerableTile, IFluidHandler
 	{
 		return null;
 	}
-
+	
 	@Override
 	public boolean hasCapability(Capability<?> capability, EnumFacing facing)
 	{
@@ -218,7 +222,7 @@ implements IContainerableTile, IFluidHandler
 			return CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY.cast(this);
 		return super.getCapability(capability, facing);
 	}
-
+	
 	@SideOnly(Side.CLIENT)
 	public boolean isSteamNotEnough()
 	{

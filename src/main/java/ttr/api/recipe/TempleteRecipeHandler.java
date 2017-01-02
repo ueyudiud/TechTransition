@@ -31,13 +31,11 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.oredict.OreDictionary;
-import ttr.api.material.Mat;
 import ttr.api.recipe.TempleteRecipeHandler.Recipe;
 import ttr.api.recipe.TempleteRecipeHandler.UnbakedRecipe;
 import ttr.api.stack.AbstractStack;
 import ttr.api.stack.ArrayStack;
 import ttr.api.stack.BaseStack;
-import ttr.api.stack.MatterStack;
 import ttr.api.stack.OreStack;
 import ttr.api.util.Log;
 
@@ -78,13 +76,6 @@ public abstract class TempleteRecipeHandler<R extends Recipe, U extends UnbakedR
 			OreStack stack = (OreStack) src;
 			object.addProperty("size", stack.size);
 			object.addProperty("ore", stack.oreName);
-			return object;
-		}
-		else if(src instanceof MatterStack)
-		{
-			MatterStack stack = (MatterStack) src;
-			object.addProperty("size", stack.size);
-			object.addProperty("matter", stack.material.name);
 			return object;
 		}
 		return null;
@@ -162,19 +153,11 @@ public abstract class TempleteRecipeHandler<R extends Recipe, U extends UnbakedR
 			}
 			stack = new BaseStack(it, size, meta);
 		}
-		else if(object.has("matter"))
-		{
-			String matterName = object.get("matter").getAsString();
-			Mat material = Mat.register().get(matterName);
-			if(material == null)
-				throw new JsonParseException("No material named '" + matterName + "'.");
-			stack = new MatterStack(material, size);
-		}
 		else throw new JsonParseException("No valid stack detected!");
 		return stack;
 	};
 	private static final List<TempleteRecipeHandler> HANDLERS = new ArrayList();
-
+	
 	public static void load(File file)
 	{
 		for(TempleteRecipeHandler handler : HANDLERS)
@@ -206,14 +189,14 @@ public abstract class TempleteRecipeHandler<R extends Recipe, U extends UnbakedR
 	{
 		HANDLERS.add(this);
 		this.name = name;
-		gson = createGson();
+		this.gson = createGson();
 	}
-
+	
 	public String name()
 	{
-		return name;
+		return this.name;
 	}
-
+	
 	public void loadRecipe(File file)
 	{
 		JsonReader reader = null;
@@ -221,7 +204,7 @@ public abstract class TempleteRecipeHandler<R extends Recipe, U extends UnbakedR
 		try
 		{
 			File file1;
-			file1 = new File(file, name + "_auto.json");
+			file1 = new File(file, this.name + "_auto.json");
 			if(!file1.exists())
 			{
 				file1.createNewFile();
@@ -231,23 +214,23 @@ public abstract class TempleteRecipeHandler<R extends Recipe, U extends UnbakedR
 				writer = new JsonWriter(new BufferedWriter(new FileWriter(file1)));
 				writer.setIndent("	");
 				writer.beginArray();
-				for(U unbakedRecipe : unbakedRecipes.values())
+				for(U unbakedRecipe : this.unbakedRecipes.values())
 				{
-					gson.toJson(unbakedRecipe, getRecipeClass(), writer);
+					this.gson.toJson(unbakedRecipe, getRecipeClass(), writer);
 				}
 				writer.endArray();
 				writer.close();
 				writer = null;
 			}
-			file1 = new File(file, name + "_user.json");
+			file1 = new File(file, this.name + "_user.json");
 			if(file1.canRead())
 			{
 				reader = new JsonReader(new BufferedReader(new FileReader(file1)));
 				reader.beginArray();
 				while(reader.hasNext())
 				{
-					U unbakedRecipe = gson.fromJson(reader, getRecipeClass());
-					unbakedRecipes.put(unbakedRecipe.name(), unbakedRecipe);
+					U unbakedRecipe = this.gson.fromJson(reader, getRecipeClass());
+					this.unbakedRecipes.put(unbakedRecipe.name(), unbakedRecipe);
 				}
 				reader.endArray();
 				reader.close();
@@ -283,28 +266,28 @@ public abstract class TempleteRecipeHandler<R extends Recipe, U extends UnbakedR
 	}
 	public void addRecipe(U recipe)
 	{
-		unbakedRecipes.put(recipe.name(), recipe);
+		this.unbakedRecipes.put(recipe.name(), recipe);
 	}
 	public void addRecipe(R recipe)
 	{
-		recipes.put(recipe.name, recipe);
+		this.recipes.put(recipe.name, recipe);
 	}
 	public void reloadRecipes()
 	{
-		for(Entry<String, U> entry : unbakedRecipes.entrySet())
+		for(Entry<String, U> entry : this.unbakedRecipes.entrySet())
 		{
-			recipes.put(entry.getKey(), entry.getValue().bake());
+			this.recipes.put(entry.getKey(), entry.getValue().bake());
 		}
 	}
 	public abstract Class<U> getRecipeClass();
 	public abstract Gson createGson();
 	public Collection<R> getRecipes()
 	{
-		return recipes.values();
+		return this.recipes.values();
 	}
 	public R readFromNBT(String key, NBTTagCompound nbt, R recipe)
 	{
-		return recipes.get(nbt.getString(key));
+		return this.recipes.get(nbt.getString(key));
 	}
 	public NBTTagCompound writeToNBT(String key, NBTTagCompound nbt, R recipe)
 	{
@@ -314,18 +297,18 @@ public abstract class TempleteRecipeHandler<R extends Recipe, U extends UnbakedR
 		}
 		return nbt;
 	}
-
+	
 	public static abstract class UnbakedRecipe<R extends Recipe>
 	{
 		public abstract String name();
-
+		
 		public abstract R bake();
 	}
 	
 	public static abstract class Recipe
 	{
 		final String name;
-
+		
 		public Recipe(String name)
 		{
 			this.name = name;

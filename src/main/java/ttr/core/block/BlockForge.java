@@ -14,7 +14,7 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import ttr.api.data.EnumToolType;
+import ttr.api.enums.EnumTools;
 import ttr.core.tile.machine.TEForge;
 
 public class BlockForge extends BlockMachine
@@ -82,6 +82,6 @@ public class BlockForge extends BlockMachine
 	@Override
 	public String getHarvestTool(IBlockState state)
 	{
-		return EnumToolType.pickaxe.name();
+		return EnumTools.pickaxe.name();
 	}
 }

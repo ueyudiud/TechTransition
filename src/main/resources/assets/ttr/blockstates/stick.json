@@ -1,0 +1,22 @@
+{
+	"forge_marker":1,
+	"defaults": {
+		"transform": "forge:default-item",
+		"model": "ttr:item",
+		"textures": { "layer0": "ttr:items/iconsets/void" }
+	},
+	"variants": {
+		"type": {
+			"default"   : { "textures": { "layer1": "ttr:items/iconsets/stick_dull" } },
+			"dull"      : { "textures": { "layer1": "ttr:items/iconsets/stick_dull" } },
+			"rocky"     : { "textures": { "layer1": "ttr:items/iconsets/stick_rocky" } },
+			"metallic"  : { "textures": { "layer1": "ttr:items/iconsets/stick_metallic" } },
+			"shiny"     : { 
+				"textures": { 
+					"layer1": "ttr:items/iconsets/stick_shiny",
+					"layer2": "ttr:items/iconsets/stick_shiny_overlay"
+				} 
+			}
+		}
+	}
+}

@@ -29,28 +29,28 @@ public abstract class GuiContainerBase extends GuiContainer
 	private static final ResourceLocation voidTexture = new ResourceLocation("ttr:textures/gui/void.png");
 	
 	private final ResourceLocation location;
-
+	
 	public ContainerBase container;
 	protected int xoffset;
 	protected int yoffset;
-
+	
 	public GuiContainerBase(ContainerBase container)
 	{
 		this(container, 176, 166);
 	}
-
+	
 	public GuiContainerBase(ContainerBase container, int ySize)
 	{
 		this(container, 176, ySize);
 	}
-
+	
 	public GuiContainerBase(ContainerBase container, int xSize, int ySize)
 	{
 		super(container);
 		this.container = container;
 		this.ySize = ySize;
 		this.xSize = xSize;
-		location = getResourceLocation();
+		this.location = getResourceLocation();
 	}
 	
 	@Override
@@ -59,14 +59,14 @@ public abstract class GuiContainerBase extends GuiContainer
 		if(shouldRenderName())
 		{
 			String str = getName();
-			fontRendererObj.drawString(str, (xSize - fontRendererObj.getStringWidth(str)) / 2, 6, 0x404040);
+			this.fontRendererObj.drawString(str, (this.xSize - this.fontRendererObj.getStringWidth(str)) / 2, 6, 0x404040);
 		}
-		fontRendererObj.drawString(I18n.format("container.inventory"), 8, ySize - 96 + 2, 4210752);
+		this.fontRendererObj.drawString(I18n.format("container.inventory"), 8, this.ySize - 96 + 2, 4210752);
 		drawFrontgroundOther(par1, par2);
-		for(FluidSlot slot : container.fluidSlotList)
+		par1 -= this.xoffset;
+		par2 -= this.yoffset;
+		for(FluidSlot slot : this.container.fluidSlotList)
 		{
-			par1 -= xoffset;
-			par2 -= yoffset;
 			if(slot.shouldRender() && slot.x <= par1 && slot.x + slot.w >= par1 && slot.y <= par2 && slot.y + slot.h >= par2)
 			{
 				FluidTankInfo info = slot.getTankInfo();
@@ -82,29 +82,29 @@ public abstract class GuiContainerBase extends GuiContainer
 			}
 		}
 	}
-
+	
 	protected void drawFrontgroundOther(int x, int y)
 	{
-
+		
 	}
-
+	
 	@Override
 	protected void drawGuiContainerBackgroundLayer(float f, int x, int y)
 	{
 		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-		mc.getTextureManager().bindTexture(location);
-		xoffset = (width - xSize) / 2;
-		yoffset = (height - ySize) / 2;
-		drawTexturedModalRect(xoffset, yoffset, 0, 0, xSize, ySize);
-		drawUnderFluid(xoffset, yoffset);
-		mc.getTextureManager().bindTexture(location);
-		drawOther(xoffset, yoffset, x, y);
+		this.mc.getTextureManager().bindTexture(this.location);
+		this.xoffset = (this.width - this.xSize) / 2;
+		this.yoffset = (this.height - this.ySize) / 2;
+		drawTexturedModalRect(this.xoffset, this.yoffset, 0, 0, this.xSize, this.ySize);
+		drawUnderFluid(this.xoffset, this.yoffset);
+		this.mc.getTextureManager().bindTexture(this.location);
+		drawOther(this.xoffset, this.yoffset, x, y);
 	}
 	
 	protected void drawUnderFluid(int xO, int yO)
 	{
 		GL11.glPushMatrix();
-		for(FluidSlot slot : container.fluidSlotList)
+		for(FluidSlot slot : this.container.fluidSlotList)
 		{
 			slot.renderFluidInSlot(this);
 		}
@@ -112,24 +112,24 @@ public abstract class GuiContainerBase extends GuiContainer
 	}
 	
 	protected abstract void drawOther(int xOffset, int yOffset, int aMouseXPosition, int aMouseYPosition);
-
+	
 	@Deprecated
 	public boolean hasCustomName()
 	{
-		return container instanceof ContainerBase ? container.inv.hasCustomName() : false;
+		return this.container instanceof ContainerBase ? this.container.inv.hasCustomName() : false;
 	}
 	
 	public String getName()
 	{
-		return container.inv.hasCustomName() ? container.inv.getDisplayName().getFormattedText() :
-			LanguageManager.translateToLocal(container.inv.getName());
+		return this.container.inv.hasCustomName() ? this.container.inv.getDisplayName().getFormattedText() :
+			LanguageManager.translateToLocal(this.container.inv.getName());
 	}
 	
 	protected boolean shouldRenderName()
 	{
 		return true;
 	}
-
+	
 	public abstract ResourceLocation getResourceLocation();
 	
 	public void drawFluid(int x, int y, FluidTankInfo tank, int width, int height)
@@ -138,19 +138,19 @@ public abstract class GuiContainerBase extends GuiContainer
 	}
 	public void drawFluid(int x, int y, FluidTankInfo info, int width, int height, boolean lay)
 	{
-		xoffset = (this.width - xSize) / 2;
-		yoffset = (this.height - ySize) / 2;
+		this.xoffset = (this.width - this.xSize) / 2;
+		this.yoffset = (this.height - this.ySize) / 2;
 		
 		if(info.fluid == null) return;
 		if (info.fluid.amount > 0)
 		{
 			TextureAtlasSprite fluidIcon =
-					mc.getTextureMapBlocks().getAtlasSprite(info.fluid.getFluid().getStill(info.fluid).toString());
+					this.mc.getTextureMapBlocks().getAtlasSprite(info.fluid.getFluid().getStill(info.fluid).toString());
 			if (fluidIcon != null)
 			{
-				mc.renderEngine.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+				this.mc.renderEngine.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
 				int color = info.fluid.getFluid().getColor(info.fluid);
-				drawTexturedModalRect(xoffset + x, yoffset + y, fluidIcon, width, height);
+				drawTexturedModalRect(this.xoffset + x, this.yoffset + y, fluidIcon, width, height);
 				//				if(lay)
 				//				{
 				//					drawRepeated(fluidIcon, xoffset + x, yoffset + y, (double) (info.fluid.amount * width) / (double)info.capacity, height, zLevel, color);
@@ -160,7 +160,7 @@ public abstract class GuiContainerBase extends GuiContainer
 				//					drawRepeated(fluidIcon, xoffset + x, yoffset + y + height - (double) (info.fluid.amount * height) / (double) info.capacity, width, (double) (info.fluid.amount * height) / (double) info.capacity, zLevel, color);
 				//				}
 				GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-				mc.renderEngine.bindTexture(location);
+				this.mc.renderEngine.bindTexture(this.location);
 			}
 		}
 	}
@@ -173,7 +173,7 @@ public abstract class GuiContainerBase extends GuiContainer
 		int r = color >>> 16 & 0xFF;
 		int g = color >>> 8 & 0xFF;
 		int b = color & 0xFF;
-
+		
 		GL11.glColor4f(1F, 1F, 1F, 1F);
 		Tessellator tessellator = Tessellator.getInstance();
 		VertexBuffer buffer = tessellator.getBuffer();
@@ -196,15 +196,15 @@ public abstract class GuiContainerBase extends GuiContainer
 		}
 		tessellator.draw();
 	}
-
+	
 	protected void drawAreaTooltip(int mouseX, int mouseY, String tooltip, int x, int y, int u, int v)
 	{
 		if (mouseX >= x && mouseX <= (x + u) && mouseY >= y && mouseY <= (y + v))
 		{
-			drawTooltip(mouseX - xoffset, mouseY - yoffset, tooltip);
+			drawTooltip(mouseX - this.xoffset, mouseY - this.yoffset, tooltip);
 		}
 	}
-
+	
 	protected void drawTooltip(int x, int y, String tooltip)
 	{
 		drawTooltip(x, y, Arrays.asList(tooltip));
@@ -220,39 +220,39 @@ public abstract class GuiContainerBase extends GuiContainer
 			GL11.glDisable(GL11.GL_DEPTH_TEST);
 			int k = 0;
 			Iterator iterator = tooltip.iterator();
-
+			
 			while (iterator.hasNext())
 			{
 				String s = (String)iterator.next();
 				int l = font.getStringWidth(s);
-
+				
 				if (l > k)
 				{
 					k = l;
 				}
 			}
-
+			
 			int j2 = x + 12;
 			int k2 = y - 12;
 			int i1 = 8;
-
+			
 			if (tooltip.size() > 1)
 			{
 				i1 += 2 + (tooltip.size() - 1) * 10;
 			}
-
-			if (j2 + k > width)
+			
+			if (j2 + k > this.width)
 			{
 				j2 -= 28 + k;
 			}
-
-			if (k2 + i1 + 6 > height)
+			
+			if (k2 + i1 + 6 > this.height)
 			{
-				k2 = height - i1 - 6;
+				k2 = this.height - i1 - 6;
 			}
-
-			zLevel = 300.0F;
-			itemRender.zLevel = 300.0F;
+			
+			this.zLevel = 300.0F;
+			this.itemRender.zLevel = 300.0F;
 			int j1 = -267386864;
 			drawGradientRect(j2 - 3, k2 - 4, j2 + k + 3, k2 - 3, j1, j1);
 			drawGradientRect(j2 - 3, k2 + i1 + 3, j2 + k + 3, k2 + i1 + 4, j1, j1);
@@ -265,22 +265,22 @@ public abstract class GuiContainerBase extends GuiContainer
 			drawGradientRect(j2 + k + 2, k2 - 3 + 1, j2 + k + 3, k2 + i1 + 3 - 1, k1, l1);
 			drawGradientRect(j2 - 3, k2 - 3, j2 + k + 3, k2 - 3 + 1, k1, k1);
 			drawGradientRect(j2 - 3, k2 + i1 + 2, j2 + k + 3, k2 + i1 + 3, l1, l1);
-
+			
 			for (int i2 = 0; i2 < tooltip.size(); ++i2)
 			{
 				String s1 = tooltip.get(i2);
 				font.drawStringWithShadow(s1, j2, k2, -1);
-
+				
 				if (i2 == 0)
 				{
 					k2 += 2;
 				}
-
+				
 				k2 += 10;
 			}
-
-			zLevel = 0.0F;
-			itemRender.zLevel = 0.0F;
+			
+			this.zLevel = 0.0F;
+			this.itemRender.zLevel = 0.0F;
 			GL11.glEnable(GL11.GL_LIGHTING);
 			GL11.glEnable(GL11.GL_DEPTH_TEST);
 			RenderHelper.enableGUIStandardItemLighting();

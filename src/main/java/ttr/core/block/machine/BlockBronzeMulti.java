@@ -15,23 +15,25 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import ttr.core.block.BlockMachine;
+import ttr.core.tile.machine.steam.TEBronzeBlastFurnace;
 import ttr.core.tile.machine.steam.TEBronzeCompressor;
 
 public class BlockBronzeMulti extends BlockMachine
 {
 	public static enum EnumType implements IStringSerializable
 	{
-		COMPRESSOR;
-
+		COMPRESSOR,
+		BLAST_FURNACE;
+		
 		@Override
 		public String getName()
 		{
 			return name().toLowerCase();
 		}
 	}
-
+	
 	public static final PropertyEnum<EnumType> MACHINE_TYPE = PropertyEnum.create("type", EnumType.class);
-
+	
 	public BlockBronzeMulti()
 	{
 		setHardness(3.0F);
@@ -44,24 +46,25 @@ public class BlockBronzeMulti extends BlockMachine
 	{
 		return new BlockStateContainer(this, FACING_PRIMARYII, WORKING, MACHINE_TYPE);
 	}
-
+	
 	@Override
 	public int getMetaFromState(IBlockState state)
 	{
 		return state.getValue(MACHINE_TYPE).ordinal();
 	}
-
+	
 	@Override
 	public IBlockState getStateFromMeta(int meta)
 	{
 		return getDefaultState().withProperty(MACHINE_TYPE, EnumType.values()[meta]);
 	}
-
+	
 	@Override
 	@SideOnly(Side.CLIENT)
 	public void getSubBlocks(Item itemIn, CreativeTabs tab, List<ItemStack> list)
 	{
 		list.add(new ItemStack(this, 1, 0));
+		list.add(new ItemStack(this, 1, 1));
 	}
 	
 	@Override
@@ -70,6 +73,7 @@ public class BlockBronzeMulti extends BlockMachine
 		switch (state.getValue(MACHINE_TYPE))
 		{
 		case COMPRESSOR : return new TEBronzeCompressor();
+		case BLAST_FURNACE : return new TEBronzeBlastFurnace();
 		default : return null;
 		}
 	}

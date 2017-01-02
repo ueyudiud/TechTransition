@@ -1,0 +1,23 @@
+{
+	"forge_marker":1,
+	"defaults": {
+		"transform": "forge:default-item",
+		"model": "ttr:item",
+		"textures": { 
+			"layer0": "ttr:items/iconsets/void",
+			"layer2": "ttr:items/iconsets/dust_ore_overlay"
+		}
+	},
+	"variants": {
+		"type": {
+			"default"   : { "textures": { "layer1": "ttr:items/iconsets/dust_dull" } },
+			"dull"      : { "textures": { "layer1": "ttr:items/iconsets/dust_dull" } },
+			"white"     : { "textures": { "layer1": "ttr:items/iconsets/dust_white" } },
+			"metallic"  : { "textures": { "layer1": "ttr:items/iconsets/dust_metallic" } },
+			"nonmetal1" : { "textures": { "layer1": "ttr:items/iconsets/dust_rough" } },
+			"nonmetal2" : { "textures": { "layer1": "ttr:items/iconsets/dust_shiny" } },
+			"wood"      : { "textures": { "layer1": "ttr:items/iconsets/dust_fine" } },
+			"shiny"     : { "textures": { "layer1": "ttr:items/iconsets/dust_shiny" } }
+		}
+	}
+}

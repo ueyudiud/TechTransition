@@ -1,0 +1,34 @@
+{
+   "forge_marker":1,
+   "defaults": {
+		"transform":"forge:default-block",
+		"model":"ttr:base",
+		"textures": {
+			"top": "ttr:blocks/machine/electric/base/top",
+			"back": "ttr:blocks/machine/electric/base/side",
+			"left": "ttr:blocks/machine/electric/base/side",
+			"right": "ttr:blocks/machine/electric/base/side",
+			"bottom": "ttr:blocks/machine/electric/base/bottom"
+		}
+	},
+   "variants": {
+		"facing_primary": {
+			"north": { "y":180 },
+			"east" : { "y":270 },
+			"south": { "y":0   },
+			"west" : { "y":90  }
+		},
+		"working": {
+			"false": {
+				"textures": { 
+					"front": "ttr:blocks/machine/electric/base/bender_front" 
+				}
+			},
+			"true": {
+				"textures": { 
+					"front": "ttr:blocks/machine/electric/base/bender_front_active" 
+				}
+			}
+		}
+	}
+}

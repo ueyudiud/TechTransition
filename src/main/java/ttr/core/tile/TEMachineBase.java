@@ -26,7 +26,7 @@ public class TEMachineBase extends TESynchronization implements IPluginAccess
 	public long currentState;
 	public long lastCurrentState;
 	protected Map<String, Integer> plugins = new HashMap();
-
+	
 	public static final int[][] MACHINE_ROTATION = {
 			{2, 3, 1, 0, 5, 4},
 			{3, 2, 0, 1, 4, 5},
@@ -45,29 +45,29 @@ public class TEMachineBase extends TESynchronization implements IPluginAccess
 	}
 	protected void addFacing(String tag, EnumFacing defaultFacing, EnumFacing[] allowedFacings)
 	{
-		if(allowfacing.containsKey(tag))
+		if(this.allowfacing.containsKey(tag))
 		{
 			Log.warn("The " + getClass() + " tag: " + tag + " has already set.");
 		}
-		else if(defaultfacings[defaultFacing.ordinal()] != null)
+		else if(this.defaultfacings[defaultFacing.ordinal()] != null)
 		{
 			Log.warn("The " + getClass() + " facing : " + defaultFacing.name() + " has already set. Please select another facing for use.");
 		}
 		else
 		{
-			defaultfacings[defaultFacing.ordinal()] = tag;
-			facings[defaultFacing.ordinal()] = tag;
-			allowfacing.put(tag, allowedFacings);
+			this.defaultfacings[defaultFacing.ordinal()] = tag;
+			this.facings[defaultFacing.ordinal()] = tag;
+			this.allowfacing.put(tag, allowedFacings);
 		}
 	}
-
-	public EnumFacing facing;
-
+	
+	public EnumFacing facing = EnumFacing.NORTH;
+	
 	public TEMachineBase()
 	{
 		addFacing("main", EnumFacing.NORTH, getMainAllowedFacing());
 	}
-
+	
 	protected EnumFacing[] getMainAllowedFacing()
 	{
 		return EnumFacing.HORIZONTALS;
@@ -76,14 +76,14 @@ public class TEMachineBase extends TESynchronization implements IPluginAccess
 	@Override
 	public NBTTagCompound writeToNBT(NBTTagCompound nbt)
 	{
-		nbt.setByte("facing", (byte) facing.ordinal());
-		nbt.setLong("currentState", currentState);
+		nbt.setByte("facing", (byte) this.facing.ordinal());
+		nbt.setLong("currentState", this.currentState);
 		NBTTagList list = new NBTTagList();
-		for (int i = 0; i < facings.length; ++i)
+		for (int i = 0; i < this.facings.length; ++i)
 		{
-			if(facings[i] != null)
+			if(this.facings[i] != null)
 			{
-				list.appendTag(new NBTTagString(i + facings[i]));
+				list.appendTag(new NBTTagString(i + this.facings[i]));
 			}
 		}
 		nbt.setTag("faces", list);
@@ -94,8 +94,8 @@ public class TEMachineBase extends TESynchronization implements IPluginAccess
 	public void readFromNBT(NBTTagCompound nbt)
 	{
 		super.readFromNBT(nbt);
-		facing = EnumFacing.VALUES[nbt.getByte("facing")];
-		currentState = nbt.getLong("currentState");
+		this.facing = EnumFacing.VALUES[nbt.getByte("facing")];
+		this.currentState = nbt.getLong("currentState");
 		NBTTagList list = nbt.getTagList("faces", NBT.TAG_STRING);
 		for (int i = 0; i < list.tagCount(); ++i)
 		{
@@ -104,38 +104,38 @@ public class TEMachineBase extends TESynchronization implements IPluginAccess
 			if(id < EnumFacing.VALUES.length && id >= 0)
 			{
 				key = key.substring(1);
-				facings[id] = key;
+				this.facings[id] = key;
 			}
 		}
 	}
-
+	
 	@Override
 	public void writeToDescription(NBTTagCompound nbt)
 	{
 		super.writeToDescription(nbt);
-		nbt.setByte("f", (byte) facing.ordinal());
-		nbt.setLong("s", currentState);
+		nbt.setByte("f", (byte) this.facing.ordinal());
+		nbt.setLong("s", this.currentState);
 		NBTTagList list = new NBTTagList();
-		for (int i = 0; i < facings.length; ++i)
+		for (int i = 0; i < this.facings.length; ++i)
 		{
-			if(facings[i] != null)
+			if(this.facings[i] != null)
 			{
-				list.appendTag(new NBTTagString(i + facings[i]));
+				list.appendTag(new NBTTagString(i + this.facings[i]));
 			}
 		}
 		nbt.setTag("fs", list);
 	}
-
+	
 	@Override
 	public void readFromDescription(NBTTagCompound nbt)
 	{
 		boolean flag = false;
 		super.readFromDescription(nbt);
-		facing = EnumFacing.VALUES[nbt.getByte("f")];
+		this.facing = EnumFacing.VALUES[nbt.getByte("f")];
 		long state = nbt.getLong("s");
-		if(state != currentState)
+		if(state != this.currentState)
 		{
-			currentState = state;
+			this.currentState = state;
 			flag = true;
 		}
 		NBTTagList list = nbt.getTagList("fs", NBT.TAG_STRING);
@@ -146,7 +146,7 @@ public class TEMachineBase extends TESynchronization implements IPluginAccess
 			if(id < EnumFacing.VALUES.length && id >= 0)
 			{
 				key = key.substring(1);
-				facings[id] = key;
+				this.facings[id] = key;
 			}
 		}
 		if(flag)
@@ -164,19 +164,19 @@ public class TEMachineBase extends TESynchronization implements IPluginAccess
 	@Override
 	protected void preUpdateEntity()
 	{
-		lastCurrentState = currentState;
+		this.lastCurrentState = this.currentState;
 	}
-
+	
 	@Override
 	protected void postUpdateEntity()
 	{
-		byte lightValue = (byte) worldObj.getBlockState(pos).getLightValue(worldObj, pos);
-		if(lightValue != lastLightValue)
+		byte lightValue = (byte) this.worldObj.getBlockState(this.pos).getLightValue(this.worldObj, this.pos);
+		if(lightValue != this.lastLightValue)
 		{
 			markLightUpdate();
-			lastLightValue = lightValue;
+			this.lastLightValue = lightValue;
 		}
-		if(lastCurrentState != currentState)
+		if(this.lastCurrentState != this.currentState)
 		{
 			syncToNearby();
 		}
@@ -184,48 +184,48 @@ public class TEMachineBase extends TESynchronization implements IPluginAccess
 	
 	protected boolean is(int flag)
 	{
-		return (currentState & (1 << flag)) != 0;
+		return (this.currentState & (1 << flag)) != 0;
 	}
 	
 	protected void swit(int flag)
 	{
-		currentState ^= 1 << flag;
+		this.currentState ^= 1 << flag;
 	}
-
+	
 	protected void enable(int flag)
 	{
-		currentState |= 1 << flag;
+		this.currentState |= 1 << flag;
 	}
-
+	
 	protected void disable(int flag)
 	{
-		currentState &= ~(1 << flag);
+		this.currentState &= ~(1 << flag);
 	}
-
+	
 	protected boolean swiandget(int flag)
 	{
 		swit(flag);
 		return is(flag);
 	}
-
+	
 	@Override
 	public void initRotation(EnumFacing frontFacing)
 	{
-		Arrays.fill(facings, null);
-		facing = frontFacing;
-		int[] off = MACHINE_ROTATION[facing.ordinal()];
-		for(int i = 0; i < defaultfacings.length; ++i)
+		Arrays.fill(this.facings, null);
+		this.facing = frontFacing;
+		int[] off = MACHINE_ROTATION[this.facing.ordinal()];
+		for(int i = 0; i < this.defaultfacings.length; ++i)
 		{
-			facings[off[i]] = defaultfacings[i];
+			this.facings[off[i]] = this.defaultfacings[i];
 		}
 	}
 	
 	@Override
 	public EnumFacing getRotation()
 	{
-		return facing;
+		return this.facing;
 	}
-
+	
 	@Override
 	public boolean setRotation(EnumFacing facing)
 	{
@@ -238,22 +238,22 @@ public class TEMachineBase extends TESynchronization implements IPluginAccess
 	@Override
 	public boolean setRotation(EnumFacing firstDir, EnumFacing secondDir)
 	{
-		if(facings[firstDir.ordinal()] == null && facings[secondDir.ordinal()] == null)
+		if(this.facings[firstDir.ordinal()] == null && this.facings[secondDir.ordinal()] == null)
 			return false;
-		String key1 = facings[firstDir.ordinal()];
-		String key2 = facings[secondDir.ordinal()];
+		String key1 = this.facings[firstDir.ordinal()];
+		String key2 = this.facings[secondDir.ordinal()];
 		if(key1 != key2 && rotateAllowed(key1, secondDir) && rotateAllowed(key2, firstDir))
 		{
-			if(facing == firstDir)
+			if(this.facing == firstDir)
 			{
-				facing = secondDir;
+				this.facing = secondDir;
 			}
-			else if(facing == secondDir)
+			else if(this.facing == secondDir)
 			{
-				facing = firstDir;
+				this.facing = firstDir;
 			}
-			facings[secondDir.ordinal()] = key1;
-			facings[firstDir.ordinal()] = key2;
+			this.facings[secondDir.ordinal()] = key1;
+			this.facings[firstDir.ordinal()] = key2;
 			syncToNearby();
 			return true;
 		}
@@ -263,24 +263,24 @@ public class TEMachineBase extends TESynchronization implements IPluginAccess
 	protected boolean rotateAllowed(String tag, EnumFacing side)
 	{
 		if(tag == null) return true;
-		if(!allowfacing.containsKey(tag)) return false;
-		for(EnumFacing facing : allowfacing.get(tag))
+		if(!this.allowfacing.containsKey(tag)) return false;
+		for(EnumFacing facing : this.allowfacing.get(tag))
 		{
 			if(facing == side) return true;
 		}
 		return false;
 	}
-
+	
 	public int getFacingID(String key)
 	{
-		for(int i = 0; i < facings.length; ++i)
+		for(int i = 0; i < this.facings.length; ++i)
 		{
-			if(key.equals(facings[i]))
+			if(key.equals(this.facings[i]))
 				return i;
 		}
 		return -1;
 	}
-
+	
 	@Override
 	public EnumFacing getFacing(String key)
 	{
@@ -290,20 +290,20 @@ public class TEMachineBase extends TESynchronization implements IPluginAccess
 	
 	protected void writePluginToNBT(String key, NBTTagCompound nbt)
 	{
-		if(!plugins.isEmpty())
+		if(!this.plugins.isEmpty())
 		{
 			NBTTagList list = new NBTTagList();
-			for(Entry<String, Integer> plugin : plugins.entrySet())
+			for(Entry<String, Integer> plugin : this.plugins.entrySet())
 			{
 				list.appendTag(new NBTTagString(plugin.getKey() + ":" + plugin.getValue()));
 			}
 			nbt.setTag(key, list);
 		}
 	}
-
+	
 	protected void readPluginFromNBT(String key, NBTTagCompound nbt)
 	{
-		plugins.clear();
+		this.plugins.clear();
 		if(nbt.hasKey(key, NBT.TAG_LIST))
 		{
 			NBTTagList list = nbt.getTagList(key, NBT.TAG_STRING);
@@ -311,7 +311,7 @@ public class TEMachineBase extends TESynchronization implements IPluginAccess
 			{
 				String value = list.getStringTagAt(i);
 				String[] split = value.split(":");
-				plugins.put(split[0], Integer.valueOf(split[1]));
+				this.plugins.put(split[0], Integer.valueOf(split[1]));
 			}
 		}
 	}
@@ -327,7 +327,7 @@ public class TEMachineBase extends TESynchronization implements IPluginAccess
 		}
 		drops.add(stack);
 	}
-
+	
 	@Override
 	public void onBlockPlacedBy(IBlockState state, EntityLivingBase placer, ItemStack stack)
 	{
@@ -355,11 +355,11 @@ public class TEMachineBase extends TESynchronization implements IPluginAccess
 	{
 		return false;
 	}
-
+	
 	@Override
 	public int getPluginLevel(String key)
 	{
-		return plugins.getOrDefault(key, 0);
+		return this.plugins.getOrDefault(key, 0);
 	}
 	
 	protected boolean isPluginAllowed(String key)
@@ -372,7 +372,7 @@ public class TEMachineBase extends TESynchronization implements IPluginAccess
 	{
 		if(getPluginLevel(key) < level && isPluginAllowed(key))
 		{
-			plugins.put(key, level);
+			this.plugins.put(key, level);
 			return true;
 		}
 		return false;
@@ -381,6 +381,6 @@ public class TEMachineBase extends TESynchronization implements IPluginAccess
 	@Override
 	public void removePlugin(String key)
 	{
-		plugins.remove(key);
+		this.plugins.remove(key);
 	}
 }

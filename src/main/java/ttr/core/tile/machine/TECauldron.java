@@ -23,49 +23,49 @@ public class TECauldron extends TEStatic
 		super.readFromNBT(compound);
 		if(compound.hasKey("fluid"))
 		{
-			fluid = FluidRegistry.getFluid(compound.getString("fluid"));
-			level = compound.getByte("level");
+			this.fluid = FluidRegistry.getFluid(compound.getString("fluid"));
+			this.level = compound.getByte("level");
 		}
 	}
-
+	
 	@Override
 	public NBTTagCompound writeToNBT(NBTTagCompound compound)
 	{
-		if(fluid != null && level > 0)
+		if(this.fluid != null && this.level > 0)
 		{
-			compound.setString("fluid", fluid.getName());
-			compound.setByte("level", (byte) level);
+			compound.setString("fluid", this.fluid.getName());
+			compound.setByte("level", (byte) this.level);
 		}
 		return super.writeToNBT(compound);
 	}
-
+	
 	@Override
 	public void readFromDescription(NBTTagCompound nbt)
 	{
 		super.readFromDescription(nbt);
-		if(nbt.hasKey("f"))
+		//		if(nbt.hasKey("f"))
 		{
-			fluid = FluidRegistry.getFluid(nbt.getString("f"));
-			level = nbt.getByte("l");
+			this.fluid = FluidRegistry.getFluid(nbt.getString("f"));
+			this.level = nbt.getByte("l");
 		}
 		markBlockRenderUpdate();
 	}
-
+	
 	@Override
 	public void writeToDescription(NBTTagCompound nbt)
 	{
 		super.writeToDescription(nbt);
-		if(fluid != null && level > 0)
+		if(this.fluid != null && this.level > 0)
 		{
-			nbt.setString("f", fluid.getName());
-			nbt.setByte("l", (byte) level);
+			nbt.setString("f", this.fluid.getName());
+			nbt.setByte("l", (byte) this.level);
 		}
 	}
-
+	
 	public Fluid getFluidType()
 	{
 		checkClientCondition();
-		return level == 0 ? null : fluid;
+		return this.level == 0 ? null : this.fluid;
 	}
 	
 	public void setFluidType(Fluid fluid)
@@ -76,18 +76,18 @@ public class TECauldron extends TEStatic
 			updateFluidState();
 		}
 	}
-
+	
 	public void setFluidType(Fluid fluid, int amt)
 	{
-		if(worldObj.isRemote) return;
+		if(this.worldObj.isRemote) return;
 		amt = MathHelper.clamp_int(amt, 0, 3);
-		boolean flag = amt != level;
+		boolean flag = amt != this.level;
 		if(this.fluid != fluid)
 		{
 			this.fluid = fluid;
 			flag = true;
 		}
-		level = amt;
+		this.level = amt;
 		if(flag)
 		{
 			markBlockUpdate();
@@ -97,19 +97,19 @@ public class TECauldron extends TEStatic
 	public int getLevel()
 	{
 		checkClientCondition();
-		return level;
+		return this.level;
 	}
 	
 	public boolean useFluid(boolean process)
 	{
-		if(level > 0)
+		if(this.level > 0)
 		{
 			if(process)
 			{
-				--level;
-				if(level == 0)
+				--this.level;
+				if(this.level == 0)
 				{
-					fluid = null;
+					this.fluid = null;
 				}
 				updateFluidState();
 			}
@@ -120,20 +120,20 @@ public class TECauldron extends TEStatic
 	
 	public void checkClientCondition()
 	{
-		if(worldObj.isRemote && !initialized)
+		if(this.worldObj.isRemote && !this.initialized)
 		{
-			sendToServer(new PacketTEAsk(worldObj, pos));
+			sendToServer(new PacketTEAsk(this.worldObj, this.pos));
 		}
 	}
-
+	
 	@Override
 	public void markBlockRenderUpdate()
 	{
 		int light = getLightValue();
-		if(prelight != light)
+		if(this.prelight != light)
 		{
-			prelight = light;
-			worldObj.checkLightFor(EnumSkyBlock.BLOCK, pos);
+			this.prelight = light;
+			this.worldObj.checkLightFor(EnumSkyBlock.BLOCK, this.pos);
 		}
 		super.markBlockRenderUpdate();
 	}
@@ -145,7 +145,7 @@ public class TECauldron extends TEStatic
 	
 	public int getLightValue()
 	{
-		return fluid == null ? 0 :
-			(int) (fluid.getLuminosity() * LIGHT_VALUE_COEFFICIENT[level]);
+		return this.fluid == null ? 0 :
+			(int) (this.fluid.getLuminosity() * LIGHT_VALUE_COEFFICIENT[this.level]);
 	}
 }

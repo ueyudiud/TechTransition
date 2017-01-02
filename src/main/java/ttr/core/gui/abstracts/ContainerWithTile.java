@@ -24,19 +24,19 @@ public abstract class ContainerWithTile<T extends TEMachineBase> extends Contain
 	public ContainerWithTile(EntityPlayer aPlayer, T aTile)
 	{
 		super(aPlayer.inventory, aTile);
-		inventoryTile = aTile;
-		if(inventoryTile instanceof IInventory)
+		this.inventoryTile = aTile;
+		if(this.inventoryTile instanceof IInventory)
 		{
-			cachedFields = new int[((IInventory) inventoryTile).getFieldCount()];
+			this.cachedFields = new int[((IInventory) this.inventoryTile).getFieldCount()];
 		}
 	}
 	public ContainerWithTile(InventoryPlayer aPlayer, T aTile)
 	{
 		super(aPlayer, aTile);
-		inventoryTile = aTile;
-		if(inventoryTile instanceof IInventory)
+		this.inventoryTile = aTile;
+		if(this.inventoryTile instanceof IInventory)
 		{
-			cachedFields = new int[((IInventory) inventoryTile).getFieldCount()];
+			this.cachedFields = new int[((IInventory) this.inventoryTile).getFieldCount()];
 		}
 	}
 	
@@ -46,14 +46,14 @@ public abstract class ContainerWithTile<T extends TEMachineBase> extends Contain
 		super.addListener(listener);
 		if(listener instanceof EntityPlayer)
 		{
-			if(inventoryTile instanceof ITankSyncable)
+			if(this.inventoryTile instanceof ITankSyncable)
 			{
-				TTr.network.sendToPlayer(new PacketFluidUpdateAll(windowId, (ITankSyncable) inventoryTile), (EntityPlayer) listener);
+				TTr.network.sendToPlayer(new PacketFluidUpdateAll(this.windowId, (ITankSyncable) this.inventoryTile), (EntityPlayer) listener);
 			}
 		}
-		if(inventoryTile instanceof IInventory)
+		if(this.inventoryTile instanceof IInventory)
 		{
-			listener.sendAllWindowProperties(this, inventoryTile);
+			listener.sendAllWindowProperties(this, this.inventoryTile);
 		}
 	}
 	
@@ -61,76 +61,77 @@ public abstract class ContainerWithTile<T extends TEMachineBase> extends Contain
 	public void detectAndSendChanges()
 	{
 		super.detectAndSendChanges();
-		if(inventoryTile instanceof IInventory)
+		if(this.inventoryTile instanceof IInventory)
 		{
-			IInventory inventory = inventoryTile;
-
-			for(int i = 0; i < cachedFields.length; ++i)
+			IInventory inventory = this.inventoryTile;
+			
+			for(int i = 0; i < this.cachedFields.length; ++i)
 			{
 				int newValue;
-				if((newValue = inventory.getField(i)) != cachedFields[i])
+				if((newValue = inventory.getField(i)) != this.cachedFields[i])
 				{
-					for(IContainerListener listener : listeners)
+					for(IContainerListener listener : this.listeners)
 					{
 						listener.sendProgressBarUpdate(this, i, newValue);
 					}
 				}
-				cachedFields[i] = newValue;
+				this.cachedFields[i] = newValue;
 			}
 		}
-		if(inventoryTile instanceof ITankSyncable)
+		if(this.inventoryTile instanceof ITankSyncable)
 		{
 			IntegerArray array = new IntegerArray();
-			for(int i = 0; i < fluidSlotList.size(); ++i)
+			for(int i = 0; i < this.fluidSlotList.size(); ++i)
 			{
-				FluidStack stack1 = fluidSlotList.get(i).getStack();
-				FluidStack stack2 = fluidList.get(i);
-				if(!((stack1 == null && stack2 == null) || (stack1 != null && stack1.isFluidStackIdentical(stack2))))
+				FluidStack stack1 = this.fluidSlotList.get(i).getStack();
+				FluidStack stack2 = this.fluidList.get(i);
+				if((stack1 == null || stack2 == null) ? stack1 != stack2 :
+					(stack1 != null && !stack1.isFluidStackIdentical(stack2)))
 				{
 					array.add(i);
 				}
 			}
-			for(IContainerListener listener : listeners)
+			for(IContainerListener listener : this.listeners)
 			{
 				if(listener instanceof EntityPlayer)
 				{
-					TTr.network.sendToPlayer(new PacketFluidUpdateSingle(windowId, (ITankSyncable) inventoryTile, array.toIntArray()), (EntityPlayer) listener);
+					TTr.network.sendToPlayer(new PacketFluidUpdateSingle(this.windowId, (ITankSyncable) this.inventoryTile, array.toIntArray()), (EntityPlayer) listener);
 				}
 			}
 			for(int i : array.toIntArray())
 			{
-				for(i = 0; i < fluidSlotList.size(); ++i)
+				for(i = 0; i < this.fluidSlotList.size(); ++i)
 				{
-					FluidStack stack1 = fluidSlotList.get(i).getStack();
-					fluidList.set(i, stack1 != null ? stack1.copy() : null);
+					FluidStack stack1 = this.fluidSlotList.get(i).getStack();
+					this.fluidList.set(i, stack1 != null ? stack1.copy() : null);
 				}
 			}
 		}
 	}
-
+	
 	@Override
 	@SideOnly(Side.CLIENT)
 	public void updateProgressBar(int id, int data)
 	{
-		if(inventoryTile instanceof IInventory)
+		if(this.inventoryTile instanceof IInventory)
 		{
-			((IInventory) inventoryTile).setField(id, data);
+			((IInventory) this.inventoryTile).setField(id, data);
 		}
 	}
 	
 	@Override
 	public boolean canInteractWith(EntityPlayer player)
 	{
-		return super.canInteractWith(player) && inventoryTile.getWorld().getTileEntity(inventoryTile.getPos()) == inventoryTile;
+		return super.canInteractWith(player) && this.inventoryTile.getWorld().getTileEntity(this.inventoryTile.getPos()) == this.inventoryTile;
 	}
-
+	
 	@Override
 	@SideOnly(Side.CLIENT)
 	public void setFluid(int idx, FluidStack stack)
 	{
-		if(inventoryTile instanceof ITankSyncable)
+		if(this.inventoryTile instanceof ITankSyncable)
 		{
-			((ITankSyncable) inventoryTile).setFluidStackToTank(idx, stack);
+			((ITankSyncable) this.inventoryTile).setFluidStackToTank(idx, stack);
 		}
 	}
 }

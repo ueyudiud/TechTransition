@@ -1,0 +1,83 @@
+{
+	"forge_marker":1,
+	"defaults": {
+		"transform": "forge:default-item",
+		"model": "ttr:item"
+	},
+	"variants": {
+		"type": {
+			"axe" : { 
+				"textures": { 
+					"layer0": "ttr:items/iconsets/axe_head",
+					"layer1": "ttr:items/iconsets/axe_handle"
+				}
+			},
+			"shovel" : { 
+				"textures": { 
+					"layer0": "ttr:items/iconsets/shovel_head",
+					"layer1": "ttr:items/iconsets/shovel_handle"
+				}
+			},
+			"pickaxe" : { 
+				"textures": { 
+					"layer0": "ttr:items/iconsets/pickaxe_head",
+					"layer1": "ttr:items/iconsets/pickaxe_handle"
+				}
+			},
+			"sword" : { 
+				"textures": { 
+					"layer0": "ttr:items/iconsets/sword_head",
+					"layer1": "ttr:items/iconsets/sword_handle"
+				}
+			},
+			"hoe" : { 
+				"textures": { 
+					"layer0": "ttr:items/iconsets/hoe_head",
+					"layer1": "ttr:items/iconsets/hoe_handle"
+				}
+			},
+			"hammer" : { 
+				"textures": { 
+					"layer0": "ttr:items/iconsets/hammer_head",
+					"layer1": "ttr:items/iconsets/hammer_handle"
+				}
+			},
+			"soft_hammer" : { 
+				"textures": { 
+					"layer0": "ttr:items/iconsets/soft_hammer_head",
+					"layer1": "ttr:items/iconsets/hammer_handle",
+					"layer2": "ttr:items/iconsets/soft_hammer_head_overlay"
+				}
+			},
+			"file" : { 
+				"textures": { 
+					"layer0": "ttr:items/iconsets/file_head",
+					"layer1": "ttr:items/iconsets/handle_1"
+				}
+			},
+			"saw" : { 
+				"textures": { 
+					"layer0": "ttr:items/iconsets/saw_head",
+					"layer1": "ttr:items/iconsets/saw_handle"
+				}
+			},
+			"screwdriver" : { 
+				"textures": { 
+					"layer0": "ttr:items/iconsets/screwdriver_head",
+					"layer1": "ttr:items/iconsets/handle_1"
+				}
+			},
+			"wrench" : { 
+				"textures": { 
+					"layer0": "ttr:items/iconsets/wrench"
+				}
+			},
+			"cutter" : { 
+				"textures": { 
+					"layer0": "ttr:items/iconsets/cutter_head",
+					"layer1": "ttr:items/iconsets/cutter_handle"
+				}
+			}
+		}
+	}
+}

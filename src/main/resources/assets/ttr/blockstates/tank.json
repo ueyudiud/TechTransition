@@ -1,0 +1,33 @@
+{
+	"forge_marker":1,
+	"defaults": {
+		"transform": "forge:default-block",
+		"model": "ttr:tank_simple",
+		"textures": { 
+			"glass1": "ttr:blocks/iconsets/tank_glass_side",
+			"rod"   : "ttr:blocks/iconsets/tank_rod"
+		}
+	},
+	"variants": {
+		"type": {
+			"bottom": { 
+				"textures": { 
+					"glass_top": "ttr:blocks/iconsets/tank_glass_top1",
+					"glass_down": "ttr:blocks/iconsets/tank_glass_top2"
+				} 
+			},
+			"side": { 
+				"textures": { 
+					"glass_top": "ttr:blocks/iconsets/tank_glass_top1",
+					"glass_down": "ttr:blocks/iconsets/tank_glass_top1"
+				} 
+			},
+			"top": { 
+				"textures": { 
+					"glass_top": "ttr:blocks/iconsets/tank_glass_top2",
+					"glass_down": "ttr:blocks/iconsets/tank_glass_top1"
+				} 
+			}
+		}
+	}
+}

@@ -26,39 +26,43 @@ public abstract class TEElectricalMachineRecipeMap extends TEMachineRecipeMap im
 	{
 		super(itemInputSize, itemOutputSize, fluidInputSize, fluidOutputSize);
 	}
-
+	
 	@Override
 	public NBTTagCompound writeToNBT(NBTTagCompound nbt)
 	{
-		nbt.setLong("energy", energy);
-		nbt.setByte("energyAllowedSide", energyAllowedSide);
+		nbt.setLong("energy", this.energy);
+		nbt.setByte("energyAllowedSide", this.energyAllowedSide);
 		return super.writeToNBT(nbt);
 	}
-
+	
 	@Override
 	public void readFromNBT(NBTTagCompound nbt)
 	{
 		super.readFromNBT(nbt);
-		energy = nbt.getLong("energy");
-		energyAllowedSide = nbt.getByte("energyAllowedSide");
+		this.energy = nbt.getLong("energy");
+		this.energyAllowedSide = nbt.getByte("energyAllowedSide");
 	}
-
+	
 	@Override
 	protected void preUpdateEntity()
 	{
 		super.preUpdateEntity();
-		energyInput = 0;
-		oldTier = newTier;
+		this.energyInput = 0;
+		this.oldTier = this.newTier;
+		if(!this.addedInToNet)
+		{
+			addToEnergyNet();
+		}
 	}
-
+	
 	@Override
 	protected void postUpdateEntity()
 	{
 		super.postUpdateEntity();
-		if(oldTier != newTier)
+		if(this.oldTier != this.newTier)
 		{
 			removeFromEnergyNet();
-			oldTier = newTier;
+			this.oldTier = this.newTier;
 			addToEnergyNet();
 		}
 	}
@@ -70,79 +74,78 @@ public abstract class TEElectricalMachineRecipeMap extends TEMachineRecipeMap im
 		long value = getDefaultMaxEnergyCapacity();
 		return (getPluginLevel(IPluginAccess.energyCapacity) + 1) * value;
 	}
-
+	
 	@Override
 	public boolean acceptsEnergyFrom(IEnergyEmitter emitter, EnumFacing side)
 	{
-		return (energyAllowedSide & (1 << side.ordinal())) != 0;
+		return (this.energyAllowedSide & (1 << side.ordinal())) != 0;
 	}
-
+	
 	protected void transferEnergy()
 	{
-		if(untranslateEnergy >= EnergyTrans.J_TO_ELE)
+		if(this.untranslateEnergy >= EnergyTrans.J_TO_ELE)
 		{
-			long value = (long) (untranslateEnergy * EnergyTrans.ELE_TO_J);
+			long value = (long) (this.untranslateEnergy * EnergyTrans.ELE_TO_J);
 			long maxValue = getMaxEnergyCapacity();
-			energy += value;
-			untranslateEnergy -= value * EnergyTrans.J_TO_ELE;
-			if(energy > maxValue)
-			{
-				energy = maxValue;
-			}
+			long translated = Math.min(maxValue - this.energy, value);
+			this.energy += translated;
+			this.untranslateEnergy -= translated * EnergyTrans.J_TO_ELE;
 		}
 	}
 	
 	@Override
 	public double getDemandedEnergy()
 	{
-		return getMaxEnergyCapacity() - energy;
+		return (getMaxEnergyCapacity() - this.energy) * EnergyTrans.J_TO_ELE - this.untranslateEnergy;
 	}
-
+	
 	@Override
 	public int getSinkTier()
 	{
-		return oldTier;
+		return this.oldTier;
 	}
-
+	
 	protected abstract long getMaxVoltage();
-
+	
 	@Override
 	public double injectEnergy(EnumFacing directionFrom, double amount, double voltage)
 	{
-		if(voltage > getMaxVoltage())
+		if(amount / voltage > getMaxVoltage())
 		{
 			onOverpowered(amount, voltage);
 			return 0;
 		}
-		untranslateEnergy += amount;
-		energyInput += amount;
+		double amount1 = Math.min(amount, getMaxEnergyCapacity() - this.energy - this.untranslateEnergy);
+		this.untranslateEnergy += amount1;
+		this.energyInput += amount1;
 		transferEnergy();
-		return amount;
+		return amount - amount1;
 	}
 	
 	@Override
 	protected void initServer()
 	{
 		super.initServer();
-		oldTier = newTier = (byte) getBaseTier();
-		if(enabledAddedInToNet && !addedInToNet)
+		this.oldTier = this.newTier = (byte) getBaseTier();
+		if(this.enabledAddedInToNet && !this.addedInToNet &&
+				this.worldObj.isBlockLoaded(this.pos))//Prevent looped loaded.
 		{
 			addToEnergyNet();
 		}
 	}
-
+	
 	protected abstract int getBaseTier();
-
+	
 	protected void setTier(int tier)
 	{
-		newTier = (byte) tier;
+		this.newTier = (byte) tier;
 	}
-
+	
 	@Override
 	public void onRemoveFromLoadedWorld()
 	{
 		super.onRemoveFromLoadedWorld();
-		if(addedInToNet)
+		if(this.addedInToNet)
 		{
 			removeFromEnergyNet();
 		}
@@ -150,37 +153,37 @@ public abstract class TEElectricalMachineRecipeMap extends TEMachineRecipeMap im
 	
 	protected void addToEnergyNet()
 	{
-		if(enabledAddedInToNet)
+		if(this.enabledAddedInToNet)
 		{
 			MinecraftForge.EVENT_BUS.post(new EnergyTileLoadEvent(this));
-			addedInToNet = true;
+			this.addedInToNet = true;
 		}
 	}
-
+	
 	protected void removeFromEnergyNet()
 	{
 		MinecraftForge.EVENT_BUS.post(new EnergyTileUnloadEvent(this));
-		addedInToNet = false;
+		this.addedInToNet = false;
 	}
-
+	
 	protected void onOverpowered(double amount, double voltage)
 	{
 		if(getPluginLevel(IPluginAccess.fuse) > 0)
 		{
 			removeFromEnergyNet();
 			removePlugin(IPluginAccess.fuse);
-			enabledAddedInToNet = false;
+			this.enabledAddedInToNet = false;
 		}
 		else
 		{
-			worldObj.createExplosion(null, pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5, (float) (voltage - getMaxVoltage()) / 100F + 3, true);
+			this.worldObj.createExplosion(null, this.pos.getX() + .5, this.pos.getY() + .5, this.pos.getZ() + .5, (float) (amount / voltage - getMaxVoltage()) / 100F + 3, true);
 		}
 	}
 	
 	@Override
 	protected long getEnergyInput()
 	{
-		return (long) energyInput;
+		return (long) this.energyInput;
 	}
 	
 	@Override

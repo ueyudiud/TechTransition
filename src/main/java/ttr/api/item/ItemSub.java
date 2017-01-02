@@ -31,45 +31,49 @@ public class ItemSub extends ItemBase
 	protected String[] metas = new String[32768];
 	protected Map<String, Integer> nameMap = new HashMap();
 	protected Map<String, List<IBehavior>> behaviors = new HashMap();
+	protected boolean registerSimpleItemModel = true;
 	
 	protected ItemSub(String name)
 	{
 		super(name);
-		hasSubtypes = true;
+		this.hasSubtypes = true;
 	}
 	protected ItemSub(String modid, String name)
 	{
 		super(modid, name);
-		hasSubtypes = true;
+		this.hasSubtypes = true;
 	}
-
+	
 	protected void addSubItem(int meta, String name, String localized, IBehavior...behaviors)
 	{
-		if (metas[meta] != null)
+		if (this.metas[meta] != null)
 			throw new RuntimeException("The name " + name + " has already registered!");
-		metas[meta] = name;
-		nameMap.put(name, meta);
+		this.metas[meta] = name;
+		this.nameMap.put(name, meta);
 		this.behaviors.put(name, ImmutableList.copyOf(behaviors));
-		LanguageManager.registerLocal(getUnlocalizedName(new ItemStack(this, 1, meta)), localized);
-		TTrAPI.proxy.registerItemModel(this, meta, modid, this.name + "/" + name);
+		LanguageManager.registerLocal(getTranslateName(new ItemStack(this, 1, meta)), localized);
+		if(this.registerSimpleItemModel)
+		{
+			TTrAPI.proxy.registerItemModel(this, meta, this.modid, this.name + "/" + name);
+		}
 	}
-
+	
 	@Override
 	@SideOnly(Side.CLIENT)
 	public void getSubItems(Item itemIn, CreativeTabs tab, List<ItemStack> subItems)
 	{
-		for(int i = 0; i < metas.length; ++i)
+		for(int i = 0; i < this.metas.length; ++i)
 		{
-			if(metas[i] != null)
+			if(this.metas[i] != null)
 			{
 				subItems.add(new ItemStack(itemIn, 1, i));
 			}
 		}
 	}
-
+	
 	protected List<IBehavior> getBehavior(ItemStack stack)
 	{
-		return behaviors.getOrDefault(metas[getBaseDamage(stack)], IBehavior.NONE);
+		return this.behaviors.getOrDefault(this.metas[getBaseDamage(stack)], IBehavior.NONE);
 	}
 	
 	protected boolean isItemUsable(ItemStack stack)
@@ -143,7 +147,7 @@ public class ItemSub extends ItemBase
 			return false;
 		}
 	}
-
+	
 	@Override
 	public ActionResult<ItemStack> onItemRightClick(ItemStack itemStackIn, World worldIn, EntityPlayer playerIn,
 			EnumHand hand)
@@ -236,7 +240,7 @@ public class ItemSub extends ItemBase
 			return EnumActionResult.FAIL;
 		}
 	}
-
+	
 	@Override
 	public boolean onLeftClickEntity(ItemStack stack, EntityPlayer player, Entity entity)
 	{
@@ -270,7 +274,7 @@ public class ItemSub extends ItemBase
 			behavior.onPlayerStoppedUsing(stack, worldIn, entityLiving, timeLeft);
 		}
 	}
-
+	
 	@Override
 	public void onUpdate(ItemStack stack, World worldIn, Entity entityIn, int itemSlot, boolean isSelected)
 	{
@@ -296,7 +300,7 @@ public class ItemSub extends ItemBase
 			}
 		}
 	}
-
+	
 	@Override
 	public void onUsingTick(ItemStack stack, EntityLivingBase player, int count)
 	{

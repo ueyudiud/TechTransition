@@ -1,0 +1,32 @@
+{
+   "forge_marker":1,
+   "defaults": {
+		"transform":"forge:default-block",
+		"model":"ttr:base",
+		"textures": {
+			"front": "ttr:blocks/machine/generator/pipe_side",
+			"back": "ttr:blocks/machine/generator/side",
+			"left": "ttr:blocks/machine/generator/side",
+			"right": "ttr:blocks/machine/generator/side",
+			"bottom": "ttr:blocks/machine/generator/side"
+		}
+	},
+   "variants": {
+		"facing_primary": {
+			"north": { "y":180 },
+			"east" : { "y":270 },
+			"south": { "y":0   },
+			"west" : { "y":90  },
+			"up"   : { "x":90  },
+			"down" : { "x":270 }
+		},
+		"working": {
+			"false": {
+				"textures": { "top": "ttr:blocks/machine/generator/turbine" }
+			},
+			"true": {
+				"textures": { "top": "ttr:blocks/machine/generator/turbine_active" }
+			}
+		}
+	}
+}

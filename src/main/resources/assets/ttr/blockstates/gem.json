@@ -1,0 +1,32 @@
+{
+	"forge_marker":1,
+	"defaults": {
+		"transform": "forge:default-item",
+		"model": "ttr:item",
+		"textures": { "layer0": "ttr:items/iconsets/void" }
+	},
+	"variants": {
+		"type": {
+			"nonmetal1"   : { "textures": { "layer1": "ttr:items/iconsets/gem_nonmetal1" } },
+			"nonmetal2"   : { "textures": { "layer1": "ttr:items/iconsets/gem_nonmetal2" } },
+			"nonmetal4"   : { "textures": { "layer1": "ttr:items/iconsets/gem_nonmetal4" } },
+			"metallic"    : { "textures": { "layer1": "ttr:items/iconsets/gem_metallic" } },
+			"diamond"     : { "textures": { "layer1": "ttr:items/iconsets/gem_diamond" } },
+			"ruby"        : { "textures": { "layer1": "ttr:items/iconsets/gem_ruby" } },
+			"quartz"      : { "textures": { "layer1": "ttr:items/iconsets/gem_quartz" } },
+			"cube"        : { "textures": { "layer1": "ttr:items/iconsets/gem_cube" } },
+			"cube_shiny"  : { 
+				"textures": { 
+					"layer1": "ttr:items/iconsets/gem_cube_shiny",
+					"layer2": "ttr:items/iconsets/gem_cube_shiny_overlay"
+				} 
+			},
+			"flint"       : { 
+				"textures": { 
+					"layer1": "ttr:items/iconsets/gem_flint",
+					"layer2": "ttr:items/iconsets/gem_flint_overlay"
+				}
+			}
+		}
+	}
+}

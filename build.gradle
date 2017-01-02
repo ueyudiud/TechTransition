@@ -39,7 +39,7 @@ tasks.withType(JavaCompile) {
 }
 
 minecraft {
-    version = "1.10.2-12.18.1.2011"
+    version = "1.10.2-12.18.2.2122"
     runDir = "run"
     
     // the mappings can be changed at any time, and must be in the following format.
@@ -58,8 +58,8 @@ configurations {
 }
 
 dependencies {
-	provided "mezz.jei:jei_${minecraft.version}:3.7.3.221"
-    //runtime "mezz.jei:jei_${minecraft.version}:3.7.3.221"
+	provided "mezz.jei:jei_${minecraft.version}:3.13.4.384"
+    //runtime "mezz.jei:jei_${minecraft.version}:3.13.3.221"
     provided "net.industrial-craft:industrialcraft-2:2.6.23-ex110:dev"
 
     // you may put jars on which you depend on in ./libs

@@ -1,0 +1,75 @@
+{
+	"parent": "block/block",
+	"textures": {
+		"particle": "#glass1"
+	},
+    "elements": [
+        {   "from": [ 0, 0, 0 ],
+            "to": [ 2, 16, 2 ],
+            "faces": {
+                "down":  { "uv": [ 0 , 0 , 2 , 2  ], "texture": "#rod", "tintindex": 1, "cullface": "down" },
+                "up":    { "uv": [ 0 , 0 , 2 , 2  ], "texture": "#rod", "tintindex": 1, "cullface": "up"},
+                "north": { "uv": [ 0 , 0 , 2 , 16 ], "texture": "#rod", "tintindex": 1, "cullface": "north" },
+                "south": { "uv": [ 14, 0 , 16, 16 ], "texture": "#rod", "tintindex": 1 },
+                "west":  { "uv": [ 0 , 0 , 2 , 16 ], "texture": "#rod", "tintindex": 1, "cullface": "west" },
+                "east":  { "uv": [ 14, 0 , 16, 16 ], "texture": "#rod", "tintindex": 1 }
+            }
+        },
+		{   "from": [ 0, 0, 14 ],
+            "to": [ 2, 16, 16 ],
+            "faces": {
+                "down":  { "uv": [ 0 , 14, 2 , 16 ], "texture": "#rod", "tintindex": 1, "cullface": "down" },
+                "up":    { "uv": [ 0 , 14, 2 , 16 ], "texture": "#rod", "tintindex": 1, "cullface": "up"},
+                "north": { "uv": [ 0 , 0 , 2 , 16 ], "texture": "#rod", "tintindex": 1 },
+                "south": { "uv": [ 14, 0 , 16, 16 ], "texture": "#rod", "tintindex": 1, "cullface": "south" },
+                "west":  { "uv": [ 0 , 0 , 2 , 16 ], "texture": "#rod", "tintindex": 1, "cullface": "west" },
+                "east":  { "uv": [ 14, 0 , 16, 16 ], "texture": "#rod", "tintindex": 1 }
+            }
+        },
+		{   "from": [ 14, 0, 0 ],
+            "to": [ 16, 16, 2 ],
+            "faces": {
+                "down":  { "uv": [ 14, 0 , 16, 2  ], "texture": "#rod", "tintindex": 1, "cullface": "down" },
+                "up":    { "uv": [ 14, 0 , 16, 2  ], "texture": "#rod", "tintindex": 1, "cullface": "up"},
+                "north": { "uv": [ 0 , 0 , 2 , 16 ], "texture": "#rod", "tintindex": 1, "cullface": "north" },
+                "south": { "uv": [ 14, 0 , 16, 16 ], "texture": "#rod", "tintindex": 1 },
+                "west":  { "uv": [ 0 , 0 , 2 , 16 ], "texture": "#rod", "tintindex": 1 },
+                "east":  { "uv": [ 14, 0 , 16, 16 ], "texture": "#rod", "tintindex": 1, "cullface": "east" }
+            }
+        },
+		{   "from": [ 14, 0, 14 ],
+            "to": [ 16, 16, 16 ],
+            "faces": {
+                "down":  { "uv": [ 14, 14, 16, 16 ], "texture": "#rod", "tintindex": 1, "cullface": "down" },
+                "up":    { "uv": [ 14, 14, 16, 16 ], "texture": "#rod", "tintindex": 1, "cullface": "up"},
+                "north": { "uv": [ 0 , 0 , 2 , 16 ], "texture": "#rod", "tintindex": 1 },
+                "south": { "uv": [ 14, 0 , 16, 16 ], "texture": "#rod", "tintindex": 1, "cullface": "south" },
+                "west":  { "uv": [ 0 , 0 , 2 , 16 ], "texture": "#rod", "tintindex": 1 },
+                "east":  { "uv": [ 14, 0 , 16, 16 ], "texture": "#rod", "tintindex": 1, "cullface": "east" }
+            }
+        },
+        {   "from": [ 1, 0, 1 ],
+            "to": [ 15, 16, 15 ],
+            "faces": {
+                "north": { "uv": [ 1, 0, 15, 16 ], "texture": "#glass1" },
+                "south": { "uv": [ 1, 0, 15, 16 ], "texture": "#glass1" },
+                "west":  { "uv": [ 1, 0, 15, 16 ], "texture": "#glass1" },
+                "east":  { "uv": [ 1, 0, 15, 16 ], "texture": "#glass1" }
+            }
+        },
+        {   "from": [ 0, -0.01, 0 ],
+            "to": [ 16, 0, 16 ],
+            "faces": {
+                "down":  { "uv": [ 0, 0, 16, 16 ], "texture": "#glass_down", "cullface": "down"},
+                "up":    { "uv": [ 0, 0, 16, 16 ], "texture": "#glass_down" }
+            }
+        },
+        {   "from": [ 0, 16, 0 ],
+            "to": [ 16, 16.01, 16 ],
+            "faces": {
+                "down":  { "uv": [ 0, 0, 16, 16 ], "texture": "#glass_top"},
+                "up":    { "uv": [ 0, 0, 16, 16 ], "texture": "#glass_top", "cullface": "up" }
+            }
+        }
+    ]
+}

@@ -25,23 +25,23 @@ public class PacketFluidUpdateSingle extends PacketContainer
 	public PacketFluidUpdateSingle(int windowID, ITankSyncable tank, int...is)
 	{
 		super(windowID);
-		id = is;
-		stacks = new FluidStack[id.length];
+		this.id = is;
+		this.stacks = new FluidStack[this.id.length];
 		for(int i = 0; i < is.length; ++i)
 		{
-			stacks[i] = tank.getStackInTank(i);
+			this.stacks[i] = tank.getStackInTank(i);
 		}
 	}
-
+	
 	@Override
 	protected void encode(PacketBuffer output) throws IOException
 	{
 		super.encode(output);
-		output.writeByte(stacks.length);
-		output.writeVarIntArray(id);
-		for (int i = 0; i < id.length; ++i)
+		output.writeByte(this.stacks.length);
+		output.writeVarIntArray(this.id);
+		for (int i = 0; i < this.id.length; ++i)
 		{
-			FluidStack stack = stacks[i];
+			FluidStack stack = this.stacks[i];
 			if(stack != null)
 			{
 				output.writeBoolean(true);
@@ -55,13 +55,14 @@ public class PacketFluidUpdateSingle extends PacketContainer
 			}
 		}
 	}
-
+	
 	@Override
 	protected void decode(PacketBuffer input) throws IOException
 	{
 		super.decode(input);
-		stacks = new FluidStack[input.readByte()];
-		id = input.readVarIntArray();
+		this.stacks = new FluidStack[input.readByte()];
+		this.id = input.readVarIntArray();
+		int i = 0;
 		for(int id : this.id)
 		{
 			if(input.readBoolean())
@@ -72,20 +73,20 @@ public class PacketFluidUpdateSingle extends PacketContainer
 					throw new IOException();
 				int amt = input.readInt();
 				NBTTagCompound nbt = input.readNBTTagCompoundFromBuffer();
-				stacks[id] = new FluidStack(fluid, amt, nbt);
+				this.stacks[i++] = new FluidStack(fluid, amt, nbt);
 			}
 		}
 	}
-
+	
 	@Override
 	public IPacket process(Network network)
 	{
 		Container container = getPlayer().openContainer;
-		if(container.windowId == windowID && container instanceof IFluidSyncableContainer)
+		if(container.windowId == this.windowID && container instanceof IFluidSyncableContainer)
 		{
-			for(int i = 0; i < id.length; ++i)
+			for(int i = 0; i < this.id.length; ++i)
 			{
-				((IFluidSyncableContainer) container).setFluid(id[i], stacks[i]);
+				((IFluidSyncableContainer) container).setFluid(this.id[i], this.stacks[i]);
 			}
 		}
 		return null;

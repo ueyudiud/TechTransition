@@ -1,0 +1,21 @@
+{
+	"forge_marker":1,
+	"defaults": {
+		"transform": "forge:default-block",
+		"model": "ttr:cube_double"
+	},
+	"variants": {
+		"rock": {
+			"stone"     : { "textures": { "rock": "blocks/stone" } },
+			"netherrack": { "textures": { "rock": "blocks/netherrack" } },
+			"marble"    : { "textures": { "rock": "ttr:blocks/rock/marble/resource" } }
+		},
+		"type": {
+			"default"   : { "textures": { "overlay": "ttr:blocks/iconsets/ore_normal" } },
+			"normal"    : { "textures": { "overlay": "ttr:blocks/iconsets/ore_normal" } },
+			"gem"       : { "textures": { "overlay": "ttr:blocks/iconsets/ore_gem" } },
+			"ven"       : { "textures": { "overlay": "ttr:blocks/iconsets/ore_ven" } },
+			"powder"    : { "textures": { "overlay": "ttr:blocks/iconsets/ore_powder" } }
+		}
+	}
+}

@@ -3,6 +3,7 @@ package ttr.load;
 import ttr.load.recipe.TTrMachineRecipes;
 import ttr.load.recipe.TTrMaterialsRecipes;
 import ttr.load.recipe.TTrRecipeRemove;
+import ttr.load.recipe.TTrToolRecipes;
 import ttr.load.recipe.TTrVanillaRecipes;
 
 public class TTrRecipes
@@ -16,6 +17,7 @@ public class TTrRecipes
 	{
 		TTrVanillaRecipes.init();
 		TTrMaterialsRecipes.init();
+		TTrToolRecipes.init();
 		TTrMachineRecipes.init();
 	}
 }

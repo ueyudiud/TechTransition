@@ -24,7 +24,7 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import ttr.api.data.EnumToolType;
+import ttr.api.enums.EnumTools;
 
 public class BlockBrick extends Block
 {
@@ -137,7 +137,7 @@ public class BlockBrick extends Block
 	@Override
 	public String getHarvestTool(IBlockState state)
 	{
-		return EnumToolType.wrench.name();
+		return EnumTools.wrench.name();
 	}
 	
 	@Override

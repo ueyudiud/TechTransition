@@ -17,12 +17,11 @@ import net.minecraft.item.crafting.IRecipe;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.oredict.ShapedOreRecipe;
-import ttr.api.material.Mat;
 import ttr.api.recipe.FakeCraftingInventory;
 import ttr.api.stack.AbstractStack;
 import ttr.api.stack.BaseStack;
 import ttr.api.stack.OreStack;
-import ttr.api.util.SubTag;
+import ttr.core.TTrRecipeHandler;
 import ttr.load.Config;
 
 public class TTrRecipeRemove
@@ -34,44 +33,34 @@ public class TTrRecipeRemove
 	 */
 	private static List<FakeCraftingInventory> logRemoveList = new ArrayList();
 	private static List<AbstractStack> smeltingInputRemoveList = new ArrayList();
-
+	
 	public static void init()
 	{
-		addRemoveRecipe("xxx", "x x", "xxx", 'x', Blocks.COBBLESTONE);
+		TTrRecipeHandler.markRemoveCraftingShapedInputs("xxx", "x x", "xxx", 'x', Blocks.COBBLESTONE);
 		if(Config.disableIC2Tools)
 		{
-			addRemoves(IC2Items.getItem("forge_hammer"), IC2Items.getItem("cutter"));
-			addRemoveRecipe("p p", " p ", "s s", 'p', "plateIron", 's', Items.IRON_INGOT);
-			addRemoveRecipe(" x ", "xxx", "x  ", 'x', Blocks.PLANKS);
+			TTrRecipeHandler.markRemoveCraftingOutput(IC2Items.getItem("forge_hammer"), IC2Items.getItem("cutter"), IC2Items.getItem("treetap"));
 		}
 		//		if(Config.overrideMagnetizer)
 		//		{
 		//			addRemoves(Util.ItemStacks.getIC2("magnetizer"));
 		//		}
-		addRemoveRecipe("xxx", " s ", " s ", 'x', Items.QUARTZ, 's', Items.STICK);//AE2
-		addRemoveRecipe("x", "x", 'x', Blocks.PLANKS);//Sticks
-		addRemoveRecipe("xxx", "o  ", 'x', "dustCopper", 'o', "dustTin");
-		addRemoveRecipe("xxx", "o  ", 'x', "dustCopper", 'o', "dustZinc");
-		addRemoveRecipe("xxo", 'x', "dustIron", 'o', "dustNickel");
-		addRemoveRecipe("xo", 'x', "dustGold", 'o', "dustSilver");
-		addRemoveRecipe("ccc", "sr ", 'c', "dustCopper", 's', "dustSilver", 'r', "bucketRedstone");
-		addRemoveRecipe("ttt", "sr ", 't', "dustTin", 's', "dustSilver", 'r', "bucketGlowstone");
-		addRemoveRecipe("ttp", "sr ", 't', "dustTin", 'p', "dustPlatinum", 's', "dustSilver", 'r', "bucketEnder");
-		addRemoveRecipe("ttt", "ttx", 'x', "dustElectrum", 't', "dustRedstone");
-		addRemoveRecipe("xxx", "o  ", 'x', "ingotCopper", 'o', "ingotTin");
-		addRemoveRecipe("xxx", "x x", "xxx", 'x', "plankWood");//Chest
-
-		for(Mat material : Mat.register())
-		{
-			if(material.contain(SubTag.METAL) && material.hasBlock)
-			{
-				addRemoveRecipe("x", 'x', "block" + material.oreDictName);
-				addRemoveRecipe("xxx", "xxx", "xxx", 'x', "ingot" + material.oreDictName);
-				//				addRemoveRecipe("xxx", "xxx", "xxx", 'x', "nugget" + material.oreDictName);
-			}
-		}
+		TTrRecipeHandler.markRemoveCraftingShapedInputs("xxx", " s ", " s ", 'x', Items.QUARTZ, 's', Items.STICK);//AE2
+		TTrRecipeHandler.markRemoveCraftingShapedInputs("x", "x", 'x', Blocks.PLANKS);//Stick
+		TTrRecipeHandler.markRemoveCraftingShapelessInputs("ingotCopper", "ingotCopper", "ingotCopper", "ingotTin");//Forestry
+		TTrRecipeHandler.markRemoveCraftingShapedInputs("xxx", "x x", "xxx", 'x', "plankWood");//Chest
 		
-		addRemoves(
+		//		for(Enum material : Mat.register())
+		//		{
+		//			if(material.contain(SubTag.METAL) && material.hasBlock)
+		//			{
+		//				addRemoveRecipe("x", 'x', "block" + material.oreDictName);
+		//				addRemoveRecipe("xxx", "xxx", "xxx", 'x', "ingot" + material.oreDictName);
+		//				//				addRemoveRecipe("xxx", "xxx", "xxx", 'x', "nugget" + material.oreDictName);
+		//			}
+		//		}
+		
+		TTrRecipeHandler.markRemoveCraftingOutput(
 				Items.SHEARS, Blocks.PISTON,
 				Items.GOLDEN_HORSE_ARMOR, Items.BUCKET, Items.COOKIE,
 				IC2Items.getItem("crafting", "circuit"), IC2Items.getItem("crafting", "advanced_circuit"),
@@ -98,56 +87,15 @@ public class TTrRecipeRemove
 				"ingotSignalum", "ingotLumium", "ingotEnderium");
 	}
 	
-	public static void addRemoves(Object...objects)
-	{
-		for(Object object : objects)
-		{
-			addRemove(object);
-		}
-	}
-	
-	public static void addRemove(Object object)
-	{
-		if(object instanceof Item)
-		{
-			addRemove(new BaseStack((Item) object));
-		}
-		else if(object instanceof Block)
-		{
-			addRemove(new BaseStack((Block) object));
-		}
-		else if(object instanceof ItemStack)
-		{
-			addRemove(new BaseStack((ItemStack) object));
-		}
-		else if(object instanceof String)
-		{
-			addRemove(new OreStack((String) object));
-		}
-		else if(object instanceof AbstractStack)
-		{
-			outputRemoveList.add((AbstractStack) object);
-		}
-	}
-	
-	public static void addRemoveRecipe(Object...objects)
-	{
-		FakeCraftingInventory inventory = FakeCraftingInventory.init(objects);
-		if(inventory.isValid())
-		{
-			removeList.add(inventory);
-		}
-	}
-	
 	public static void addLogRemoveRecipe(Object...objects)
 	{
-		FakeCraftingInventory inventory = FakeCraftingInventory.init(objects);
+		FakeCraftingInventory inventory = FakeCraftingInventory.createShaped(objects);
 		if(inventory.isValid())
 		{
 			logRemoveList.add(inventory);
 		}
 	}
-
+	
 	public static void addRemoveSmelting(Object...objects)
 	{
 		for(Object object : objects)
@@ -210,30 +158,60 @@ public class TTrRecipeRemove
 				}
 			}
 		}
-		label:
-			for(Object rawRecipe : new ArrayList(CraftingManager.getInstance().getRecipeList()))
+		for(Object rawRecipe : new ArrayList(CraftingManager.getInstance().getRecipeList()))
+		{
+			IRecipe recipe = (IRecipe) rawRecipe;
+			ItemStack output = recipe.getRecipeOutput();
+			//				if(output != null)
+			//				{
+			//					for(AbstractStack stack1 : outputRemoveList)
+			//					{
+			//						if(stack1.similar(output))
+			//						{
+			//							CraftingManager.getInstance().getRecipeList().remove(rawRecipe);
+			//							continue label;
+			//						}
+			//					}
+			//				}
+			//				for(FakeCraftingInventory inventory : removeList)
+			//				{
+			//					try
+			//					{
+			//						if(recipe.matches(inventory, null))
+			//						{
+			//							CraftingManager.getInstance().getRecipeList().remove(rawRecipe);
+			//							continue label;
+			//						}
+			//					}
+			//					catch(Exception exception)
+			//					{
+			//						;
+			//					}
+			//				}
+			if(Config.logHalfOutput)
 			{
-				IRecipe recipe = (IRecipe) rawRecipe;
-				ItemStack output = recipe.getRecipeOutput();
-				if(output != null)
-				{
-					for(AbstractStack stack1 : outputRemoveList)
-					{
-						if(stack1.similar(output))
-						{
-							CraftingManager.getInstance().getRecipeList().remove(rawRecipe);
-							continue label;
-						}
-					}
-				}
-				for(FakeCraftingInventory inventory : removeList)
+				for(FakeCraftingInventory inventory : logRemoveList)
 				{
 					try
 					{
 						if(recipe.matches(inventory, null))
 						{
 							CraftingManager.getInstance().getRecipeList().remove(rawRecipe);
-							continue label;
+							ItemStack log = inventory.getStackInSlot(0);
+							GameRegistry.addRecipe(new ShapedOreRecipe(output.copy(), "s", "x", 's', "craftingToolSaw", 'x', log));
+							output.stackSize /= 2;
+							if(output.stackSize == 0)
+							{
+								output.stackSize = 1;
+							}
+							GameRegistry.addRecipe(new ShapedOreRecipe(output, "x", 'x', log));
+							if(log.getItem() instanceof ItemBlock)
+							{
+								//								PlateCuttingRecipe.addCuttingRecipe("minecraft:log" +
+								//										GameData.getBlockRegistry().getNameForObject(
+								//												Block.getBlockFromItem(log.getItem())),
+								//										new CuttingInfo(new BaseStack(log), 3200, 30, new BaseStack(output), new BaseStack(output, output.stackSize * 3)));
+							}
 						}
 					}
 					catch(Exception exception)
@@ -241,38 +219,7 @@ public class TTrRecipeRemove
 						;
 					}
 				}
-				if(Config.logHalfOutput)
-				{
-					for(FakeCraftingInventory inventory : logRemoveList)
-					{
-						try
-						{
-							if(recipe.matches(inventory, null))
-							{
-								CraftingManager.getInstance().getRecipeList().remove(rawRecipe);
-								ItemStack log = inventory.getStackInSlot(0);
-								GameRegistry.addRecipe(new ShapedOreRecipe(output.copy(), "s", "x", 's', "craftingToolSaw", 'x', log));
-								output.stackSize /= 2;
-								if(output.stackSize == 0)
-								{
-									output.stackSize = 1;
-								}
-								GameRegistry.addRecipe(new ShapedOreRecipe(output, "x", 'x', log));
-								if(log.getItem() instanceof ItemBlock)
-								{
-									//								PlateCuttingRecipe.addCuttingRecipe("minecraft:log" +
-									//										GameData.getBlockRegistry().getNameForObject(
-									//												Block.getBlockFromItem(log.getItem())),
-									//										new CuttingInfo(new BaseStack(log), 3200, 30, new BaseStack(output), new BaseStack(output, output.stackSize * 3)));
-								}
-							}
-						}
-						catch(Exception exception)
-						{
-							;
-						}
-					}
-				}
 			}
+		}
 	}
 }

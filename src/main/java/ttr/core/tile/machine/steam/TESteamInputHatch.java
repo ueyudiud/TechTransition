@@ -9,7 +9,7 @@ import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidTankProperties;
 import ttr.api.tile.ISteamInputHatch;
 import ttr.core.tile.TEMachineBase;
-import ttr.load.TTrFluids;
+import ttr.load.TTrIBF;
 
 public class TESteamInputHatch extends TEMachineBase
 implements ISteamInputHatch, IFluidHandler
@@ -110,7 +110,7 @@ implements ISteamInputHatch, IFluidHandler
 					@Override
 					public FluidStack getContents()
 					{
-						return amount != 0 ? new FluidStack(TTrFluids.steam, amount) : null;
+						return amount != 0 ? new FluidStack(TTrIBF.steam, amount) : null;
 					}
 					
 					@Override
@@ -122,7 +122,7 @@ implements ISteamInputHatch, IFluidHandler
 					@Override
 					public boolean canFillFluidType(FluidStack fluidStack)
 					{
-						return fluidStack.getFluid() == TTrFluids.steam;
+						return fluidStack.getFluid() == TTrIBF.steam;
 					}
 					
 					@Override
@@ -149,7 +149,7 @@ implements ISteamInputHatch, IFluidHandler
 	@Override
 	public int fill(FluidStack resource, boolean doFill)
 	{
-		if(resource.getFluid() == TTrFluids.steam)
+		if(resource.getFluid() == TTrIBF.steam)
 		{
 			int ret = Math.min(resource.amount, capacity - amount);
 			if(doFill)

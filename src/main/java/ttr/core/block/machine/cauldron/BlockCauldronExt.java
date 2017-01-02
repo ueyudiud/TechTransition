@@ -53,13 +53,13 @@ public class BlockCauldronExt extends BlockMachine
 	{
 		super(Material.IRON, MapColor.STONE);
 	}
-
+	
 	@Override
 	protected BlockStateContainer createBlockState()
 	{
 		return new BlockStateContainer(this);
 	}
-
+	
 	@Override
 	public void addCollisionBoxToList(IBlockState state, World worldIn, BlockPos pos, AxisAlignedBB entityBox, List<AxisAlignedBB> collidingBoxes, @Nullable Entity entityIn)
 	{
@@ -69,7 +69,7 @@ public class BlockCauldronExt extends BlockMachine
 		addCollisionBoxToList(pos, entityBox, collidingBoxes, AABB_WALL_EAST);
 		addCollisionBoxToList(pos, entityBox, collidingBoxes, AABB_WALL_SOUTH);
 	}
-
+	
 	@Override
 	public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos)
 	{
@@ -99,7 +99,7 @@ public class BlockCauldronExt extends BlockMachine
 			return ((TECauldron) tile).getLightValue();
 		return super.getLightValue(state, world, pos);
 	}
-
+	
 	protected boolean onWashing(World world, BlockPos pos, TECauldron cauldron, EntityItem entityIn, TemplateRecipe recipe, boolean isSolute)
 	{
 		if(isSolute)
@@ -164,7 +164,7 @@ public class BlockCauldronExt extends BlockMachine
 		cauldron.washingBuf = 5;
 		return true;
 	}
-
+	
 	/**
 	 * Called When an Entity Collided with the Block
 	 */
@@ -177,6 +177,18 @@ public class BlockCauldronExt extends BlockMachine
 			if(stack != null)
 			{
 				TECauldron tile = ((TECauldron) worldIn.getTileEntity(pos));
+				if(stack.element == FluidRegistry.WATER)
+				{
+					int i = (int) stack.size;
+					float f = pos.getY() + (6.0F + 3 * i) / 16.0F;
+					
+					if (!worldIn.isRemote && entityIn.isBurning() && i > 0 && entityIn.getEntityBoundingBox().minY <= f)
+					{
+						entityIn.extinguish();
+						setFluid(worldIn, pos, FluidRegistry.WATER, i - 1);
+						return;
+					}
+				}
 				if(tile.washingBuf > 0)
 				{
 					tile.washingBuf--;
@@ -200,19 +212,8 @@ public class BlockCauldronExt extends BlockMachine
 				}
 			}
 		}
-		//		if(stack.element == FluidRegistry.WATER)
-		//		{
-		//			int i = state.getValue(LEVEL).intValue();
-		//			float f = pos.getY() + (6.0F + 3 * i) / 16.0F;
-		//
-		//			if (!worldIn.isRemote && entityIn.isBurning() && i > 0 && entityIn.getEntityBoundingBox().minY <= f)
-		//			{
-		//				entityIn.extinguish();
-		//				setFluid(worldIn, pos, FluidRegistry.WATER, i - 1);
-		//			}
-		//		}
 	}
-
+	
 	@Override
 	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, @Nullable ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ)
 	{
@@ -288,7 +289,7 @@ public class BlockCauldronExt extends BlockMachine
 						{
 							ItemStack itemstack1 = PotionUtils.addPotionToItemStack(new ItemStack(Items.POTIONITEM), PotionTypes.WATER);
 							playerIn.addStat(StatList.CAULDRON_USED);
-
+							
 							if (--heldItem.stackSize == 0)
 							{
 								playerIn.setHeldItem(hand, itemstack1);
@@ -355,7 +356,7 @@ public class BlockCauldronExt extends BlockMachine
 			return false;
 		}
 	}
-
+	
 	/**
 	 * Called similar to random ticks, but only when it is raining.
 	 */
@@ -393,13 +394,13 @@ public class BlockCauldronExt extends BlockMachine
 	{
 		return 0;
 	}
-
+	
 	@Override
 	public String getHarvestTool(IBlockState state)
 	{
 		return "pickaxe";
 	}
-
+	
 	@Override
 	public int getHarvestLevel(IBlockState state)
 	{
@@ -411,7 +412,7 @@ public class BlockCauldronExt extends BlockMachine
 	{
 		return new TECauldron();
 	}
-
+	
 	public void setFluid(World world, BlockPos pos, Fluid fluid, int amt)
 	{
 		TileEntity tile = world.getTileEntity(pos);

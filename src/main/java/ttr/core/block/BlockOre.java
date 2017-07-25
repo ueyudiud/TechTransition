@@ -41,6 +41,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import ttr.api.block.IBlockName;
 import ttr.api.enums.EnumMaterial;
 import ttr.api.enums.EnumOrePrefix;
 import ttr.api.enums.EnumTools;
@@ -50,6 +51,7 @@ import ttr.api.recipe.MaterialInstance;
 import ttr.api.recipe.TTrRecipeAdder;
 import ttr.api.recipe.TemplateRecipeMap;
 import ttr.api.stack.BaseStack;
+import ttr.api.util.LanguageManager;
 import ttr.api.util.ParticleDiggingExt;
 import ttr.api.util.SubTag;
 import ttr.core.TTrMaterialHandler;
@@ -61,7 +63,7 @@ import ttr.load.TTrIBF;
  * Created at 2016年12月20日 下午8:46:30
  * @author ueyudiud
  */
-public class BlockOre extends Block implements ITileEntityProvider
+public class BlockOre extends Block implements ITileEntityProvider, IBlockName
 {
 	private static final ThreadLocal<TEOre> THREAD = new ThreadLocal();
 	
@@ -154,6 +156,7 @@ public class BlockOre extends Block implements ITileEntityProvider
 				for(RockBase rock : BlockOre.RockBase.values())
 				{
 					ItemStack stack = new ItemStack(this.itemList[rock.ordinal()], 1, material.id);
+					LanguageManager.registerLocal(this.itemList[rock.ordinal()].getUnlocalizedName() + "@" + material.name + ".name", EnumOrePrefix.ore.getTranslatedName(material));
 					if(!EnumOrePrefix.gem.access(material))
 					{
 						TTrRecipeAdder.addGrindingRecipe(new BaseStack(stack),
@@ -185,6 +188,12 @@ public class BlockOre extends Block implements ITileEntityProvider
 				TTrMaterialHandler.registerOre(instance, material, EnumOrePrefix.ore);
 			}
 		}
+	}
+	
+	@Override
+	public String getBlockDisplayName(ItemStack stack)
+	{
+		return LanguageManager.translateToLocal(stack.getItem().getUnlocalizedName() + "@" + EnumMaterial.getMaterialNonNull(stack.getItemDamage()).name + ".name");
 	}
 	
 	@Override

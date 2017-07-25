@@ -2,30 +2,30 @@ package ttr.core.tile.pipe;
 
 public class TEFluidPipeMRC extends TEFluidPipe
 {
-	public TEFluidPipeMRC(int capacity, long maxTemperature, boolean canCurrentGas, int flowSpeed)
+	public TEFluidPipeMRC(int capacity, int size, long maxTemperature, boolean canCurrentGas, int flowSpeed)
 	{
-		super(capacity, maxTemperature, canCurrentGas, flowSpeed);
+		super(capacity, size, maxTemperature, canCurrentGas, flowSpeed);
 	}
-
+	
 	public static class TEFluidPipeStainlessSteelSmall extends TEFluidPipeMRC
 	{
 		public TEFluidPipeStainlessSteelSmall()
 		{
-			super(400, 2000, true, 60);
+			super(400, 3, 2000, true, 60);
 		}
 	}
 	public static class TEFluidPipeStainlessSteelMiddle extends TEFluidPipeMRC
 	{
 		public TEFluidPipeStainlessSteelMiddle()
 		{
-			super(800, 2000, true, 120);
+			super(800, 4, 2000, true, 120);
 		}
 	}
 	public static class TEFluidPipeStainlessSteelBig extends TEFluidPipeMRC
 	{
 		public TEFluidPipeStainlessSteelBig()
 		{
-			super(1200, 2000, true, 180);
+			super(1200, 5, 2000, true, 180);
 		}
 	}
 	
@@ -33,21 +33,21 @@ public class TEFluidPipeMRC extends TEFluidPipe
 	{
 		public TEFluidPipeTitaniumSmall()
 		{
-			super(600, 2400, true, 100);
+			super(600, 3, 2400, true, 100);
 		}
 	}
 	public static class TEFluidPipeTitaniumMiddle extends TEFluidPipeMRC
 	{
 		public TEFluidPipeTitaniumMiddle()
 		{
-			super(1200, 2400, true, 200);
+			super(1200, 4, 2400, true, 200);
 		}
 	}
 	public static class TEFluidPipeTitaniumBig extends TEFluidPipeMRC
 	{
 		public TEFluidPipeTitaniumBig()
 		{
-			super(2400, 2400, true, 300);
+			super(2400, 5, 2400, true, 300);
 		}
 	}
 	
@@ -55,21 +55,21 @@ public class TEFluidPipeMRC extends TEFluidPipe
 	{
 		public TEFluidPipeTungstenSteelSmall()
 		{
-			super(1000, 2400, true, 180);
+			super(1000, 3, 2400, true, 180);
 		}
 	}
 	public static class TEFluidPipeTungstenSteelMiddle extends TEFluidPipeMRC
 	{
 		public TEFluidPipeTungstenSteelMiddle()
 		{
-			super(2000, 2400, true, 360);
+			super(2000, 4, 2400, true, 360);
 		}
 	}
 	public static class TEFluidPipeTungstenSteelBig extends TEFluidPipeMRC
 	{
 		public TEFluidPipeTungstenSteelBig()
 		{
-			super(3000, 2400, true, 540);
+			super(3000, 5, 2400, true, 540);
 		}
 	}
 }

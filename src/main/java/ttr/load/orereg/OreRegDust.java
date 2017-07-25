@@ -88,6 +88,10 @@ public class OreRegDust implements IOreDictRegister
 					{
 						TTrRecipeHandler.addShapelessRecipe(Util.copyAmount(stack, size * 3 / 4), list1.toArray());
 					}
+					else
+					{
+						TTrRecipeHandler.addShapelessRecipe(TTrMaterialHandler.getItemStack(EnumOrePrefix.dustSmall, material, size * 3), list1.toArray());
+					}
 				}
 			}
 		}

@@ -100,8 +100,11 @@ public abstract class TEMachineRecipeMap extends TEMachineInventory implements I
 	{
 		if(accessConfigGUIOpen() && hand == EnumHand.MAIN_HAND && EnumTools.wrench.match(heldItem))
 		{
-			Util.damageOrDischargeItem(heldItem, 100L, 1, player);
-			player.openGui(TTr.MODID, CommonProxy.ELE_MACHINE_CONFIG_ID, this.worldObj, this.pos.getX(), this.pos.getY(), this.pos.getZ());
+			if (isServer())
+			{
+				Util.damageOrDischargeItem(heldItem, 100L, 1, player);
+				player.openGui(TTr.MODID, CommonProxy.ELE_MACHINE_CONFIG_ID, this.worldObj, this.pos.getX(), this.pos.getY(), this.pos.getZ());
+			}
 			return true;
 		}
 		return super.onActived(player, hand, heldItem, facing, hitX, hitY, hitZ);

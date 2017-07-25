@@ -7,9 +7,10 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.ClickType;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumFacing;
+import ttr.core.TTr;
 import ttr.core.gui.abstracts.ContainerTP;
 import ttr.core.gui.abstracts.SlotHolographic;
+import ttr.core.network.PacketSlotConfig;
 import ttr.core.tile.TEMachineRecipeMap;
 
 /**
@@ -49,7 +50,7 @@ public class ContainerEleMachineConfig extends ContainerTP<TEMachineRecipeMap>
 	
 	public ContainerEleMachineConfig(EntityPlayer player, TEMachineRecipeMap inventory)
 	{
-		super(player, inventory);
+		super(player, inventory, 0, 0);
 		addSlotToContainer(new SlotOption(0, 8, 63));
 		addSlotToContainer(new SlotOption(1, 26, 63));
 		addSlotToContainer(new SlotOption(2, 44, 63));
@@ -63,38 +64,11 @@ public class ContainerEleMachineConfig extends ContainerTP<TEMachineRecipeMap>
 		Slot slot;
 		if(slotId >= 0 && slotId < this.inventorySlots.size() && (slot = getSlot(slotId)) instanceof SlotOption)
 		{
-			SlotOption option = (SlotOption) slot;
-			switch (option.optionID)
+			if (player.worldObj.isRemote)
 			{
-			case 0 :
-				this.inventoryTile.allowAutoOutputFluid = !this.inventoryTile.allowAutoOutputFluid;
-				break;
-			case 1 :
-				this.inventoryTile.allowAutoOutputItem = !this.inventoryTile.allowAutoOutputItem;
-				break;
-			case 2 :
-				int o = this.inventoryTile.autoOutputFace == null ? -1 : this.inventoryTile.autoOutputFace.ordinal();
-				o++;
-				if(this.inventoryTile.facing.ordinal() == o) o++;
-				if(o == 6)
-				{
-					this.inventoryTile.autoOutputFace = null;
-				}
-				else
-				{
-					this.inventoryTile.autoOutputFace = EnumFacing.VALUES[o];
-				}
-				break;
-			case 3 :
-				this.inventoryTile.moveFully = !this.inventoryTile.moveFully;
-				break;
-			case 4 :
-				this.inventoryTile.throwItemOut = !this.inventoryTile.throwItemOut;
-				break;
-			default:
-				break;
+				SlotOption option = (SlotOption) slot;
+				TTr.network.sendToServer(new PacketSlotConfig(this.inventoryTile.getWorld(), this.inventoryTile.getPos(), option.optionID));
 			}
-			this.inventoryTile.syncToPlayer(player);
 			return null;
 		}
 		return super.slotClick(slotId, dragType, clickTypeIn, player);

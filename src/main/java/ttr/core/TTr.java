@@ -32,6 +32,7 @@ import ttr.api.recipe.TemplateRecipeMap;
 import ttr.api.recipe.TempleteRecipeHandler;
 import ttr.api.util.LanguageManager;
 import ttr.api.util.Log;
+import ttr.core.network.PacketSlotConfig;
 import ttr.load.Config;
 import ttr.load.TTrIBF;
 import ttr.load.TTrLangs;
@@ -148,6 +149,7 @@ public class TTr
 		network.registerPacket(PacketTESAskRender.class, Side.CLIENT);
 		network.registerPacket(PacketFluidUpdateAll.class, Side.CLIENT);
 		network.registerPacket(PacketFluidUpdateSingle.class, Side.CLIENT);
+		network.registerPacket(PacketSlotConfig.class, Side.SERVER);
 		TTrLangs.init();
 		TTrIBF.postinit();
 		NetworkRegistry.INSTANCE.registerGuiHandler(MODID, proxy);

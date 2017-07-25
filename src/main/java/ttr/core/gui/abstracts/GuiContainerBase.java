@@ -61,7 +61,10 @@ public abstract class GuiContainerBase extends GuiContainer
 			String str = getName();
 			this.fontRendererObj.drawString(str, (this.xSize - this.fontRendererObj.getStringWidth(str)) / 2, 6, 0x404040);
 		}
-		this.fontRendererObj.drawString(I18n.format("container.inventory"), 8, this.ySize - 96 + 2, 4210752);
+		if (renderInventoryText())
+		{
+			this.fontRendererObj.drawString(I18n.format("container.inventory"), 8, this.ySize - 96 + 2, 4210752);
+		}
 		drawFrontgroundOther(par1, par2);
 		par1 -= this.xoffset;
 		par2 -= this.yoffset;
@@ -81,6 +84,11 @@ public abstract class GuiContainerBase extends GuiContainer
 				break;
 			}
 		}
+	}
+	
+	protected boolean renderInventoryText()
+	{
+		return true;
 	}
 	
 	protected void drawFrontgroundOther(int x, int y)

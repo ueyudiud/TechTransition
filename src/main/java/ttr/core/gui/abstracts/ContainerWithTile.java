@@ -1,6 +1,6 @@
 package ttr.core.gui.abstracts;
 
-import com.sun.org.apache.xalan.internal.xsltc.util.IntegerArray;
+import java.util.Arrays;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
@@ -80,7 +80,8 @@ public abstract class ContainerWithTile<T extends TEMachineBase> extends Contain
 		}
 		if(this.inventoryTile instanceof ITankSyncable)
 		{
-			IntegerArray array = new IntegerArray();
+			int[] array = new int[((ITankSyncable) this.inventoryTile).getTankSize()];
+			int p = 0;
 			for(int i = 0; i < this.fluidSlotList.size(); ++i)
 			{
 				FluidStack stack1 = this.fluidSlotList.get(i).getStack();
@@ -88,17 +89,18 @@ public abstract class ContainerWithTile<T extends TEMachineBase> extends Contain
 				if((stack1 == null || stack2 == null) ? stack1 != stack2 :
 					(stack1 != null && !stack1.isFluidStackIdentical(stack2)))
 				{
-					array.add(i);
+					array[p++] = i;
 				}
 			}
+			array = Arrays.copyOfRange(array, 0, p);
 			for(IContainerListener listener : this.listeners)
 			{
 				if(listener instanceof EntityPlayer)
 				{
-					TTr.network.sendToPlayer(new PacketFluidUpdateSingle(this.windowId, (ITankSyncable) this.inventoryTile, array.toIntArray()), (EntityPlayer) listener);
+					TTr.network.sendToPlayer(new PacketFluidUpdateSingle(this.windowId, (ITankSyncable) this.inventoryTile, array), (EntityPlayer) listener);
 				}
 			}
-			for(int i : array.toIntArray())
+			for(int i : array)
 			{
 				for(i = 0; i < this.fluidSlotList.size(); ++i)
 				{

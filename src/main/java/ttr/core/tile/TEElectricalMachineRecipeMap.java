@@ -110,7 +110,7 @@ public abstract class TEElectricalMachineRecipeMap extends TEMachineRecipeMap im
 	@Override
 	public double injectEnergy(EnumFacing directionFrom, double amount, double voltage)
 	{
-		if(amount / voltage > getMaxVoltage())
+		if(voltage > getMaxVoltage())
 		{
 			onOverpowered(amount, voltage);
 			return 0;
@@ -176,7 +176,7 @@ public abstract class TEElectricalMachineRecipeMap extends TEMachineRecipeMap im
 		}
 		else
 		{
-			this.worldObj.createExplosion(null, this.pos.getX() + .5, this.pos.getY() + .5, this.pos.getZ() + .5, (float) (amount / voltage - getMaxVoltage()) / 100F + 3, true);
+			this.worldObj.createExplosion(null, this.pos.getX() + .5, this.pos.getY() + .5, this.pos.getZ() + .5, (float) (voltage * voltage - getMaxVoltage() * getMaxVoltage()) / 100F + 3, true);
 		}
 	}
 	

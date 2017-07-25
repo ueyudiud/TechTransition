@@ -41,13 +41,13 @@ public class BlockFluidPipe1a extends BlockFluidPipeAbstract
 	{
 		return getDefaultState().withProperty(MATERIAL, PipeMaterial.values()[meta]);
 	}
-
+	
 	@Override
 	public float getPipeSize()
 	{
 		return 0.375F;
 	}
-
+	
 	@Override
 	@SideOnly(Side.CLIENT)
 	public void getSubBlocks(Item itemIn, CreativeTabs tab, List<ItemStack> list)
@@ -60,7 +60,7 @@ public class BlockFluidPipe1a extends BlockFluidPipeAbstract
 		list.add(new ItemStack(itemIn, 1, 5));
 		list.add(new ItemStack(itemIn, 1, 6));
 	}
-
+	
 	@Override
 	public TileEntity createTileEntity(World world, IBlockState state)
 	{

@@ -44,7 +44,7 @@ public class JEIIntegration implements IModPlugin
 	public void register(IModRegistry registry)
 	{
 		registry.addRecipeHandlers(new TTrRecipeHandlerTemplate());
-		addRecipeMapDisplay(registry, TemplateRecipeMap.SMELTING, new ResourceLocation("ttr", "textures/gui/JEI/furnace.png"), new int[][]{{56, 17}}, new int[][]{{116, 35}}, new ItemStack(TTrIBF.furnace, 1, 0), new ItemStack(TTrIBF.furnace, 1, 1), new ItemStack(TTrIBF.furnace, 1, 2));
+		addRecipeMapDisplay(registry, TemplateRecipeMap.SMELTING, new ResourceLocation("ttr", "textures/gui/JEI/furnace.png"), new int[][]{{56, 17}}, new int[][]{{116, 35}}, new ItemStack(TTrIBF.furnace, 1, 0), new ItemStack(TTrIBF.furnace, 1, 1), new ItemStack(TTrIBF.furnace, 1, 2), new ItemStack(TTrIBF.electricMachine1, 1, MachineType3.FURNACE.ordinal()));
 		
 		addRecipeMapDisplay(registry, TemplateRecipeMap.CAULDRON_SOLUTE, new ResourceLocation("ttr", "textures/gui/JEI/cauldron.png"), new int[][]{{35, 24}}, new int[][]{{71, 24}}, new int[][]{{53, 42}}, new int[][]{{99, 42}}, new ItemStack(TTrIBF.cauldron));
 		addRecipeMapDisplay(registry, TemplateRecipeMap.CAULDRON_WASHING, new ResourceLocation("ttr", "textures/gui/JEI/cauldron.png"), new int[][]{{35, 24}}, new int[][]{{71, 24}, {89, 24}, {107, 24}}, new int[][]{{53, 42}}, new int[0][], new ItemStack(TTrIBF.cauldron));

@@ -264,7 +264,8 @@ public class Util
 							return true;
 						}
 					}
-					if(handler.canInsertItem())
+					if (!heldItem.getItem().isItemTool(heldItem) &&
+							handler.canInsertItem())
 					{
 						int size = handler.tryInsertItem(heldItem.copy(), facing, false);
 						if(size > 0)

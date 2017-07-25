@@ -14,6 +14,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTTagString;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumFacing.Axis;
 import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -76,7 +77,7 @@ public class TEMachineBase extends TESynchronization implements IPluginAccess
 	@Override
 	public NBTTagCompound writeToNBT(NBTTagCompound nbt)
 	{
-		nbt.setByte("facing", (byte) this.facing.ordinal());
+		nbt.setByte("facing", (byte) this.facing.getIndex());
 		nbt.setLong("currentState", this.currentState);
 		NBTTagList list = new NBTTagList();
 		for (int i = 0; i < this.facings.length; ++i)
@@ -113,7 +114,7 @@ public class TEMachineBase extends TESynchronization implements IPluginAccess
 	public void writeToDescription(NBTTagCompound nbt)
 	{
 		super.writeToDescription(nbt);
-		nbt.setByte("f", (byte) this.facing.ordinal());
+		nbt.setByte("f", (byte) this.facing.getIndex());
 		nbt.setLong("s", this.currentState);
 		NBTTagList list = new NBTTagList();
 		for (int i = 0; i < this.facings.length; ++i)
@@ -131,7 +132,10 @@ public class TEMachineBase extends TESynchronization implements IPluginAccess
 	{
 		boolean flag = false;
 		super.readFromDescription(nbt);
-		this.facing = EnumFacing.VALUES[nbt.getByte("f")];
+		if (nbt.getByte("f") == 0)
+			this.facing = EnumFacing.NORTH;
+		else
+			this.facing = EnumFacing.VALUES[nbt.getByte("f")];
 		long state = nbt.getLong("s");
 		if(state != this.currentState)
 		{
@@ -223,7 +227,7 @@ public class TEMachineBase extends TESynchronization implements IPluginAccess
 	@Override
 	public EnumFacing getRotation()
 	{
-		return this.facing;
+		return this.facing == null || this.facing.getAxis() == Axis.Y ? EnumFacing.NORTH : this.facing;
 	}
 	
 	@Override

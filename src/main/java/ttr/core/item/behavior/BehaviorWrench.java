@@ -23,7 +23,7 @@ public class BehaviorWrench extends BehaviorBase
 	public EnumActionResult onItemUseFirst(ItemStack stack, EntityPlayer player, World world, BlockPos pos,
 			EnumFacing side, float hitX, float hitY, float hitZ, EnumHand hand)
 	{
-		if(world.isRemote)
+		if (world.isRemote || !player.isSneaking())
 			return EnumActionResult.PASS;
 		IBlockState state = world.getBlockState(pos);
 		state = state.getActualState(world, pos);
@@ -77,11 +77,11 @@ public class BehaviorWrench extends BehaviorBase
 				return EnumActionResult.SUCCESS;
 			}
 			if(flag)
-				return EnumActionResult.FAIL;
+				return EnumActionResult.PASS;
 		}
 		catch(Exception exception)
 		{
-			;
+			return EnumActionResult.PASS;
 		}
 		return super.onItemUseFirst(stack, player, world, pos, side, hitX, hitY, hitZ, hand);
 	}

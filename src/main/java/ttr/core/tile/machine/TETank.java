@@ -59,19 +59,21 @@ public class TETank extends TEMaterialed implements IFluidHandler
 	@Override
 	public boolean hasCapability(Capability<?> capability, EnumFacing facing)
 	{
-		return (capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY && this.tankList != null) || super.hasCapability(capability, facing);
+		return (capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY && (this.tankList != null || isClient())) ||
+				super.hasCapability(capability, facing);
 	}
 	
 	@Override
 	public <T> T getCapability(Capability<T> capability, EnumFacing facing)
 	{
-		return (capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY && this.tankList != null) ? CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY.cast(this) : super.getCapability(capability, facing);
+		return (capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY && (this.tankList != null || isClient())) ?
+				CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY.cast(this) : super.getCapability(capability, facing);
 	}
 	
 	@Override
 	public IFluidTankProperties[] getTankProperties()
 	{
-		return new IFluidTankProperties[0]; //Not applicable.
+		return this.tankList != null ? this.tankList[0].getTankProperties() : new IFluidTankProperties[0]; //Not applicable.
 	}
 	
 	@Override

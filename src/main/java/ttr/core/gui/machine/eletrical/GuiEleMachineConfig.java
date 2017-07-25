@@ -51,6 +51,12 @@ public class GuiEleMachineConfig extends GuiContainerBase
 	}
 	
 	@Override
+	protected boolean renderInventoryText()
+	{
+		return false;
+	}
+	
+	@Override
 	public ResourceLocation getResourceLocation()
 	{
 		return new ResourceLocation("ttr", "textures/gui/machine/electric/config.png");

@@ -70,6 +70,7 @@ import ttr.core.item.behavior.BehaviorHoe;
 import ttr.core.item.behavior.BehaviorKnockbackApply;
 import ttr.core.item.behavior.BehaviorWrench;
 import ttr.core.item.stat.ToolSoftHammer;
+import ttr.core.render.TESRFluidPipe;
 import ttr.core.tile.TEOre;
 import ttr.core.tile.boiler.TECoalBoiler;
 import ttr.core.tile.electric.TEElectricalAlloySmelter;
@@ -325,6 +326,18 @@ public class TTrIBF
 		{
 			ore_washed_water = new FluidTTr("ore_washed_water").setDensity(1200).setViscosity(1100).setTemperature(350);
 		}
+		EnumMaterial.CarbonDioxide.gas = FluidRegistry.getFluid("gas.carbondioxide");
+		if (EnumMaterial.CarbonDioxide.gas == null)
+		{
+			EnumMaterial.CarbonDioxide.gas = new FluidTTr("gas.carbondioxide")
+					.setDensity(10).setViscosity(40).setTemperature(298).setGaseous(true);
+		}
+		EnumMaterial.CarbonMonoxide.gas = FluidRegistry.getFluid("gas.carbonmonoxide");
+		if (EnumMaterial.CarbonMonoxide.gas == null)
+		{
+			EnumMaterial.CarbonMonoxide.gas = new FluidTTr("gas.carbonmonoxide")
+					.setDensity(1).setViscosity(26).setTemperature(298).setGaseous(true);
+		}
 		
 		marble = new BlockRock(EnumMaterial.Marble);
 		
@@ -374,6 +387,8 @@ public class TTrIBF
 	@SideOnly(Side.CLIENT)
 	public static void registerRneder()
 	{
+		TESRFluidPipe.registerTESR();
+		
 		ItemMeshDefinition definition = (ItemStack stack) ->
 		new ModelResourceLocation("ttr:tool", "type=" + tool.getName(stack));
 		ModelLoader.setCustomMeshDefinition(tool, definition);
@@ -454,6 +469,7 @@ public class TTrIBF
 	public void onIconMapReload(TextureStitchEvent.Pre event)
 	{
 		FluidTTr.registerTextures(event.getMap());
+		TESRFluidPipe.registerTextures(event.getMap());
 	}
 	
 	@SideOnly(Side.CLIENT)

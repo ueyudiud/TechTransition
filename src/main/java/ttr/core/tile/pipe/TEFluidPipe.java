@@ -23,7 +23,7 @@ public class TEFluidPipe extends TESynchronization
 	{
 		public FluidPipeHanlerWrapper(EnumFacing facing)
 		{
-			super(facing, tank);
+			super(facing, TEFluidPipe.this.tank);
 		}
 		
 		@Override
@@ -31,11 +31,11 @@ public class TEFluidPipe extends TESynchronization
 		{
 			if(resource == null) return 0;
 			resource = resource.copy();
-			resource.amount = Math.min(resource.amount, flowSpeed - fluidIOAmount);
+			resource.amount = Math.min(resource.amount, TEFluidPipe.this.flowSpeed - TEFluidPipe.this.fluidIOAmount);
 			int amt = super.fill(resource, doFill);
 			if(doFill)
 			{
-				flowAmount[facing.ordinal()] -= amt;
+				TEFluidPipe.this.flowAmount[this.facing.ordinal()] -= amt;
 				//				fluidIOAmount += amt;
 			}
 			return amt;
@@ -46,12 +46,12 @@ public class TEFluidPipe extends TESynchronization
 		{
 			if(resource == null) return null;
 			resource = resource.copy();
-			resource.amount = Math.min(resource.amount, flowSpeed - fluidIOAmount);
+			resource.amount = Math.min(resource.amount, TEFluidPipe.this.flowSpeed - TEFluidPipe.this.fluidIOAmount);
 			FluidStack stack = super.drain(resource, doDrain);
-			if(doDrain && stack != null && facing != null)
+			if(doDrain && stack != null && this.facing != null)
 			{
-				flowAmount[facing.ordinal()] += stack.amount;
-				fluidIOAmount += stack.amount;
+				TEFluidPipe.this.flowAmount[this.facing.ordinal()] += stack.amount;
+				TEFluidPipe.this.fluidIOAmount += stack.amount;
 			}
 			return stack;
 		}
@@ -60,72 +60,74 @@ public class TEFluidPipe extends TESynchronization
 		public FluidStack drain(int maxDrain, boolean doDrain)
 		{
 			if(maxDrain == 0) return null;
-			maxDrain = Math.min(maxDrain, flowSpeed - fluidIOAmount);
+			maxDrain = Math.min(maxDrain, TEFluidPipe.this.flowSpeed - TEFluidPipe.this.fluidIOAmount);
 			FluidStack stack = super.drain(maxDrain, doDrain);
-			if(doDrain && stack != null && facing != null)
+			if(doDrain && stack != null && this.facing != null)
 			{
-				flowAmount[facing.ordinal()] += stack.amount;
-				fluidIOAmount += stack.amount;
+				TEFluidPipe.this.flowAmount[this.facing.ordinal()] += stack.amount;
+				TEFluidPipe.this.fluidIOAmount += stack.amount;
 			}
 			return stack;
 		}
 	}
-
+	
 	private final IFluidHandler[] handlers;
 	
 	protected final long maxTemperature;
 	protected final boolean canCurrentGas;
 	protected final int flowSpeed;
+	public final short size;
 	protected FluidTank tank;
 	protected byte sideLink = (byte) 0x3F;
 	protected int fluidIOAmount;
 	protected int[] lastFlowAmount = new int[6];
 	protected int[] flowAmount = new int[6];
-
-	public TEFluidPipe(int capacity, long maxTemperature, boolean canCurrentGas, int flowSpeed)
+	
+	public TEFluidPipe(int capacity, int size, long maxTemperature, boolean canCurrentGas, int flowSpeed)
 	{
-		tank = new FluidTank(capacity);
+		this.size = (short) size;
+		this.tank = new FluidTank(capacity);
 		this.maxTemperature = maxTemperature;
 		this.canCurrentGas = canCurrentGas;
 		this.flowSpeed = flowSpeed;
-		handlers = new IFluidHandler[EnumFacing.VALUES.length];
-		for(int i = 0; i < handlers.length; ++i)
+		this.handlers = new IFluidHandler[EnumFacing.VALUES.length];
+		for(int i = 0; i < this.handlers.length; ++i)
 		{
-			handlers[i] = new FluidPipeHanlerWrapper(EnumFacing.VALUES[i]);
+			this.handlers[i] = new FluidPipeHanlerWrapper(EnumFacing.VALUES[i]);
 		}
 	}
-
+	
 	@Override
 	public void readFromNBT(NBTTagCompound nbt)
 	{
 		super.readFromNBT(nbt);
-		tank.readFromNBT(nbt.getCompoundTag("tank"));
-		sideLink = nbt.getByte("sideLink");
+		this.tank.readFromNBT(nbt.getCompoundTag("tank"));
+		this.sideLink = nbt.getByte("sideLink");
 	}
-
+	
 	@Override
 	public NBTTagCompound writeToNBT(NBTTagCompound nbt)
 	{
-		nbt.setTag("tank", tank.writeToNBT(new NBTTagCompound()));
-		nbt.setByte("sideLink", sideLink);
+		nbt.setTag("tank", this.tank.writeToNBT(new NBTTagCompound()));
+		nbt.setByte("sideLink", this.sideLink);
 		return super.writeToNBT(nbt);
 	}
-
+	
 	protected boolean isFluidCanStayInPipe(Fluid fluid, FluidStack stack)
 	{
-		return (canCurrentGas || !fluid.isGaseous(stack));
+		return (this.canCurrentGas || !fluid.isGaseous(stack));
 	}
-
+	
 	protected boolean isFluidCanDestoryPipe(Fluid fluid, FluidStack stack)
 	{
 		return false;
 	}
-
+	
 	public boolean isLink(EnumFacing facing)
 	{
 		if(isSideLinkable(facing))
 		{
-			TileEntity tile = worldObj.getTileEntity(pos.offset(facing));
+			TileEntity tile = this.worldObj.getTileEntity(this.pos.offset(facing));
 			if(tile != null && tile.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, facing.getOpposite()))
 				return true;
 		}
@@ -134,31 +136,31 @@ public class TEFluidPipe extends TESynchronization
 	
 	protected boolean isSideLinkable(EnumFacing facing)
 	{
-		return (sideLink & (1 << facing.ordinal())) != 0;
+		return (this.sideLink & (1 << facing.ordinal())) != 0;
 	}
 	
 	public void switchLink(EnumFacing facing)
 	{
-		sideLink ^= (1 << facing.ordinal());
+		this.sideLink ^= (1 << facing.ordinal());
 		syncToNearby();
 	}
-
+	
 	@Override
 	protected void updateServer()
 	{
-		System.arraycopy(flowAmount, 0, lastFlowAmount, 0, 6);
-		Arrays.fill(flowAmount, 0);
-		fluidIOAmount = 0;
+		System.arraycopy(this.flowAmount, 0, this.lastFlowAmount, 0, 6);
+		Arrays.fill(this.flowAmount, 0);
+		this.fluidIOAmount = 0;
 		super.updateServer();
 		if(checkPipe())
 		{
 			flowFluidToNearby();
 		}
 	}
-
+	
 	protected boolean checkPipe()
 	{
-		FluidStack stack = tank.getFluid();
+		FluidStack stack = this.tank.getFluid();
 		if(stack != null)
 		{
 			if(isFluidCanDestoryPipe(stack.getFluid(), stack))
@@ -166,11 +168,11 @@ public class TEFluidPipe extends TESynchronization
 				removeBlock();
 				return false;
 			}
-			else if(stack.getFluid().getTemperature(stack) > maxTemperature)
+			else if(stack.getFluid().getTemperature(stack) > this.maxTemperature)
 			{
-				if(Blocks.FIRE.canPlaceBlockAt(worldObj, pos))
+				if(Blocks.FIRE.canPlaceBlockAt(this.worldObj, this.pos))
 				{
-					worldObj.setBlockState(pos, Blocks.FIRE.getDefaultState());
+					this.worldObj.setBlockState(this.pos, Blocks.FIRE.getDefaultState());
 				}
 				else
 				{
@@ -178,9 +180,9 @@ public class TEFluidPipe extends TESynchronization
 				}
 				return false;
 			}
-			else if(isFluidCanStayInPipe(stack.getFluid(), stack))
+			else if(!isFluidCanStayInPipe(stack.getFluid(), stack))
 			{
-				tank.setFluid(null);
+				this.tank.setFluid(null);
 				return false;
 			}
 		}
@@ -192,14 +194,14 @@ public class TEFluidPipe extends TESynchronization
 		List<EnumFacing> allowed = new ArrayList(6);
 		for(EnumFacing facing : EnumFacing.VALUES)
 		{
-			if(isLink(facing) && lastFlowAmount[facing.ordinal()] >= 0)
+			if(isLink(facing) && this.lastFlowAmount[facing.ordinal()] >= 0)
 			{
 				allowed.add(facing);
 			}
 		}
 		if(allowed.size() == 0) return;
 		int[] suggestedFlow = new int[allowed.size()];
-		int average = (flowSpeed - fluidIOAmount) / allowed.size();
+		int average = (this.flowSpeed - this.fluidIOAmount) / allowed.size();
 		int total = 0;
 		int last;
 		int now;
@@ -215,13 +217,13 @@ public class TEFluidPipe extends TESynchronization
 			}
 			EnumFacing facing = allowed.get(now);
 			int id = facing.ordinal();
-			if(lastFlowAmount[id] > 0)
+			if(this.lastFlowAmount[id] > 0)
 			{
-				suggestedFlow[id] -= lastFlowAmount[id];
-				suggestedFlow[id] += lastFlowAmount[allowed.get(last).ordinal()];
+				suggestedFlow[now] -= this.lastFlowAmount[id];
+				suggestedFlow[now] += this.lastFlowAmount[allowed.get(last).ordinal()];
 			}
-			suggestedFlow[id] += average;
-			total += suggestedFlow[id];
+			suggestedFlow[now] += average;
+			total += suggestedFlow[now];
 		}
 		average = (total + allowed.size() - 1) / allowed.size();
 		for(now = 0; now < allowed.size(); ++now)
@@ -240,33 +242,35 @@ public class TEFluidPipe extends TESynchronization
 	
 	protected int tryFlowFluidTo(EnumFacing facing, int amount)
 	{
+		if (this.tank.getFluid() == null || amount <= 0) return 0;
 		TileEntity tile = getTile(facing);
 		if(tile.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, facing.getOpposite()))
 		{
 			IFluidHandler handler = tile.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, facing.getOpposite());
-			FluidStack stack = tank.drain(amount, false);
+			FluidStack stack = this.tank.drain(amount, false);
+			if (stack == null) return 0;
 			if(handler.fill(stack, false) != 0)
 			{
 				int amt = handler.fill(stack, true);
-				handlers[facing.ordinal()].drain(amt, true);
+				this.handlers[facing.ordinal()].drain(amt, true);
 				return amount - amt;
 			}
 		}
 		return amount;
 	}
-
+	
 	@Override
 	public void readFromDescription(NBTTagCompound nbt)
 	{
 		super.readFromDescription(nbt);
-		sideLink = nbt.getByte("sl");
+		this.sideLink = nbt.getByte("sl");
 	}
-
+	
 	@Override
 	public void writeToDescription(NBTTagCompound nbt)
 	{
 		super.writeToDescription(nbt);
-		nbt.setByte("sl", sideLink);
+		nbt.setByte("sl", this.sideLink);
 	}
 	
 	@Override
@@ -275,12 +279,12 @@ public class TEFluidPipe extends TESynchronization
 		return (capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY && isSideLinkable(facing)) ||
 				super.hasCapability(capability, facing);
 	}
-
+	
 	@Override
 	public <T> T getCapability(Capability<T> capability, EnumFacing facing)
 	{
 		if(capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY)
-			return (T) handlers[facing.ordinal()];
+			return (T) this.handlers[facing.ordinal()];
 		return super.getCapability(capability, facing);
 	}
 }

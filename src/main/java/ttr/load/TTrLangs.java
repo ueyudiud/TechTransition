@@ -121,6 +121,8 @@ public class TTrLangs
 		b(TTrIBF.electricMachine1, 12, "Electrical Ore Washer");
 		b(TTrIBF.electricMachine1, 13, "Electrical Pyrolysisor");
 		
+		b(TTrIBF.turbine, 0, "Small Steam Turbine");
+		
 		LanguageManager.registerLocal(forge, "Forge");
 		
 		LanguageManager.registerLocal(boilerCoalBronze, "Bronze Coal Boiler");

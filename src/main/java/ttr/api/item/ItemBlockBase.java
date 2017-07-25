@@ -5,7 +5,9 @@ package ttr.api.item;
 
 import net.minecraft.block.Block;
 import net.minecraft.item.ItemBlock;
+import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.registry.GameRegistry;
+import ttr.api.block.IBlockName;
 
 /**
  * Created at 2016年12月20日 下午10:53:08
@@ -25,6 +27,13 @@ public class ItemBlockBase extends ItemBlock
 			setRegistryName(name);
 			GameRegistry.register(this);
 		}
+	}
+	
+	@Override
+	public String getItemStackDisplayName(ItemStack stack)
+	{
+		return this.block instanceof IBlockName ? ((IBlockName) this.block).getBlockDisplayName(stack) :
+			super.getItemStackDisplayName(stack);
 	}
 	
 	@Override

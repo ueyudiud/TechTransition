@@ -158,11 +158,6 @@ public class BlockMachine extends Block implements ITileEntityProvider, IWrencha
 			EnumHand hand, ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ)
 	{
 		TileEntity tile = worldIn.getTileEntity(pos);
-		if(tile instanceof TEMachineBase)
-		{
-			if(((TEMachineBase) tile).onActived(playerIn, hand, heldItem, side, hitX, hitY, hitZ))
-				return true;
-		}
 		return Util.onTileActivatedGeneral(playerIn, hand, heldItem, side, hitX, hitY, hitZ, tile);
 	}
 	

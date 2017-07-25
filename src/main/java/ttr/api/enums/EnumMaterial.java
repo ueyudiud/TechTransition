@@ -191,7 +191,9 @@ public class EnumMaterial implements ISubTagContainer
 	CuprousOxide		= new EnumMaterial(2401, TextureSet.RUBY     , 1|2                              , "CuprousOxide", "CuprousOxide", "Cuprous Oxide", 0xAF2424FF),
 	CupricOxide			= new EnumMaterial(2402, TextureSet.DULL     , 1                                , "CupricOxide", "CupricOxide", "Cupric Oxide", 0x110303FF),
 	//Chloride
-	
+	//Carbonate
+	LithiumCarbonate	= new EnumMaterial(4001, TextureSet.DULL     , 1                                , "LithiumCarbonate", "LithiumCarbonate", "Lithium Carbonate", 0xEFEFEFFF),
+	SodiumCarbonate		= new EnumMaterial(4002, TextureSet.DULL     , 1                                , "SodiumCarbonate", "SodiumCarbonate", "Sodium Carbonate", 0xEFEFEFFF),
 	//Alloy
 	Bronze				= new EnumMaterial(6001, TextureSet.METALLIC , 1  |4|8                          , "Bronze", "Bronze", "Bronze", 0xE5651BFF),
 	Brass				= new EnumMaterial(6002, TextureSet.METALLIC , 1  |4|8                          , "Brass", "Brass", "Brass", 0xE5B91BFF),
@@ -214,7 +216,11 @@ public class EnumMaterial implements ISubTagContainer
 	
 	Marble				= new EnumMaterial(9001, TextureSet.ROCKY    , 1                                , "Marble", "Marble", "Marble", 0xE2E6F0FF).setChemicalFormula("CaCO3").setBlockProperties(0, 1.0F, 8.0F),
 	Stone				= new EnumMaterial(9002, TextureSet.ROCKY    , 1                                , "Stone", "Stone", "Stone", 0xCECECEFF).setBlockProperties(0, 3.0F, 10.0F),
-	Netherrack			= new EnumMaterial(9003, TextureSet.ROCKY    , 1                                , "Netherrack", "Netherrack", "Netherrack", 0x931313FF).setBlockProperties(0, 0.5F, 5.0F);
+	Netherrack			= new EnumMaterial(9003, TextureSet.ROCKY    , 1                                , "Netherrack", "Netherrack", "Netherrack", 0x931313FF).setBlockProperties(0, 0.5F, 5.0F),
+	
+	Ruby				= new EnumMaterial(10001,TextureSet.RUBY     , 1|2    |16                       , "Ruby", "Ruby", "Ruby", 0xE21B39FF),
+	Sapphire			= new EnumMaterial(10002,TextureSet.VERTICAL , 1|2    |16                       , "Sappire", "Sappire", "Sappire", 0x0029DEFF),
+	Emerald				= new EnumMaterial(10003,TextureSet.EMERALD  , 1|2    |16                       , "Emerald", "Emerald", "Emerald", 0xFFFFFFFF);
 	
 	static
 	{
@@ -262,8 +268,11 @@ public class EnumMaterial implements ISubTagContainer
 		Stone.tankCapacity = 1200;
 		Marble.tankCapacity = 1500;
 		
-		final EnumMaterial Peroxide = new EnumMaterial(-1, TextureSet.NONE, 0, "Peroxide", "Peroxide", "Peroxide", 0xFFFFFFFF);
+		final EnumMaterial
+		Peroxide = new EnumMaterial(-1, TextureSet.NONE, 0, "Peroxide", "Peroxide", "Peroxide", 0xFFFFFFFF),
+		Carbonate = new EnumMaterial(-1, TextureSet.NONE, 0, "Carbonate", "Carbonate", "Carbonate", 0xFFFFFFFF);
 		Peroxide.setContain(new MaterialStack(OxygenRadicals, 2));
+		Carbonate.setContain(new MaterialStack(Carbon, 1), new MaterialStack(OxygenRadicals, 3));
 		
 		Water.setContain(new MaterialStack(HydrogenRadicals, 2), new MaterialStack(OxygenRadicals, 1));
 		Ice.setContain(new MaterialStack(Water, 1));
@@ -316,6 +325,12 @@ public class EnumMaterial implements ISubTagContainer
 		CupricOxide.setContain(new MaterialStack(Copper, 1), new MaterialStack(OxygenRadicals, 1));
 		
 		DichlorineMonoxide.setContain(new MaterialStack(ChlorineRadicals, 2), new MaterialStack(OxygenRadicals, 1));
+		
+		LithiumCarbonate.setContain(new MaterialStack(Lithium, 2), new MaterialStack(Carbonate, 1));
+		SodiumCarbonate.setContain(new MaterialStack(Sodium, 2), new MaterialStack(Carbonate, 1));
+		
+		Ruby.setContain(new MaterialStack(AluminiumOxide, 3), new MaterialStack(Chromium, 1));
+		Sapphire.setContain(new MaterialStack(AluminiumOxide, 3), new MaterialStack(Titanium, 1));
 		
 		Ice.meltingPoint = Water.meltingPoint = 273;
 		Ice.boilingPoint = Water.boilingPoint = 373;

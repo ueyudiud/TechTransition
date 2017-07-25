@@ -76,6 +76,7 @@ public class TTrRecipeRemove
 				IC2Items.getItem("te", "blast_furnace"), IC2Items.getItem("te", "electric_furnace"),
 				IC2Items.getItem("te", "ore_washing_plant"), IC2Items.getItem("te", "metal_former"),
 				IC2Items.getItem("te", "itnt"), IC2Items.getItem("fence", "iron"),
+				IC2Items.getItem("dust", "energium"),
 				Blocks.IRON_BARS, Blocks.IRON_BLOCK, Blocks.GOLD_BLOCK, Blocks.HOPPER, Items.CAULDRON,
 				Blocks.GLASS_PANE, Blocks.REDSTONE_BLOCK, Blocks.HEAVY_WEIGHTED_PRESSURE_PLATE, Blocks.LIGHT_WEIGHTED_PRESSURE_PLATE,
 				Items.IRON_DOOR,
@@ -129,7 +130,7 @@ public class TTrRecipeRemove
 	
 	public static void removeAll()
 	{
-		for(Entry<ItemStack, ItemStack> entry : new ArrayList<Entry<ItemStack, ItemStack>>(FurnaceRecipes.instance().getSmeltingList().entrySet()))
+		for(Entry<ItemStack, ItemStack> entry : new ArrayList<>(FurnaceRecipes.instance().getSmeltingList().entrySet()))
 		{
 			ItemStack input = entry.getKey();
 			for(AbstractStack stack : smeltingInputRemoveList)

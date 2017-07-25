@@ -14,13 +14,16 @@ import ttr.core.TTrMaterialHandler;
 
 public class TTrMaterialsRecipes
 {
-	private static final AbstractStack[] EMPTY_ITEM_STACK = {};
-	private static final FluidStack[] EMPTY_FLUID_STACK = {};
+	//	private static final AbstractStack[] EMPTY_ITEM_STACK = {};
+	//	private static final FluidStack[] EMPTY_FLUID_STACK = {};
 	
 	public static void init()
 	{
 		OreDictionary.registerOre("plateAdvancedCarbon", IC2Items.getItem("crafting", "carbon_plate"));
 		OreDictionary.registerOre("plateAdvancedAlloy", IC2Items.getItem("crafting", "alloy"));
+		
+		TemplateRecipeMap.BRONZE_COMPRESS.addRecipe(new BaseStack(IC2Items.getItem("ingot", "alloy")), 100, 200, new OreStack("plateAdvancedAlloy"));
+		TemplateRecipeMap.COMPRESS.addRecipe(new BaseStack(IC2Items.getItem("ingot", "alloy")), 200, 80, new OreStack("plateAdvancedAlloy"));
 		
 		BaseStack blastAsh = new BaseStack(TTrMaterialHandler.getItemStack(EnumOrePrefix.dust, EnumMaterial.BlastAsh, 4));
 		TemplateRecipeMap.BRONZE_BLAST.addRecipe(new AbstractStack[]{new OreStack("ingotIron"), new OreStack("gemCharcoal", 4)}, 3600, 1, new AbstractStack[]{new BaseStack(TTrMaterialHandler.getItemStack(EnumOrePrefix.ingot, EnumMaterial.Steel, 1)), blastAsh});
@@ -35,5 +38,8 @@ public class TTrMaterialsRecipes
 		TemplateRecipeMap.FORGE.addRecipe(new AbstractStack[]{new OreStack("dustMagnetite", 7), new OreStack("dustCoal", 2), new OreStack("dustCalcite")}, new AbstractStack[]{new OreStack("dustIron", 4)}, 4000, 20, 1000);
 		TemplateRecipeMap.FORGE.addRecipe(new AbstractStack[]{new OreStack("dustLimonite", 8), new OreStack("dustCoal"), new OreStack("dustMarble")}, new AbstractStack[]{new OreStack("dustIron", 2)}, 2000, 20, 1000);
 		TemplateRecipeMap.FORGE.addRecipe(new AbstractStack[]{new OreStack("dustLimonite", 8), new OreStack("dustCoal"), new OreStack("dustCalcite")}, new AbstractStack[]{new OreStack("dustIron", 2)}, 2000, 20, 1000);
+		
+		TemplateRecipeMap.PYROLYSIS.addRecipe(new OreStack(EnumOrePrefix.dust.getDictName(EnumMaterial.SodiumCarbonate), 2), 720, 192, new OreStack(EnumOrePrefix.dust.getDictName(EnumMaterial.SodiumOxide)), new FluidStack(EnumMaterial.CarbonDioxide.gas, 1000));
+		TemplateRecipeMap.PYROLYSIS.addRecipe(new OreStack(EnumOrePrefix.dust.getDictName(EnumMaterial.LithiumCarbonate), 2), 360, 160, new OreStack(EnumOrePrefix.dust.getDictName(EnumMaterial.LithiumOxide)), new FluidStack(EnumMaterial.CarbonDioxide.gas, 1000));
 	}
 }

@@ -34,13 +34,13 @@ implements IContainerableTile
 	public TEBronzeCompressor()
 	{
 		super(1, 1, 0, 0);
-		inventory = new Inventory(1, TTrLangs.steamCompressor, 64);
+		this.inventory = new Inventory(1, TTrLangs.steamCompressor, 64);
 	}
 	
 	@Override
 	public NBTTagCompound writeToNBT(NBTTagCompound nbt)
 	{
-		nbt.setLong("pressure", pressure);
+		nbt.setLong("pressure", this.pressure);
 		return super.writeToNBT(nbt);
 	}
 	
@@ -48,7 +48,7 @@ implements IContainerableTile
 	public void readFromNBT(NBTTagCompound nbt)
 	{
 		super.readFromNBT(nbt);
-		pressure = nbt.getLong("pressure");
+		this.pressure = nbt.getLong("pressure");
 	}
 	
 	@Override
@@ -60,7 +60,7 @@ implements IContainerableTile
 	@Override
 	protected boolean checkStructure()
 	{
-		hatchs.clear();
+		this.hatchs.clear();
 		EnumFacing facing = getRotation().getOpposite();
 		MutableBlockPos pos1 = new MutableBlockPos();
 		for(int i = 0; i <= 2; ++i)
@@ -74,64 +74,64 @@ implements IContainerableTile
 						continue;
 					}
 					pos1.setPos(
-							pos.getX() + facing.getFrontOffsetX() * i + facing.getFrontOffsetZ() * k,
-							pos.getY() + j,
-							pos.getZ() + facing.getFrontOffsetZ() * i + facing.getFrontOffsetX() * k);
+							this.pos.getX() + facing.getFrontOffsetX() * i + facing.getFrontOffsetZ() * k,
+							this.pos.getY() + j,
+							this.pos.getZ() + facing.getFrontOffsetZ() * i + facing.getFrontOffsetX() * k);
 					if(k == 0 && i == 1 && j == 0)
 					{
-						if(!worldObj.isAirBlock(pos1))
+						if(!this.worldObj.isAirBlock(pos1))
 							return false;
 						continue;
 					}
 					if(i == 1 || j == 0 || k == 1)
 					{
-						TileEntity tile = worldObj.getTileEntity(pos1);
+						TileEntity tile = this.worldObj.getTileEntity(pos1);
 						if(tile != null)
 						{
 							if(!(tile instanceof ISteamInputHatch))
 								return false;
-							hatchs.add((ISteamInputHatch) tile);
+							this.hatchs.add((ISteamInputHatch) tile);
 							continue;
 						}
 					}
-					IBlockState state = worldObj.getBlockState(pos1);
+					IBlockState state = this.worldObj.getBlockState(pos1);
 					if(state != BlockBrick.BRONZE)
 						return false;
 				}
 			}
 		}
-		return !hatchs.isEmpty();
+		return !this.hatchs.isEmpty();
 	}
-
+	
 	@Override
 	protected void checkRecipe()
 	{
 		int input = 0;
-		if (!hatchs.isEmpty())
+		if (!this.hatchs.isEmpty())
 		{
-			for(ISteamInputHatch hatch : hatchs)
+			for(ISteamInputHatch hatch : this.hatchs)
 			{
-				input += hatch.inputSteam((int) (pressure / 100 + 1), true);
+				input += hatch.inputSteam((int) (this.pressure / 100 + 1), true);
 			}
-			hatchs.clear();
+			this.hatchs.clear();
 		}
-		if (pressure < MAX_PRESSURE &&  input * 100 > pressure)
+		if (this.pressure < MAX_PRESSURE && input * 100 > this.pressure)
 		{
-			pressure += (input * 100 - pressure) / 100 + 1;
+			this.pressure += (input * 100 - this.pressure) / 100 + 1;
 		}
-		else if(pressure > 0 && input * 200 < pressure)
+		else if(this.pressure > 0 && input * 200 < this.pressure)
 		{
-			pressure -= pressure / 100 + 1;
+			this.pressure -= (this.pressure - input * 200) / 100 + 1;
 		}
 		super.checkRecipe();
 	}
-
+	
 	@Override
 	protected void onMissingStructure()
 	{
 		super.onMissingStructure();
 		initRecipeOutput();
-		pressure = 0;
+		this.pressure = 0;
 	}
 	
 	@Override
@@ -139,11 +139,11 @@ implements IContainerableTile
 	{
 		return TemplateRecipeMap.BRONZE_COMPRESS;
 	}
-
+	
 	@Override
 	protected boolean useEnergy()
 	{
-		return pressure >= minPower;
+		return this.pressure >= this.minPower * 100;
 	}
 	
 	@Override
@@ -155,7 +155,7 @@ implements IContainerableTile
 	@Override
 	protected long getPower()
 	{
-		return pressure;
+		return this.pressure / 100;
 	}
 	
 	@Override
@@ -169,12 +169,12 @@ implements IContainerableTile
 	{
 		switch (id)
 		{
-		case 0 : return (int) (duration & 0xFFFFFFFF);
-		case 1 : return (int) ((duration >> 32) & 0xFFFFFFFF);
-		case 2 : return (int) (maxDuration & 0xFFFFFFFF);
-		case 3 : return (int) ((maxDuration >> 32) & 0xFFFFFFFF);
-		case 4 : return (int) (pressure & 0xFFFFFFFF);
-		case 5 : return (int) ((pressure >> 32) & 0xFFFFFFFF);
+		case 0 : return (int) (this.duration & 0xFFFFFFFF);
+		case 1 : return (int) ((this.duration >> 32) & 0xFFFFFFFF);
+		case 2 : return (int) (this.maxDuration & 0xFFFFFFFF);
+		case 3 : return (int) ((this.maxDuration >> 32) & 0xFFFFFFFF);
+		case 4 : return (int) (this.pressure & 0xFFFFFFFF);
+		case 5 : return (int) ((this.pressure >> 32) & 0xFFFFFFFF);
 		default: return 0;
 		}
 	}
@@ -184,19 +184,19 @@ implements IContainerableTile
 	{
 		switch(id)
 		{
-		case 0 : duration &= 0xFFFFFFFF00000000L; duration |= value; break;
-		case 1 : duration &= 0xFFFFFFFFL; duration |= value << 32; break;
-		case 2 : maxDuration &= 0xFFFFFFFF00000000L; maxDuration |= value; break;
-		case 3 : maxDuration &= 0xFFFFFFFFL; maxDuration |= value << 32; break;
-		case 4 : pressure &= 0xFFFFFFFF00000000L; pressure |= value; break;
-		case 5 : pressure &= 0xFFFFFFFFL; pressure |= value << 32; break;
+		case 0 : this.duration &= 0xFFFFFFFF00000000L; this.duration |= value; break;
+		case 1 : this.duration &= 0xFFFFFFFFL; this.duration |= value << 32; break;
+		case 2 : this.maxDuration &= 0xFFFFFFFF00000000L; this.maxDuration |= value; break;
+		case 3 : this.maxDuration &= 0xFFFFFFFFL; this.maxDuration |= value << 32; break;
+		case 4 : this.pressure &= 0xFFFFFFFF00000000L; this.pressure |= value; break;
+		case 5 : this.pressure &= 0xFFFFFFFFL; this.pressure |= value << 32; break;
 		}
 	}
-
+	
 	@SideOnly(Side.CLIENT)
 	public int getPressureProgress(int scale)
 	{
-		return (int) ((double) (pressure * scale) / (double) MAX_PRESSURE);
+		return (int) ((double) (this.pressure * scale) / (double) MAX_PRESSURE);
 	}
 	
 	@Override

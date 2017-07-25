@@ -11,10 +11,15 @@ import java.util.List;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
+import net.minecraftforge.fluids.capability.FluidTankProperties;
+import net.minecraftforge.fluids.capability.IFluidHandler;
+import net.minecraftforge.fluids.capability.IFluidTankProperties;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import ttr.api.util.Util;
@@ -223,10 +228,35 @@ public class TETankBottom extends TETank
 	{
 		super.updateServer();
 		refreshStructure(this.init);
+		if (this.tankList != null)
+		{
+			fillFluidToBottom();
+		}
 		syncToNearby();
 		if(this.init)
 		{
 			this.init = false;
+		}
+	}
+	
+	private void fillFluidToBottom()
+	{
+		if (this.totalGasAmount == 0 && this.totalLiquidAmount == 0) return;
+		TileEntity te = getTile(EnumFacing.DOWN);
+		if (te != null && te.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, EnumFacing.UP))
+		{
+			IFluidHandler handler = te.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, EnumFacing.UP);
+			FluidStack stack = drain(0, 1000, false);
+			if (stack != null)
+			{
+				int amount = handler.fill(stack, true);
+				if (amount > 0)
+				{
+					stack = stack.copy();
+					stack.amount = amount;
+					this.drain(0, stack, true);
+				}
+			}
 		}
 	}
 	
@@ -307,6 +337,13 @@ public class TETankBottom extends TETank
 			}
 			this.marked = false;
 		}
+	}
+	
+	@Override
+	public IFluidTankProperties[] getTankProperties()
+	{
+		return this.tankList != null ? new IFluidTankProperties[]{ new FluidTankProperties(null, this.totalCapacity, true, true) } :
+			new IFluidTankProperties[0];
 	}
 	
 	public int fill(int tankID, FluidStack resource, boolean doFill)
@@ -473,6 +510,7 @@ public class TETankBottom extends TETank
 						{
 							stack.amount -= max;
 						}
+						this.totalGasAmount -= max;
 					}
 					stack = Util.copyAmount(resource, max);
 					return stack;
@@ -501,6 +539,7 @@ public class TETankBottom extends TETank
 						{
 							stack.amount -= max;
 						}
+						this.totalLiquidAmount -= max;
 					}
 					stack = Util.copyAmount(resource, max);
 					return stack;

@@ -31,6 +31,8 @@ public class TextureSet
 	public static final TextureSet SHINY = new TextureSet("shiny");
 	public static final TextureSet DIAMOND = new TextureSet("diamond");
 	public static final TextureSet RUBY = new TextureSet("ruby");
+	public static final TextureSet VERTICAL = new TextureSet("vertical");
+	public static final TextureSet EMERALD = new TextureSet("emerald");
 	public static final TextureSet FLUIDY1 = new TextureSet("fluidy1");//Such as H2
 	public static final TextureSet FLUIDY2 = new TextureSet("fluidy2");//Such as He
 	public static final TextureSet NONMETAL1 = new TextureSet("nonemetal1");//Such as coal
@@ -52,7 +54,9 @@ public class TextureSet
 		putModelLocations(EnumOrePrefix.gem, "flint", FLINT);
 		putModelLocations(EnumOrePrefix.gem, "metallic", METALLIC);
 		putModelLocations(EnumOrePrefix.gem, "diamond", DIAMOND);
+		putModelLocations(EnumOrePrefix.gem, "emerald", EMERALD);
 		putModelLocations(EnumOrePrefix.gem, "ruby", RUBY);
+		putModelLocations(EnumOrePrefix.gem, "rect_vertical", VERTICAL);
 		putModelLocations(EnumOrePrefix.gem, "quartz", QUARTZ);
 		putModelLocations(EnumOrePrefix.gem, "cube", CUBE);
 		putModelLocations(EnumOrePrefix.gem, "cube_shiny", CUBE_SHINY);
@@ -65,7 +69,7 @@ public class TextureSet
 		putModelLocations(EnumOrePrefix.gear, "wooden", WOOD);
 		
 		putModelLocations(EnumOrePrefix.ore, "normal", METALLIC, SHINY, DULL);
-		putModelLocations(EnumOrePrefix.ore, "gem", NONMETAL2, NONMETAL4, DIAMOND, RUBY);
+		putModelLocations(EnumOrePrefix.ore, "gem", NONMETAL2, NONMETAL4, DIAMOND, RUBY, VERTICAL);
 		putModelLocations(EnumOrePrefix.ore, "ven", NONMETAL1, ROCKY, QUARTZ, CUBE, CUBE_SHINY, WHITE);
 		putModelLocations(EnumOrePrefix.plate, "nonmetal", NONMETAL1, NONMETAL2);
 		prefixs = new EnumOrePrefix[]
@@ -75,7 +79,7 @@ public class TextureSet
 			if(prefix != EnumOrePrefix.ingot)
 				putModelLocations(prefix, "shiny", RUBBER);
 			putModelLocations(prefix, "dull", DULL, QUARTZ, CUBE);
-			putModelLocations(prefix, "shiny", SHINY, NONMETAL4, DIAMOND, RUBY, CUBE_SHINY);
+			putModelLocations(prefix, "shiny", SHINY, NONMETAL4, DIAMOND, RUBY, CUBE_SHINY, VERTICAL, EMERALD);
 			putModelLocations(prefix, "metallic", METALLIC, WHITE);
 			putModelLocations(prefix, "rocky", ROCKY);
 		}
@@ -87,7 +91,7 @@ public class TextureSet
 			putModelLocations(prefix, "nonmetal2", NONMETAL4);
 			putModelLocations(prefix, "metallic", METALLIC);
 			putModelLocations(prefix, "dull", DULL, QUARTZ, CUBE);
-			putModelLocations(prefix, "shiny", SHINY, RUBBER, DIAMOND, RUBY, CUBE_SHINY);
+			putModelLocations(prefix, "shiny", SHINY, RUBBER, DIAMOND, RUBY, CUBE_SHINY, VERTICAL, EMERALD);
 			putModelLocations(prefix, "wood", WOOD);
 			putModelLocations(prefix, "white", WHITE);
 		}

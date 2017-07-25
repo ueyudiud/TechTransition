@@ -12,7 +12,9 @@
 			"nonmetal4"   : { "textures": { "layer1": "ttr:items/iconsets/gem_nonmetal4" } },
 			"metallic"    : { "textures": { "layer1": "ttr:items/iconsets/gem_metallic" } },
 			"diamond"     : { "textures": { "layer1": "ttr:items/iconsets/gem_diamond" } },
+			"emerald"     : { "textures": { "layer1": "ttr:items/iconsets/gem_emerald" } },
 			"ruby"        : { "textures": { "layer1": "ttr:items/iconsets/gem_ruby" } },
+			"rect_vertical":{ "textures": { "layer1": "ttr:items/iconsets/gem_rect_vertical" } },
 			"quartz"      : { "textures": { "layer1": "ttr:items/iconsets/gem_quartz" } },
 			"cube"        : { "textures": { "layer1": "ttr:items/iconsets/gem_cube" } },
 			"cube_shiny"  : { 

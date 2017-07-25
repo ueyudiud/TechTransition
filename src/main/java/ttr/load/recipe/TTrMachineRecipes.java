@@ -43,6 +43,7 @@ public class TTrMachineRecipes
 		OreDictionary.registerOre("craftingMachinePiston", Blocks.PISTON);
 		OreDictionary.registerOre("craftingMachinePiston", Blocks.PISTON_EXTENSION);
 		OreDictionary.registerOre("circuitTier0", IC2Items.getItem("crafting", "circuit"));
+		OreDictionary.registerOre("circuitTier2", IC2Items.getItem("crafting", "advanced_circuit"));
 		OreDictionary.registerOre("cableCopper", IC2Items.getItem("cable", "type:copper,insulation:0"));
 		OreDictionary.registerOre("cableCopperInsulated", IC2Items.getItem("cable", "type:copper,insulation:1"));
 		OreDictionary.registerOre("cableTin", IC2Items.getItem("cable", "type:tin,insulation:0"));
@@ -61,6 +62,10 @@ public class TTrMachineRecipes
 		TTrRecipeHandler.addShapelessRecipe(Util.copyAmount(IC2Items.getItem("cable", "type:tin,insulation:0"), 1), "plateTin", EnumTools.cutter.orename());
 		TTrRecipeHandler.addShapelessRecipe(Util.copyAmount(IC2Items.getItem("cable", "type:gold,insulation:0"), 1), "plateGold", EnumTools.cutter.orename());
 		TTrRecipeHandler.addShapelessRecipe(Util.copyAmount(IC2Items.getItem("cable", "type:iron,insulation:0"), 1), "plateIron", EnumTools.cutter.orename());
+		
+		TTrRecipeHandler.addShapedRecipe(IC2Items.getItem("energy_crystal"), "xxx", "xox", "xxx", 'x', "dustRedstone", 'o', "gemDiamond");
+		TTrRecipeHandler.addShapedRecipe(IC2Items.getItem("energy_crystal"), "xxx", "xox", "xxx", 'x', "dustRedstone", 'o', "gemRuby");
+		TTrRecipeHandler.addShapedRecipe(IC2Items.getItem("lapotron_crystal"), "xcx", "xox", "xcx", 'x', "gemLapis", 'o', "gemSapphire", 'c', "circuitTier2");
 		
 		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(TTrIBF.brick, 2, 0),
 				"ppp",

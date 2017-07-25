@@ -124,6 +124,11 @@ public class TemplateRecipeMap implements IRecipeMap<TemplateRecipe>
 		addRecipe(new AbstractStack[]{input1}, new FluidStack[]{input2}, new AbstractStack[]{output1}, new FluidStack[]{output2}, duration, power);
 	}
 	
+	public void addRecipe(AbstractStack input, long duration, long power, AbstractStack output1, FluidStack output2)
+	{
+		addRecipe(new AbstractStack[]{input}, new FluidStack[0], new AbstractStack[]{output1}, new FluidStack[]{output2}, duration, power);
+	}
+	
 	public void addRecipe(AbstractStack input, long duration, long power, AbstractStack output, long customValue)
 	{
 		addRecipe(new AbstractStack[]{input}, new AbstractStack[]{output}, duration, power, customValue);

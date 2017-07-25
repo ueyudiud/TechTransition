@@ -11,11 +11,15 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.BlockRenderLayer;
+import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.IStringSerializable;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import ttr.core.tile.TEBase;
 import ttr.core.tile.pipe.TEFluidPipe;
 
@@ -30,7 +34,7 @@ public abstract class BlockFluidPipeAbstract extends BlockMachine
 		TUNGSTEN,
 		TITANIUM,
 		TUNGSTENSTEEL;
-
+		
 		@Override
 		public String getName()
 		{
@@ -39,7 +43,7 @@ public abstract class BlockFluidPipeAbstract extends BlockMachine
 	}
 	
 	public static final PropertyEnum<PipeMaterial> MATERIAL = PropertyEnum.create("material", PipeMaterial.class);
-
+	
 	public static final PropertyBool DOWN = PropertyBool.create("down");
 	public static final PropertyBool UP = PropertyBool.create("up");
 	public static final PropertyBool NORTH = PropertyBool.create("north");
@@ -48,7 +52,7 @@ public abstract class BlockFluidPipeAbstract extends BlockMachine
 	public static final PropertyBool EAST = PropertyBool.create("east");
 	
 	public static final IProperty[] SIDE_LINK_PROPERTIES = {DOWN, UP, NORTH, SOUTH, WEST, EAST};
-
+	
 	public BlockFluidPipeAbstract()
 	{
 		super(Material.IRON);
@@ -79,7 +83,7 @@ public abstract class BlockFluidPipeAbstract extends BlockMachine
 		}
 		return state;
 	}
-
+	
 	@Override
 	public int getMetaFromState(IBlockState state)
 	{
@@ -97,9 +101,9 @@ public abstract class BlockFluidPipeAbstract extends BlockMachine
 	{
 		return false;
 	}
-
+	
 	public abstract float getPipeSize();
-
+	
 	@Override
 	public void addCollisionBoxToList(IBlockState state, World worldIn, BlockPos pos, AxisAlignedBB entityBox,
 			List<AxisAlignedBB> collidingBoxes, Entity entityIn)
@@ -108,37 +112,37 @@ public abstract class BlockFluidPipeAbstract extends BlockMachine
 		final float f2 = 0.5F - getPipeSize() / 2.0F;
 		final float f3 = 0.5F + getPipeSize() / 2.0F;
 		final float f4 = 1.0F;
-		collidingBoxes.add(new AxisAlignedBB(f2, f2, f2, f3, f3, f3));
+		addCollisionBoxToList(pos, entityBox, collidingBoxes, new AxisAlignedBB(f2, f2, f2, f3, f3, f3));
 		TileEntity tile = worldIn.getTileEntity(pos);
 		if(tile instanceof TEFluidPipe)
 		{
 			if(((TEFluidPipe) tile).isLink(EnumFacing.DOWN))
 			{
-				collidingBoxes.add(new AxisAlignedBB(f2, f1, f2, f3, f2, f3));
+				addCollisionBoxToList(pos, entityBox, collidingBoxes, new AxisAlignedBB(f2, f1, f2, f3, f2, f3));
 			}
 			if(((TEFluidPipe) tile).isLink(EnumFacing.UP))
 			{
-				collidingBoxes.add(new AxisAlignedBB(f2, f3, f2, f3, f4, f3));
+				addCollisionBoxToList(pos, entityBox, collidingBoxes, new AxisAlignedBB(f2, f3, f2, f3, f4, f3));
 			}
 			if(((TEFluidPipe) tile).isLink(EnumFacing.NORTH))
 			{
-				collidingBoxes.add(new AxisAlignedBB(f2, f2, f1, f3, f3, f2));
+				addCollisionBoxToList(pos, entityBox, collidingBoxes, new AxisAlignedBB(f2, f2, f1, f3, f3, f2));
 			}
 			if(((TEFluidPipe) tile).isLink(EnumFacing.SOUTH))
 			{
-				collidingBoxes.add(new AxisAlignedBB(f2, f2, f3, f3, f3, f4));
+				addCollisionBoxToList(pos, entityBox, collidingBoxes, new AxisAlignedBB(f2, f2, f3, f3, f3, f4));
 			}
 			if(((TEFluidPipe) tile).isLink(EnumFacing.WEST))
 			{
-				collidingBoxes.add(new AxisAlignedBB(f1, f2, f2, f2, f3, f3));
+				addCollisionBoxToList(pos, entityBox, collidingBoxes, new AxisAlignedBB(f1, f2, f2, f2, f3, f3));
 			}
 			if(((TEFluidPipe) tile).isLink(EnumFacing.EAST))
 			{
-				collidingBoxes.add(new AxisAlignedBB(f3, f3, f2, f4, f3, f3));
+				addCollisionBoxToList(pos, entityBox, collidingBoxes, new AxisAlignedBB(f3, f3, f2, f4, f3, f3));
 			}
 		}
 	}
-
+	
 	@Override
 	public AxisAlignedBB getSelectedBoundingBox(IBlockState state, World worldIn, BlockPos pos)
 	{
@@ -161,5 +165,18 @@ public abstract class BlockFluidPipeAbstract extends BlockMachine
 	public boolean wrenchCanRemove(World world, BlockPos pos, EntityPlayer player)
 	{
 		return false;
+	}
+	
+	@Override
+	public EnumBlockRenderType getRenderType(IBlockState state)
+	{
+		return EnumBlockRenderType.ENTITYBLOCK_ANIMATED;
+	}
+	
+	@Override
+	@SideOnly(Side.CLIENT)
+	public BlockRenderLayer getBlockLayer()
+	{
+		return BlockRenderLayer.SOLID;
 	}
 }

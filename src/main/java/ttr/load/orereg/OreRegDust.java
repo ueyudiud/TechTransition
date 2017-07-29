@@ -38,34 +38,34 @@ public class OreRegDust implements IOreDictRegister
 		String tiny = EnumOrePrefix.dustTiny.getDictName(material);
 		TTrRecipeHandler.addShapelessRecipe(Util.copyAmount(stack, 1), small, small, small, small);
 		TTrRecipeHandler.addShapelessRecipe(Util.copyAmount(stack, 1), tiny, tiny, tiny, tiny, tiny, tiny, tiny, tiny, tiny);
-		if(EnumOrePrefix.ingot.access(material))
+		if (EnumOrePrefix.ingot.access(material))
 		{
 			TTrRecipeAdder.addGrindingRecipe(new OreStack(EnumOrePrefix.ingot.getDictName(material)), new BaseStack(stack, 1), 100, 8 * material.woughtHardness / 1000L);
 		}
-		if(EnumOrePrefix.stickLong.access(material))
+		if (EnumOrePrefix.stickLong.access(material))
 		{
 			TTrRecipeAdder.addGrindingRecipe(new OreStack(EnumOrePrefix.stickLong.getDictName(material)), new BaseStack(stack, 1), 100, 8 * material.woughtHardness / 1000L);
 		}
-		if(EnumOrePrefix.gear.access(material))
+		if (EnumOrePrefix.gear.access(material))
 		{
 			TTrRecipeAdder.addGrindingRecipe(new OreStack(EnumOrePrefix.gear.getDictName(material)), new BaseStack(stack, 4), 400, 8 * material.woughtHardness / 1000L);
 		}
-		if(EnumOrePrefix.plate.access(material))
+		if (EnumOrePrefix.plate.access(material))
 		{
 			TTrRecipeAdder.addGrindingRecipe(new OreStack(EnumOrePrefix.plate.getDictName(material)), new BaseStack(stack, 1), 100, 8 * material.woughtHardness / 1000L);
 		}
-		if(EnumOrePrefix.gem.access(material))
+		if (EnumOrePrefix.gem.access(material))
 		{
 			TTrRecipeAdder.addGrindingRecipe(new OreStack(EnumOrePrefix.gem.getDictName(material)), new BaseStack(stack, 1), 100, 8 * material.woughtHardness / 1000L);
 		}
-		if(EnumOrePrefix.dustOre.access(material) && material.contain(SubTag.NORMAL_ORE_PROCESSING))
+		if (EnumOrePrefix.dustOre.access(material) && material.contain(SubTag.NORMAL_ORE_PROCESSING))
 		{
 			TemplateRecipeMap.CAULDRON_WASHING.addRecipe(
 					new AbstractStack[]{new OreStack(EnumOrePrefix.dustOre.getDictName(material))}, WASHING_WATER_INPUTS,
 					new AbstractStack[]{new BaseStack(Util.copyAmount(stack, 1)), new BaseStack(TTrMaterialHandler.getItemStack(EnumOrePrefix.dustPowder, material.byproduct4, 1))},
 					new int[][]{{10000}, {1250, 625, 313}}, null, 0, 0, 0, null);
 		}
-		if(material.contain(SubTag.ALLOY_SIMPLE))
+		if (material.contain(SubTag.ALLOY_SIMPLE))
 		{
 			if(material.contain != null)
 			{

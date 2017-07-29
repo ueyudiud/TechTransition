@@ -2,13 +2,11 @@ package ttr.core.block;
 
 import java.util.List;
 
-import com.google.common.collect.ObjectArrays;
-
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
-import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.properties.PropertyEnum;
+import net.minecraft.block.properties.PropertyInteger;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
@@ -50,31 +48,17 @@ public class BlockBrick extends Block
 			return name().toLowerCase();
 		}
 	}
-
+	
 	public static final PropertyEnum<EnumType> BRICK_TYPE = PropertyEnum.create("type", EnumType.class);
 	
-	public static final IProperty<Boolean>[] FACING;
+	public static final IProperty<Integer> FACING = PropertyInteger.create("facing", 0, 0x3F);
 	
-	static
-	{
-		FACING = new IProperty[EnumFacing.VALUES.length];
-		for(EnumFacing facing : EnumFacing.VALUES)
-		{
-			FACING[facing.ordinal()] = PropertyBool.create(facing.getName());
-		}
-	}
-
 	public BlockBrick()
 	{
 		super(Material.IRON);
 		setDefaultState(
 				getDefaultState()
-				.withProperty(FACING[0], false)
-				.withProperty(FACING[1], false)
-				.withProperty(FACING[2], false)
-				.withProperty(FACING[3], false)
-				.withProperty(FACING[4], false)
-				.withProperty(FACING[5], false));
+				.withProperty(FACING, 0));
 		BRONZE = getDefaultState().withProperty(BRICK_TYPE, EnumType.BRONZE);
 		BASIC = getDefaultState().withProperty(BRICK_TYPE, EnumType.BASIC);
 		EXTENDED = getDefaultState().withProperty(BRICK_TYPE, EnumType.EXTENDED);
@@ -84,32 +68,33 @@ public class BlockBrick extends Block
 	@Override
 	protected BlockStateContainer createBlockState()
 	{
-		return new BlockStateContainer(this, ObjectArrays.<IProperty>concat(BRICK_TYPE, FACING));
+		return new BlockStateContainer(this, BRICK_TYPE, FACING);
 	}
-
+	
 	@Override
 	public int getMetaFromState(IBlockState state)
 	{
 		return state.getValue(BRICK_TYPE).ordinal();
 	}
-
+	
 	@Override
 	public IBlockState getStateFromMeta(int meta)
 	{
 		return getDefaultState().withProperty(BRICK_TYPE, EnumType.values()[meta]);
 	}
-
+	
 	@Override
 	public IBlockState getActualState(IBlockState state, IBlockAccess worldIn, BlockPos pos)
 	{
+		int i = 0;
 		for(EnumFacing facing : EnumFacing.VALUES)
 		{
 			if(worldIn.getBlockState(pos.offset(facing)) == state)
 			{
-				state = state.withProperty(FACING[facing.ordinal()], true);
+				i |= (1 << facing.ordinal());
 			}
 		}
-		return state;
+		return state.withProperty(FACING, i);
 	}
 	
 	@Override
@@ -117,13 +102,13 @@ public class BlockBrick extends Block
 	{
 		return blockState.getValue(BRICK_TYPE).hardness;
 	}
-
+	
 	@Override
 	public float getExplosionResistance(World world, BlockPos pos, Entity exploder, Explosion explosion)
 	{
 		return world.getBlockState(pos).getValue(BRICK_TYPE).resistance;
 	}
-
+	
 	@Override
 	@SideOnly(Side.CLIENT)
 	public void getSubBlocks(Item itemIn, CreativeTabs tab, List<ItemStack> list)
@@ -133,7 +118,7 @@ public class BlockBrick extends Block
 			list.add(new ItemStack(itemIn, 1, type.ordinal()));
 		}
 	}
-
+	
 	@Override
 	public String getHarvestTool(IBlockState state)
 	{
@@ -145,7 +130,7 @@ public class BlockBrick extends Block
 	{
 		return false;
 	}
-
+	
 	@Override
 	public int damageDropped(IBlockState state)
 	{

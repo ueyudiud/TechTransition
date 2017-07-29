@@ -67,10 +67,22 @@ public class TTrMachineRecipes
 		TTrRecipeHandler.addShapedRecipe(IC2Items.getItem("energy_crystal"), "xxx", "xox", "xxx", 'x', "dustRedstone", 'o', "gemRuby");
 		TTrRecipeHandler.addShapedRecipe(IC2Items.getItem("lapotron_crystal"), "xcx", "xox", "xcx", 'x', "gemLapis", 'o', "gemSapphire", 'c', "circuitTier2");
 		
-		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(TTrIBF.brick, 2, 0),
+		TTrRecipeHandler.addShapedRecipe(new ItemStack(TTrIBF.brick, 2, 0),
 				"ppp",
 				"bhb",
-				"ppp", 'p', "plateBronze", 'b', Blocks.BRICK_BLOCK, 'h', EnumTools.hammer.orename()));
+				"ppp", 'p', "plateBronze", 'b', Blocks.BRICK_BLOCK, 'h', EnumTools.hammer.orename());
+		TTrRecipeHandler.addShapedRecipe(new ItemStack(TTrIBF.brick, 1, 1),
+				"ppp",
+				"cbc",
+				"ppp", 'p', "plateIron", 'b', "machineCasingTier2", 'c', "circuitTier0");
+		TTrRecipeHandler.addShapedRecipe(new ItemStack(TTrIBF.brick, 1, 2),
+				"ppp",
+				"cbc",
+				"ppp", 'p', "plateSteel", 'b', "machineCasingTier4", 'c', "circuitTier2");
+		TTrRecipeHandler.addShapedRecipe(new ItemStack(TTrIBF.brick, 1, 3),
+				"ppp",
+				"cbc",
+				"ppp", 'p', "plateChromium", 'b', "machineCasingTier5", 'c', "circuitTier4");
 		
 		Object[] machinecasingInputs = {"plateBrass", "plateBronze", "plateIron", "plateAluminium", "plateSteel", "plateStainlessSteel", "plateTitanium", "plateTungstensteel"};
 		for(int i = 0; i < machinecasingInputs.length; ++i)
@@ -263,32 +275,32 @@ public class TTrMachineRecipes
 				'p', "plateSteel", 'w', EnumTools.wrench.orename(), 'b', Blocks.BRICK_BLOCK,
 				'f', new ItemStack(TTrIBF.steamMachine1b, 1, 0)));
 		
-		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(TTrIBF.steamHatch, 1, 0),
+		TTrRecipeHandler.addShapedRecipe(new ItemStack(TTrIBF.steamHatch, 1, 0),
 				"pgp",
 				"gwg",
 				"pmp",
 				'p', "plateBronze", 'w', EnumTools.wrench.orename(),
-				'g', "gearBronze", 'm', "machineCasingTier1"));
-		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(TTrIBF.steamHatch, 1, 1),
+				'g', "gearBronze", 'm', "machineCasingTier1");
+		TTrRecipeHandler.addShapedRecipe(new ItemStack(TTrIBF.steamHatch, 1, 1),
 				"pgp",
 				"gwg",
 				"pmp",
 				'p', "plateSteel", 'w', EnumTools.wrench.orename(),
-				'g', "gearSteel", 'm', "machineCasingTier2"));
+				'g', "gearSteel", 'm', "machineCasingTier2");
 		
-		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(TTrIBF.bronzeMulti, 1, 0),
+		TTrRecipeHandler.addShapedRecipe(new ItemStack(TTrIBF.bronzeMulti, 1, 0),
 				"pip",
 				"iwi",
-				"pip", 'p', "plateBronze", 'i', "craftingMachinePiston", 'w', EnumTools.wrench.orename()));
-		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(TTrIBF.bronzeMulti, 1, 1),
+				"pip", 'p', "plateBronze", 'i', "craftingMachinePiston", 'w', EnumTools.wrench.orename());
+		TTrRecipeHandler.addShapedRecipe(new ItemStack(TTrIBF.bronzeMulti, 1, 1),
 				"pip",
 				"iwi",
-				"pip", 'p', "plateBronze", 'i', new ItemStack(TTrIBF.furnace, 1, 1), 'w', EnumTools.wrench.orename()));
+				"pip", 'p', "plateBronze", 'i', new ItemStack(TTrIBF.furnace, 1, 1), 'w', EnumTools.wrench.orename());
 		
-		GameRegistry.addRecipe(new ShapedOreRecipe(IC2Items.getItem("crafting", "circuit").copy(),
+		TTrRecipeHandler.addShapedRecipe(IC2Items.getItem("crafting", "circuit"),
 				"lll",
 				"xpx",
 				"lll",
-				'l', "cableCopperInsulated", 'x', TTrIBF.sub.get("circuitChipBasicHandmade"), 'p', TTrIBF.sub.get("circuitBoardBasicHandmade")));
+				'l', "cableCopperInsulated", 'x', TTrIBF.sub.get("circuitChipBasicHandmade"), 'p', TTrIBF.sub.get("circuitBoardBasicHandmade"));
 	}
 }

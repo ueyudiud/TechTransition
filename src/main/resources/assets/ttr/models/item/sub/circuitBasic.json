@@ -1,6 +1,6 @@
 {
     "parent": "item/generated",
     "textures": {
-        "layer0": "ttr:items/part/circuit.part.basic"
+        "layer0": "ttr:items/part/circuit.basic"
     }
 }

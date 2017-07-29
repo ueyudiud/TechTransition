@@ -1063,6 +1063,13 @@ public abstract class TEMachineRecipeMap extends TEMachineInventory implements I
 	}
 	
 	@Override
+	public boolean canInsertItem(int index, ItemStack stack, EnumFacing direction)
+	{
+		return super.canInsertItem(index, stack, direction) &&
+				(!this.allowAutoOutputItem || direction != this.autoOutputFace);
+	}
+	
+	@Override
 	public boolean hasCapability(Capability<?> capability, EnumFacing facing)
 	{
 		return ((capability == Capabilities.ITEM_HANDLER_IO || capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY) && this.facing != facing) || super.hasCapability(capability, facing);
@@ -1071,7 +1078,45 @@ public abstract class TEMachineRecipeMap extends TEMachineInventory implements I
 	@Override
 	public <T> T getCapability(Capability<T> capability, EnumFacing facing)
 	{
-		return capability == Capabilities.ITEM_HANDLER_IO ? Capabilities.ITEM_HANDLER_IO.cast(this) :
-			capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY ? CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY.cast(this) : super.getCapability(capability, facing);
+		return capability == Capabilities.ITEM_HANDLER_IO ?
+				Capabilities.ITEM_HANDLER_IO.cast(this) :
+					capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY ?
+							CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY.cast(new FluidSideHandler(facing)) : super.getCapability(capability, facing);
+	}
+	
+	private class FluidSideHandler implements IFluidHandler
+	{
+		EnumFacing facing;
+		
+		FluidSideHandler(EnumFacing facing)
+		{
+			this.facing = facing;
+		}
+		
+		@Override
+		public IFluidTankProperties[] getTankProperties()
+		{
+			return TEMachineRecipeMap.this.getTankProperties();
+		}
+		
+		@Override
+		public int fill(FluidStack resource, boolean doFill)
+		{
+			if (this.facing == TEMachineRecipeMap.this.autoOutputFace && TEMachineRecipeMap.this.allowAutoOutputFluid)
+				return 0;
+			return TEMachineRecipeMap.this.fill(resource, doFill);
+		}
+		
+		@Override
+		public FluidStack drain(FluidStack resource, boolean doDrain)
+		{
+			return TEMachineRecipeMap.this.drain(resource, doDrain);
+		}
+		
+		@Override
+		public FluidStack drain(int maxDrain, boolean doDrain)
+		{
+			return TEMachineRecipeMap.this.drain(maxDrain, doDrain);
+		}
 	}
 }

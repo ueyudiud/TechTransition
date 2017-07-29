@@ -190,6 +190,8 @@ public class EnumMaterial implements ISubTagContainer
 	ManganeseOxide		= new EnumMaterial(2206, TextureSet.DULL     , 1                                , "ManganeseOxide", "ManganeseOxide", "Manganese Oxide", 0x261202FF),
 	CuprousOxide		= new EnumMaterial(2401, TextureSet.RUBY     , 1|2                              , "CuprousOxide", "CuprousOxide", "Cuprous Oxide", 0xAF2424FF),
 	CupricOxide			= new EnumMaterial(2402, TextureSet.DULL     , 1                                , "CupricOxide", "CupricOxide", "Cupric Oxide", 0x110303FF),
+	FerrosoFerricOxide	= new EnumMaterial(2403, TextureSet.METALLIC , 1                                , "FerrosoFerricOxide", "FerrosoFerricOxide", "Ferroso Ferric Oxide", 0x2C352CFF),
+	FerricOxide			= new EnumMaterial(2404, TextureSet.DULL     , 1                                , "FerricOxide", "FerricOxide", "Ferric Oxide", 0x821313FF),
 	//Chloride
 	//Carbonate
 	LithiumCarbonate	= new EnumMaterial(4001, TextureSet.DULL     , 1                                , "LithiumCarbonate", "LithiumCarbonate", "Lithium Carbonate", 0xEFEFEFFF),
@@ -317,9 +319,12 @@ public class EnumMaterial implements ISubTagContainer
 		SeleniumTrioxide.setContain(new MaterialStack(Selenium, 1), new MaterialStack(OxygenRadicals, 3));
 		ScandiumOxide.setContain(new MaterialStack(Scandium, 2), new MaterialStack(OxygenRadicals, 3));
 		TitaniumDioxide.setContain(new MaterialStack(Titanium, 1), new MaterialStack(OxygenRadicals, 2));
+		DivanadiumPentaoxide.setContain(new MaterialStack(Vanadium, 2), new MaterialStack(OxygenRadicals, 5));
 		ChromiumSesquioxide.setContain(new MaterialStack(Chromium, 2), new MaterialStack(OxygenRadicals, 3));
 		ChromiumTrioxide.setContain(new MaterialStack(Chromium, 1), new MaterialStack(OxygenRadicals, 3));
 		ManganeseOxide.setContain(new MaterialStack(Manganese, 1), new MaterialStack(OxygenRadicals, 2));
+		FerrosoFerricOxide.setContain(new MaterialStack(Iron, 3), new MaterialStack(OxygenRadicals, 4));
+		FerricOxide.setContain(new MaterialStack(Iron, 2), new MaterialStack(OxygenRadicals, 3));
 		
 		CuprousOxide.setContain(new MaterialStack(Copper, 2), new MaterialStack(OxygenRadicals, 1));
 		CupricOxide.setContain(new MaterialStack(Copper, 1), new MaterialStack(OxygenRadicals, 1));

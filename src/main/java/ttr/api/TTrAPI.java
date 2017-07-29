@@ -25,12 +25,14 @@ public class TTrAPI
 	public static Common proxy;
 	public static Object ttr;
 	public static final String ID = "TTr";
-
+	
+	public static boolean enableAutoInputAndOutputItemAndFluid;
+	
 	public static EntityPlayer player()
 	{
 		return proxy.playerInstance();
 	}
-
+	
 	public static World world(int id)
 	{
 		return proxy.worldInstance(id);
@@ -40,12 +42,12 @@ public class TTrAPI
 	{
 		return proxy.locale();
 	}
-
+	
 	public static boolean isSimulating()
 	{
 		return FMLCommonHandler.instance().getEffectiveSide().isServer();
 	}
-
+	
 	public static void registerItemModel(Item item, int meta, String modid, String name)
 	{
 		proxy.registerItemModel(item, meta, modid, name);
@@ -62,7 +64,7 @@ public class TTrAPI
 		{
 			
 		}
-
+		
 		public World worldInstance(int id)
 		{
 			return DimensionManager.getWorld(id);
@@ -96,13 +98,13 @@ public class TTrAPI
 		{
 			return Minecraft.getMinecraft().thePlayer;
 		}
-
+		
 		@Override
 		public void registerItemModel(Item item, int meta, String modid, String name)
 		{
 			ModelLoader.setCustomModelResourceLocation(item, meta, new ModelResourceLocation(modid + ":" + name, "inventory"));
 		}
-
+		
 		@Override
 		public World worldInstance(int id)
 		{
@@ -114,14 +116,14 @@ public class TTrAPI
 				return world == null ? null : world.provider.getDimension() != id ? null : world;
 			}
 		}
-
+		
 		@Override
 		public String locale()
 		{
 			return Minecraft.getMinecraft().getLanguageManager()
 					.getCurrentLanguage().getLanguageCode();
 		}
-
+		
 		@Override
 		public File fileDir()
 		{

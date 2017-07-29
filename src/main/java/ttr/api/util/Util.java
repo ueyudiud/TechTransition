@@ -122,156 +122,159 @@ public class Util
 					}
 				}
 			}
-			if(tile.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, facing))
+			if (TTrAPI.enableAutoInputAndOutputItemAndFluid)
 			{
-				if(heldItem != null && heldItem.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, null))
+				if(tile.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, facing))
 				{
-					IFluidHandler handler = tile.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, facing);
-					IFluidHandler handler2 = heldItem.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, null);
-					FluidStack input;
-					FluidStack output;
-					int amt;
-					if((output = handler2.drain(Integer.MAX_VALUE, false)) != null)
+					if(heldItem != null && heldItem.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, null))
 					{
-						if((amt = handler.fill(output, true)) != 0)
+						IFluidHandler handler = tile.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, facing);
+						IFluidHandler handler2 = heldItem.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, null);
+						FluidStack input;
+						FluidStack output;
+						int amt;
+						if((output = handler2.drain(Integer.MAX_VALUE, false)) != null)
 						{
-							input = output.copy();
-							input.amount = amt;
-							handler2.drain(input, true);
-							return true;
-						}
-					}
-					else if((output = handler.drain(Integer.MAX_VALUE, false)) != null)
-					{
-						if((amt = handler2.fill(output, true)) != 0)
-						{
-							input = output.copy();
-							input.amount = amt;
-							handler.drain(input, true);
-							return true;
-						}
-					}
-				}
-			}
-			if(tile.hasCapability(Capabilities.ITEM_HANDLER_IO, facing))
-			{
-				IItemHandlerIO handler = tile.getCapability(Capabilities.ITEM_HANDLER_IO, facing);
-				if(heldItem != null && heldItem.hasCapability(Capabilities.ITEM_HANDLER_IO, null))
-				{
-					IItemHandlerIO handler2 = heldItem.getCapability(Capabilities.ITEM_HANDLER_IO, null);
-					if(handler2.canExtractItem() && handler.canInsertItem())
-					{
-						ItemStack stack = handler2.extractItem(Integer.MAX_VALUE, facing, true);
-						if(stack != null)
-						{
-							int amt = handler.tryInsertItem(stack, facing, false);
-							if(amt > 0)
+							if((amt = handler.fill(output, true)) != 0)
 							{
-								handler2.extractItem(amt, facing, false);
+								input = output.copy();
+								input.amount = amt;
+								handler2.drain(input, true);
 								return true;
 							}
 						}
-					}
-					if(handler2.canInsertItem() && handler.canExtractItem())
-					{
-						ItemStack stack = handler.extractItem(Integer.MAX_VALUE, facing, true);
-						if(stack != null)
+						else if((output = handler.drain(Integer.MAX_VALUE, false)) != null)
 						{
-							int amt = handler2.tryInsertItem(stack, facing, false);
-							if(amt > 0)
+							if((amt = handler2.fill(output, true)) != 0)
 							{
-								handler.extractItem(amt, facing, false);
+								input = output.copy();
+								input.amount = amt;
+								handler.drain(input, true);
 								return true;
 							}
 						}
 					}
 				}
-				else if(heldItem == null)
+				if(tile.hasCapability(Capabilities.ITEM_HANDLER_IO, facing))
 				{
-					if(handler.canExtractItem())
+					IItemHandlerIO handler = tile.getCapability(Capabilities.ITEM_HANDLER_IO, facing);
+					if(heldItem != null && heldItem.hasCapability(Capabilities.ITEM_HANDLER_IO, null))
 					{
-						ItemStack stack = handler.extractItem(Integer.MAX_VALUE, facing, false);
-						if(stack != null)
+						IItemHandlerIO handler2 = heldItem.getCapability(Capabilities.ITEM_HANDLER_IO, null);
+						if(handler2.canExtractItem() && handler.canInsertItem())
 						{
-							playerIn.setHeldItem(hand, stack);
-							return true;
+							ItemStack stack = handler2.extractItem(Integer.MAX_VALUE, facing, true);
+							if(stack != null)
+							{
+								int amt = handler.tryInsertItem(stack, facing, false);
+								if(amt > 0)
+								{
+									handler2.extractItem(amt, facing, false);
+									return true;
+								}
+							}
 						}
-					}
-				}
-				else
-				{
-					if(handler.canExtractItem())
-					{
-						if(heldItem.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null))
+						if(handler2.canInsertItem() && handler.canExtractItem())
 						{
-							IItemHandler handler2 = heldItem.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
 							ItemStack stack = handler.extractItem(Integer.MAX_VALUE, facing, true);
 							if(stack != null)
 							{
-								ItemStack stack2 = stack;
-								int[] puted = new int[handler2.getSlots()];
-								int point = 0;
-								for(int i = 0; i < handler2.getSlots(); ++i)
+								int amt = handler2.tryInsertItem(stack, facing, false);
+								if(amt > 0)
 								{
-									if(handler2.getStackInSlot(i) == null)
-									{
-										if(handler2.insertItem(i, stack2, true) == null)
-										{
-											stack2 = handler.extractItem(stack.stackSize, facing, false);
-											handler2.insertItem(i, stack, false);
-											return true;
-										}
-										else
-										{
-											stack2 = stack;
-											puted[point ++] = i + 1;
-										}
-									}
+									handler.extractItem(amt, facing, false);
+									return true;
 								}
-								for(int i = 0; i < handler2.getSlots(); ++i)
-								{
-									if(!stack.isItemEqual(handler2.getStackInSlot(i)))
-									{
-										continue;
-									}
-									if((stack2 = handler2.insertItem(i, stack2, true)) == null)
-									{
-										break;
-									}
-									puted[point ++] = i + 1;
-								}
-								if(stack2 != null)
-								{
-									stack = handler.extractItem(stack.stackSize - stack2.stackSize, facing, false);
-								}
-								stack2 = stack;
-								for(int i : puted)
-								{
-									if(i == 0)
-									{
-										break;
-									}
-									stack2 = handler2.insertItem(i, stack2, false);
-								}
+							}
+						}
+					}
+					else if(heldItem == null)
+					{
+						if(handler.canExtractItem())
+						{
+							ItemStack stack = handler.extractItem(Integer.MAX_VALUE, facing, false);
+							if(stack != null)
+							{
+								playerIn.setHeldItem(hand, stack);
 								return true;
 							}
 						}
-						ItemStack stack = handler.extractItem(heldItem.getMaxStackSize() - heldItem.stackSize, facing, true);
-						if(stack != null && stack.isItemEqual(heldItem))
-						{
-							heldItem.stackSize += stack.stackSize;
-							handler.extractItem(stack.stackSize, facing, false);
-							return true;
-						}
 					}
-					if (!heldItem.getItem().isItemTool(heldItem) &&
-							handler.canInsertItem())
+					else
 					{
-						int size = handler.tryInsertItem(heldItem.copy(), facing, false);
-						if(size > 0)
+						if(handler.canExtractItem())
 						{
-							heldItem.stackSize -= size;
-							return true;
+							if(heldItem.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null))
+							{
+								IItemHandler handler2 = heldItem.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
+								ItemStack stack = handler.extractItem(Integer.MAX_VALUE, facing, true);
+								if(stack != null)
+								{
+									ItemStack stack2 = stack;
+									int[] puted = new int[handler2.getSlots()];
+									int point = 0;
+									for(int i = 0; i < handler2.getSlots(); ++i)
+									{
+										if(handler2.getStackInSlot(i) == null)
+										{
+											if(handler2.insertItem(i, stack2, true) == null)
+											{
+												stack2 = handler.extractItem(stack.stackSize, facing, false);
+												handler2.insertItem(i, stack, false);
+												return true;
+											}
+											else
+											{
+												stack2 = stack;
+												puted[point ++] = i + 1;
+											}
+										}
+									}
+									for(int i = 0; i < handler2.getSlots(); ++i)
+									{
+										if(!stack.isItemEqual(handler2.getStackInSlot(i)))
+										{
+											continue;
+										}
+										if((stack2 = handler2.insertItem(i, stack2, true)) == null)
+										{
+											break;
+										}
+										puted[point ++] = i + 1;
+									}
+									if(stack2 != null)
+									{
+										stack = handler.extractItem(stack.stackSize - stack2.stackSize, facing, false);
+									}
+									stack2 = stack;
+									for(int i : puted)
+									{
+										if(i == 0)
+										{
+											break;
+										}
+										stack2 = handler2.insertItem(i, stack2, false);
+									}
+									return true;
+								}
+							}
+							ItemStack stack = handler.extractItem(heldItem.getMaxStackSize() - heldItem.stackSize, facing, true);
+							if(stack != null && stack.isItemEqual(heldItem))
+							{
+								heldItem.stackSize += stack.stackSize;
+								handler.extractItem(stack.stackSize, facing, false);
+								return true;
+							}
+						}
+						if (!heldItem.getItem().isItemTool(heldItem) &&
+								handler.canInsertItem())
+						{
+							int size = handler.tryInsertItem(heldItem.copy(), facing, false);
+							if(size > 0)
+							{
+								heldItem.stackSize -= size;
+								return true;
+							}
 						}
 					}
 				}
